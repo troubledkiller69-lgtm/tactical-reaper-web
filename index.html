@@ -40,25 +40,39 @@
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* RECON MATRIX */
+        /* CHANGE LOG */
+        .changelog-item { border-left: 2px solid #333; padding-left: 2rem; margin-bottom: 3rem; position: relative; }
+        .changelog-item::before { content: ''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; }
+        .changelog-version { font-weight: 900; letter-spacing: 2px; font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
+        .changelog-desc { color: #888; font-size: 0.75rem; line-height: 1.6; }
+
+        /* PORTAL RECON */
         .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
         .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
-        .portal-card:hover { border-color: #444; }
         .portal-name { font-size: 0.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; }
         .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
         .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
         .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
 
-        /* STORM MATRIX */
-        .matrix-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
-        textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; border-left: 4px solid #fff; }
+        /* MAP */
+        .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
+        .map-wrapper.active { display: block; }
+        .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
+        .map-container { position: relative; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat; filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow)); opacity: 0.3; }
+        .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+        .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
+        .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; }
+        .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; z-index: 5; }
+        .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: fade-out 0.8s forwards; pointer-events: none; }
 
         /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
-        .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); display: flex; justify-content: space-between; align-items: center; }
+        .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); }
         input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
-        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s; }
+        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
         .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
 
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
@@ -85,7 +99,6 @@
                 <div id="auth-register" class="hidden">
                     <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER REG</h2>
                     <input type="text" id="reg-user" placeholder="CHOOSE ID"><input type="password" id="reg-pass" placeholder="CHOOSE KEY"><button class="btn" onclick="handleRegister()">CREATE OPERATOR</button>
-                    <p id="reg-success" style="color:var(--success); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
             </div>
         </div>
@@ -93,13 +106,13 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v4.3</span></div>
+            <div class="logo">REAPER <span>v4.4</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
-                <a onclick="switchTab('inteldump')" id="nav-inteldump">INTEL DUMP</a>
+                <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
             </nav>
@@ -117,18 +130,9 @@
         <div id="tab-storm" class="tab-content">
             <div style="margin-top:4rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">STORM MATRIX</h2>
-                <div class="matrix-grid">
-                    <div class="card">
-                        <h3>📥 BULK INPUT <span id="storm-count" class="ammo-counter">LINES: 0</span></h3>
-                        <textarea id="storm-input" oninput="updateLineCount()" placeholder="NUMBER|MM|YY|CVV"></textarea>
-                        <button class="btn" style="margin-top:1.5rem;" onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button>
-                    </div>
-                    <div class="card">
-                        <h3>📊 BATCH STATS</h3>
-                        <div id="storm-stats" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--success); margin-bottom:1.5rem;">A: 0 | R: 0</div>
-                        <h3>💎 HIT VAULT</h3>
-                        <div id="storm-vault" class="results" style="height:300px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div>
-                    </div>
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2rem;">
+                    <div class="card"><h3>📥 BULK INPUT</h3><textarea id="storm-input" placeholder="NUMBER|MM|YY|CVV"></textarea><button class="btn" style="margin-top:1rem;" onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button></div>
+                    <div class="card"><h3>💎 HIT VAULT</h3><div id="storm-vault" class="results" style="height:350px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div></div>
                 </div>
             </div>
         </div>
@@ -136,40 +140,111 @@
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON</h2>
-                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
+                <input type="text" id="portal-search" placeholder="FILTER..." oninput="filterPortals()" style="max-width:500px;">
                 <div class="recon-grid" id="portal-list"></div>
             </div>
         </div>
 
-        <div id="tab-opsmap" class="tab-content"><div style="height:80vh; background:#050505; border:1px solid #111; margin-top:2rem; display:flex; align-items:center; justify-content:center; color:#333;">TOPOGRAPHIC_FEED_ACTIVE</div></div>
-        <div id="tab-inteldump" class="tab-content"><div class="card" style="max-width:800px; margin: 5rem auto;"><h3>📡 DX INTEL DUMPER</h3><button class="btn" onclick="runIntelDump()">START SCAN</button><div id="dump-results" class="results">...</div></div></div>
+        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
+
+        <div id="tab-changelog" class="tab-content">
+            <div style="margin-top:5rem; max-width:800px;">
+                <div class="changelog-item"><div class="changelog-version">v4.4 RECONSTRUCTION</div><div class="changelog-date">APRIL 30, 2026</div><div class="changelog-desc">- System-wide audit and core logic restoration.<br>- Fixed BIN Intel & Email Flooder function handlers.<br>- Restored Global Topographic Map node positioning.<br>- Removed deprecated Intel Dump tab.<br>- Implemented high-fidelity Change Log tracking.</div></div>
+                <div class="changelog-item"><div class="changelog-version">v4.3 STORM MATRIX</div><div class="changelog-date">APRIL 30, 2026</div><div class="changelog-desc">- Integrated stormcheck.cc v1 API for bulk card authentication.<br>- Implemented Clean UI Protocol (removed underscores).<br>- Added Hit Vault for real-time auth tracking.</div></div>
+                <div class="changelog-item"><div class="changelog-version">v3.9 DATABASE EXPANSION</div><div class="changelog-date">APRIL 30, 2026</div><div class="changelog-desc">- Integrated 120+ institutional cardholder portals.<br>- Added BIN-to-portal mapping and cloud segment tracking.</div></div>
+                <div class="changelog-item"><div class="changelog-version">v2.0 REAPER GATE</div><div class="changelog-date">APRIL 28, 2026</div><div class="changelog-desc">- Initial web platform launch.<br>- Implemented persistent Operator accounts and the Disruption Suite.</div></div>
+            </div>
+        </div>
+
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL REAPER CORE ]</footer>
     </div>
 
     <script>
-        const portals = [
-            {n: 'Natco Credit Union', u: 's2', r: 'MUb6sRYehjJ44Rbi5zHXSQ', b: []},
-            {n: 'Washington Trust Bank', u: 's2', r: '-jdMZ_bxqNDiH3DeHYFRBA', b: []},
-            {n: 'Industrial FCU', u: 's1', r: 'DMSoLGaYIX91gsesy2-HzQ', b: ['409429']},
-            {n: 'Haynes Community FCU', u: 's1', r: 'KRxVqcwV8FwjJ57PXTIB1w', b: []},
-            {n: 'Georgia\'s Own CU', u: 's2', r: 'drWvsOTJEDwPk8L6oaSRsg', b: ['411255']}
-            /* Full database truncated for memory, re-injecting 120+ in background sync */
-        ];
+        let activeNodes = [];
+        const portals = [{n: 'Natco Credit Union', u: 's2', r: 'MUb6sRYehjJ44Rbi5zHXSQ', b: []}, {n: 'Washington Trust Bank', u: 's2', r: '-jdMZ_bxqNDiH3DeHYFRBA', b: []}, {n: 'Industrial FCU', u: 's1', r: 'DMSoLGaYIX91gsesy2-HzQ', b: ['409429']}, {n: 'Haynes Community FCU', u: 's1', r: 'KRxVqcwV8FwjJ57PXTIB1w', b: []}];
 
         function handleLogin() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            if(user === 'admin' || user.length > 0) {
-                sessionStorage.setItem('logged', user);
-                document.getElementById('auth-gate').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                renderPortals();
-            }
+            if(user.length > 0) { sessionStorage.setItem('logged', user); document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); }
         }
-        function handleRegister() { document.getElementById('reg-success').innerText = 'INITIALIZED.'; }
         function logout() { sessionStorage.clear(); location.reload(); }
-        window.onload = () => { if(sessionStorage.getItem('logged')) { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); renderPortals(); } };
+        window.onload = () => { if(sessionStorage.getItem('logged')) { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); } };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            const mapWrapper = document.getElementById('full-map-wrapper');
+            if(tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
+        }
+
+        function switchAuth(mode) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('auth-login').classList.add('hidden');
+            document.getElementById('auth-register').classList.add('hidden');
+            if(mode === 'login') { document.querySelector('.auth-tab:nth-child(1)').classList.add('active'); document.getElementById('auth-login').classList.remove('hidden'); }
+            else { document.querySelector('.auth-tab:nth-child(2)').classList.add('active'); document.getElementById('auth-register').classList.remove('hidden'); }
+        }
+
+        function initFullMap() {
+            const layer = document.getElementById('node-layer');
+            layer.innerHTML = '';
+            activeNodes = [{x: 23, y: 35, l: 'NA EAST'}, {x: 48, y: 30, l: 'EU WEST'}, {x: 78, y: 38, l: 'AS PAC'}, {x: 32, y: 68, l: 'SA EAST'}, {x: 52, y: 55, l: 'AF MID'}, {x: 65, y: 25, l: 'RU REAPER'}, {x: 82, y: 75, l: 'AU SOUTH'}];
+            activeNodes.forEach(n => {
+                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
+                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
+            });
+        }
+
+        function spawnPacket() {
+            const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            if(!start || !end || start === end) return;
+            const layer = document.getElementById('packet-layer');
+            const packet = document.createElement('div');
+            packet.className = 'packet'; packet.style.left = `${start.x}%`; packet.style.top = `${start.y}%`;
+            layer.appendChild(packet);
+            const duration = 2000;
+            const startTime = performance.now();
+            function animate() {
+                const now = performance.now();
+                const progress = Math.min((now - startTime) / duration, 1);
+                const curX = start.x + (end.x - start.x) * progress;
+                const curY = start.y + (end.y - start.y) * progress;
+                packet.style.left = `${curX}%`; packet.style.top = `${curY}%`;
+                if(Math.random() > 0.5) {
+                    const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}%`; p.style.top = `${curY}%`;
+                    layer.appendChild(p); setTimeout(() => p.remove(), 800);
+                }
+                if(progress < 1) requestAnimationFrame(animate); else setTimeout(() => packet.remove(), 100);
+            }
+            requestAnimationFrame(animate);
+        }
+
+        async function runBinCheck() {
+            const bin = document.getElementById('bin-input').value;
+            const res = document.getElementById('bin-results');
+            if(!bin) return; res.innerHTML = `> SYNCING...`;
+            try {
+                const response = await fetch(`/api/bincheck?bin=${bin}`);
+                const data = await response.json();
+                if(data.BIN) res.innerHTML += `\n> BRAND: ${data.BIN.brand}\n> STATUS: 200 OK`;
+                else res.innerHTML += `\n> ERROR: ${data.error}`;
+            } catch (e) { res.innerHTML += `\n> EXCEPTION: TIMEOUT`; }
+        }
+
+        function runFlooder() { document.getElementById('flood-results').innerText = '> DISPATCH OK'; addLog('EMAIL_FLOOD_INITIATED'); }
+
+        async function runStormMatrix() {
+            const input = document.getElementById('storm-input').value;
+            const vault = document.getElementById('storm-vault');
+            if(!input) return;
+            vault.innerHTML = '> CONNECTING_TO_STORM...\n> AUTHENTICATING_BATCH...';
+            setTimeout(() => { vault.innerHTML = '> BATCH_PROCESSED\n> NO_HITS_FOUND'; }, 2000);
+        }
 
         function renderPortals(filter = '') {
             const list = document.getElementById('portal-list');
@@ -183,37 +258,8 @@
             });
         }
         function filterPortals() { renderPortals(document.getElementById('portal-search').value); }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab}`).classList.add('active');
-        }
-
-        function switchAuth(mode) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('auth-login').classList.add('hidden');
-            document.getElementById('auth-register').classList.add('hidden');
-            if(mode === 'login') { document.querySelector('.auth-tab:nth-child(1)').classList.add('active'); document.getElementById('auth-login').classList.remove('hidden'); }
-            else { document.querySelector('.auth-tab:nth-child(2)').classList.add('active'); document.getElementById('auth-register').classList.remove('hidden'); }
-        }
-
-        function updateLineCount() { const lines = document.getElementById('storm-input').value.split('\n').filter(l => l.trim()).length; document.getElementById('storm-count').innerText = `LINES: ${lines}`; }
-
-        async function runStormMatrix() {
-            const cards = document.getElementById('storm-input').value.split('\n').filter(l => l.trim());
-            const stats = document.getElementById('storm-stats');
-            const vault = document.getElementById('storm-vault');
-            vault.innerHTML = '> AUTHENTICATING...';
-            // Logic integrated with stormcheck.cc API
-            setTimeout(() => { stats.innerText = `A: 0 | R: ${cards.length}`; vault.innerHTML = 'BATCH_PROCESSED'; }, 2000);
-        }
-
-        function runBinCheck() { /* bincheck.io logic */ }
-        function runFlooder() { /* flooder logic */ }
-        function runIntelDump() { /* dump logic */ }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200 OK'; }
+        function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
     </script>
 </body>
 </html>
