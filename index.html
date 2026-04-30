@@ -34,22 +34,36 @@
         header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
         .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--neon-gray); text-shadow: 0 0 10px var(--neon-glow); }
         .nav-links { display: flex; gap: 1.5rem; }
-        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.65rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 5px 0; letter-spacing: 2px; }
+        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.6rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 5px 0; letter-spacing: 2px; }
         .nav-links a.active { color: var(--primary); border-bottom: 2px solid var(--primary); text-shadow: 0 0 10px var(--neon-glow); }
 
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* RECON TABLE */
+        /* PORTAL RECON */
         .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; position: relative; transition: 0.3s; }
-        .portal-card:hover { border-color: #444; }
-        .portal-name { font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; color: #fff; margin-bottom: 0.5rem; }
-        .portal-meta { font-size: 0.6rem; color: var(--text-dim); margin-bottom: 1rem; }
-        .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
-        .portal-btn { background: #fff; color: #000; padding: 0.5rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; }
+        .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
+        .portal-card:hover { border-color: #444; box-shadow: 0 0 20px rgba(255,255,255,0.05); }
+        .portal-name { font-size: 0.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; }
+        .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
+        .portal-meta span { color: var(--success); }
+        .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
+        .portal-btn:hover { background: var(--neon-gray); }
 
-        /* DASHBOARD GRID */
+        /* OPS MAP */
+        .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
+        .map-wrapper.active { display: block; }
+        .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
+        .map-container { position: relative; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat; filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow)); opacity: 0.3; }
+        .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+        .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
+        .node::after { content: ''; position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; animation: pulse 3s infinite; }
+        .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; white-space: nowrap; }
+        .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff, 0 0 20px #fff; z-index: 5; }
+        .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px #fff; animation: fade-out 0.8s forwards; pointer-events: none; }
+
+        /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
         .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); display: flex; justify-content: space-between; align-items: center; }
@@ -57,6 +71,7 @@
         .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s; }
         .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
 
+        /* REAPER_GATE */
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: #050505; border: 1px solid var(--border); padding: 0; width: 450px; text-align: center; border-radius: 4px; overflow: hidden; }
         .auth-tabs { display: flex; border-bottom: 1px solid var(--border); }
@@ -64,10 +79,6 @@
         .auth-tab.active { color: #fff; background: var(--card-bg); border-bottom: 2px solid #fff; }
         .auth-body { padding: 3rem; }
         .hidden { display: none !important; }
-
-        .guide { margin-top: 3rem; background: #0a0a0a; border: 1px solid #111; padding: 2rem; border-radius: 4px; border-left: 4px solid var(--success); }
-        .guide h4 { font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 1rem; color: var(--success); }
-        .guide p { font-size: 0.7rem; color: #888; line-height: 1.8; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
@@ -93,9 +104,10 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v3.9</span></div>
+            <div class="logo">REAPER <span>v4.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
+                <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS_MAP</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL_RECON</a>
                 <a onclick="switchTab('inteldump')" id="nav-inteldump">INTEL_DUMP</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
@@ -114,16 +126,13 @@
 
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">DX_PORTAL_DATABASE</h2>
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL_RECON_MATRIX</h2>
                 <input type="text" id="portal-search" placeholder="FILTER BY INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
                 <div class="recon-grid" id="portal-list"></div>
-                <div class="guide">
-                    <h4>DX_ACCESS_PROTOCOL</h4>
-                    <p>These institutions utilize the <strong>PSCU DX Platform</strong>. Select a target to initialize a direct bridge to the institution's cloud segment.</p>
-                </div>
             </div>
         </div>
 
+        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
         <div id="tab-inteldump" class="tab-content"><div class="card" style="max-width:800px; margin: 5rem auto;"><h3>📡 DX_INTEL_DUMPER</h3><button class="btn" onclick="runIntelDump()">START_SCAN</button><div id="dump-results" class="results">...</div></div></div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL_REAPER_CORE ]</footer>
@@ -215,7 +224,7 @@
             {n: 'Perfect Circle CU', u: 's2', r: 'qkOPCmXbjH-2x2lj_Lct4A', b: ['400402']},
             {n: 'Alcoa Tenn FCU', u: 's1', r: '5EHa9j5w-sDU0N-KfYbJAw', b: ['432665']},
             {n: 'Midwest Members CU', u: 's1', r: 'QIBa7COjaf3NeUKjr9du8A', b: ['409807']},
-            {n: 'Associated Healthcare', u: 's1', r: L-RUh4kXUafloU1ajrAXfQ, b: ['463086']},
+            {n: 'Associated Healthcare', u: 's1', r: 'L-RUh4kXUafloU1ajrAXfQ', b: ['463086']},
             {n: 'Illinois State CU', u: 's1', r: 'KmDB9gdCtGGtTfGLXKmbUw', b: ['423758']},
             {n: 'Advance Financial FCU', u: 's1', r: 'dlt8bLKwGKoyQm_b-kOaBw', b: ['401927']},
             {n: '1st Community CU', u: 's1', r: 'Dg44gg5x2TmL3EAUYI6tkw', b: ['447924']},
@@ -269,7 +278,7 @@
                 sessionStorage.setItem('logged', user);
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                renderPortals();
+                initFullMap(); setInterval(spawnPacket, 2000); renderPortals();
             } else { document.getElementById('login-error').innerText = 'INVALID'; }
         }
         function handleRegister() {
@@ -282,7 +291,7 @@
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLoginDirect(); };
-        function handleLoginDirect() { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); renderPortals(); }
+        function handleLoginDirect() { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); }
 
         function renderPortals(filter = '') {
             const list = document.getElementById('portal-list');
@@ -306,6 +315,8 @@
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
+            const mapWrapper = document.getElementById('full-map-wrapper');
+            if(tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
         }
 
         function switchAuth(mode) {
@@ -314,6 +325,42 @@
             document.getElementById('auth-register').classList.add('hidden');
             if(mode === 'login') { document.querySelector('.auth-tab:nth-child(1)').classList.add('active'); document.getElementById('auth-login').classList.remove('hidden'); }
             else { document.querySelector('.auth-tab:nth-child(2)').classList.add('active'); document.getElementById('auth-register').classList.remove('hidden'); }
+        }
+
+        function initFullMap() {
+            const layer = document.getElementById('node-layer');
+            const activeNodes = [{x: 23, y: 35, l: 'NA_EAST'}, {x: 48, y: 30, l: 'EU_WEST'}, {x: 78, y: 38, l: 'AS_PAC'}, {x: 32, y: 68, l: 'SA_EAST'}, {x: 52, y: 55, l: 'AF_MID'}, {x: 65, y: 25, l: 'RU_REAPER'}, {x: 82, y: 75, l: 'AU_SOUTH'}];
+            layer.innerHTML = '';
+            activeNodes.forEach(n => {
+                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
+                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
+            });
+        }
+        function spawnPacket() {
+            const nodes = [{x: 23, y: 35}, {x: 48, y: 30}, {x: 78, y: 38}, {x: 32, y: 68}, {x: 52, y: 55}, {x: 65, y: 25}, {x: 82, y: 75}];
+            const start = nodes[Math.floor(Math.random() * nodes.length)];
+            const end = nodes[Math.floor(Math.random() * nodes.length)];
+            if(start === end) return;
+            const layer = document.getElementById('packet-layer');
+            const packet = document.createElement('div');
+            packet.className = 'packet'; packet.style.left = `${start.x}%`; packet.style.top = `${start.y}%`;
+            layer.appendChild(packet);
+            const duration = 2000;
+            const startTime = performance.now();
+            function animate() {
+                const now = performance.now();
+                const progress = Math.min((now - startTime) / duration, 1);
+                const curX = start.x + (end.x - start.x) * progress;
+                const curY = start.y + (end.y - start.y) * progress;
+                packet.style.left = `${curX}%`; packet.style.top = `${curY}%`;
+                if(Math.random() > 0.5) {
+                    const p = document.createElement('div');
+                    p.className = 'particle'; p.style.left = `${curX}%`; p.style.top = `${curY}%`;
+                    layer.appendChild(p); setTimeout(() => p.remove(), 800);
+                }
+                if(progress < 1) requestAnimationFrame(animate); else setTimeout(() => packet.remove(), 100);
+            }
+            requestAnimationFrame(animate);
         }
 
         async function runBinCheck() {
@@ -328,8 +375,14 @@
             } catch (e) { res.innerHTML += `\n> EXCEPTION: TIMEOUT`; }
         }
 
+        function runIntelDump() {
+            const res = document.getElementById('dump-results');
+            res.innerHTML = `> SCANNING_OFFSETS...\n> DUMP_COMPLETE\n> SERVICE_ID: 1042 [IG_FOLLOWERS]`;
+        }
+
         function runFlooder() { document.getElementById('flood-results').innerText = '> DISPATCH_OK'; }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200_OK'; }
+        function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
     </script>
 </body>
 </html>
