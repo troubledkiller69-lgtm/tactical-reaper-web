@@ -22,7 +22,6 @@
         }
 
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
         @keyframes fade-out { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(0.2); } }
 
@@ -47,12 +46,7 @@
         .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
         .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
 
-        /* STORM MATRIX */
-        .matrix-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
-        .matrix-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #fff; padding: 2rem; }
-        textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
-
-        /* OPS MAP - v5.0 CONSTELLATION */
+        /* OPS MAP */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
         .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
@@ -71,6 +65,11 @@
         .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
         .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
         .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
+
+        /* STORM MATRIX */
+        .matrix-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
+        .matrix-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #fff; padding: 2rem; }
+        textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
 
         /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
@@ -111,7 +110,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v5.0</span></div>
+            <div class="logo">REAPER <span>v5.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -131,6 +130,16 @@
             </div>
         </div>
 
+        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
+
+        <div id="tab-recon" class="tab-content">
+            <div style="margin-top:4rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON</h2>
+                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
+                <div class="recon-grid" id="portal-list"></div>
+            </div>
+        </div>
+
         <div id="tab-storm" class="tab-content">
             <div style="margin-top:4rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">STORM MATRIX</h2>
@@ -141,15 +150,6 @@
             </div>
         </div>
 
-        <div id="tab-recon" class="tab-content">
-            <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON</h2>
-                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
-                <div class="recon-grid" id="portal-list"></div>
-            </div>
-        </div>
-
-        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
         <div id="tab-changelog" class="tab-content"><div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div></div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL REAPER CORE ]</footer>
@@ -328,9 +328,8 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion (tripled density).<br>- Re-implemented Sparkling Shooting Star trails.<br>- Enhanced map physics and data transit aesthetics.'},
-                {v: 'v4.9 AESTHETIC ALIGNMENT', d: 'APRIL 30, 2026', c: '- Unified visual theme for Storm Matrix & Change Log tabs.<br>- Applied industrial border protocols.'},
-                {v: 'v4.8 CHRONICLE PROTOCOL', d: 'APRIL 30, 2026', c: '- Established persistent logging for every turn.'}
+                {v: 'v5.1 GEOSPATIAL ALIGNMENT', d: 'APRIL 30, 2026', c: '- Manually re-calibrated all 12 operational centers to hit landmasses.<br>- Fixed NA WEST, EU CENTRAL, and RU REAPER coordinate shifts.'},
+                {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion (tripled density).<br>- Re-implemented Sparkling Shooting Star trails.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
@@ -339,10 +338,10 @@
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
             activeNodes = [
-                {x: 23, y: 35, l: 'NA EAST'}, {x: 18, y: 38, l: 'NA WEST'}, {x: 48, y: 30, l: 'EU WEST'},
-                {x: 52, y: 28, l: 'EU CENTRAL'}, {x: 78, y: 38, l: 'AS PAC'}, {x: 72, y: 42, l: 'AS EAST'},
-                {x: 32, y: 68, l: 'SA EAST'}, {x: 52, y: 55, l: 'AF MID'}, {x: 65, y: 25, l: 'RU REAPER'},
-                {x: 82, y: 75, l: 'AU SOUTH'}, {x: 88, y: 80, l: 'AU EAST'}, {x: 60, y: 45, l: 'ME CENTRAL'}
+                {x: 21, y: 34, l: 'NA EAST'}, {x: 13, y: 35, l: 'NA WEST'}, {x: 48, y: 22, l: 'EU WEST'},
+                {x: 52, y: 25, l: 'EU CENTRAL'}, {x: 82, y: 32, l: 'AS PAC'}, {x: 75, y: 45, l: 'AS EAST'},
+                {x: 32, y: 72, l: 'SA EAST'}, {x: 51, y: 62, l: 'AF MID'}, {x: 62, y: 18, l: 'RU REAPER'},
+                {x: 84, y: 82, l: 'AU SOUTH'}, {x: 88, y: 78, l: 'AU EAST'}, {x: 61, y: 40, l: 'ME CENTRAL'}
             ];
             activeNodes.forEach(n => {
                 const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
