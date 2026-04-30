@@ -46,7 +46,7 @@
         .hero { text-align: center; margin-bottom: 4rem; }
         .hero h1 { font-size: 3.5rem; font-weight: 900; background: linear-gradient(to bottom, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.8rem; border-radius: 4px; display: flex; flex-direction: column; transition: transform 0.3s; }
         .card h3 { font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .card p { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem; flex-grow: 1; }
@@ -78,7 +78,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.5</span></div>
+            <div class="logo">REAPER <span>v2.6</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" class="active">Dashboard</a>
                 <a onclick="switchTab('network')">Network</a>
@@ -92,29 +92,31 @@
             <div class="grid">
                 <div class="card">
                     <h3>💎 BIN Intel</h3>
-                    <p>Live BIN data via bincheck.io API.</p>
+                    <p>Live BIN intelligence via bincheck.io API.</p>
                     <input type="text" id="bin-input" placeholder="6-digit BIN">
                     <button class="btn" onclick="runBinCheck('bin')">Lookup</button>
                     <div id="bin-results" class="results">READY...</div>
                 </div>
                 <div class="card">
-                    <h3>🔍 DX Scanner</h3>
-                    <p>Financial portal compatibility scanner.</p>
-                    <input type="text" id="dx-input" placeholder="6-digit BIN">
-                    <button class="btn" onclick="runBinCheck('dx')">Scan</button>
-                    <div id="dx-results" class="results">READY...</div>
-                </div>
-                <div class="card">
                     <h3>📧 Email Flooder</h3>
+                    <p>Distributed SMTP payload delivery.</p>
                     <input type="text" id="email-target" placeholder="Target Email">
                     <button class="btn" onclick="runSim('email')">Execute</button>
                     <div id="email-results" class="results">READY...</div>
                 </div>
                 <div class="card">
                     <h3>📱 Ghost SMS</h3>
+                    <p>High-limit stealth broadcasting via Phantom Gateway.</p>
                     <input type="text" id="sms-target" placeholder="Phone Number">
                     <button class="btn" onclick="runSim('sms')">Broadcast</button>
                     <div id="sms-results" class="results">READY...</div>
+                </div>
+                <div class="card">
+                    <h3>📡 Ghost Recon</h3>
+                    <p>Deep-mapping of digital footprints.</p>
+                    <input type="text" id="recon-input" placeholder="Identifier">
+                    <button class="btn" onclick="runSim('recon')">Analyze</button>
+                    <div id="recon-results" class="results">READY...</div>
                 </div>
             </div>
         </div>
@@ -129,7 +131,7 @@
         </div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:2rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
 
-        <footer>[ ENI_SYSTEM_CORE ] // v2.5 // LIVE_API_ACTIVE</footer>
+        <footer>[ ENI_SYSTEM_CORE ] // v2.6 // DASHBOARD_OPTIMIZED</footer>
     </div>
 
     <script>
@@ -159,20 +161,8 @@
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                
-                if(data.error) {
-                    res.innerHTML += `> ERROR: ${data.details || 'LOOKUP_FAILED'}`;
-                } else {
-                    res.innerHTML += `> BRAND: ${data.brand || 'UNKNOWN'}\n> TYPE: ${data.type || 'UNKNOWN'}\n> LEVEL: ${data.level || 'UNKNOWN'}\n> ISSUER: ${data.bank || 'UNKNOWN'}\n> COUNTRY: ${data.country || 'UNKNOWN'}`;
-                    if(type === 'dx') {
-                        const bank = data.bank?.toLowerCase() || '';
-                        if(bank.includes('navy') || bank.includes('nfcx') || bank.includes('chase')) {
-                            res.innerHTML += `\n> STATUS: DX_COMPATIBLE\n> PORTAL: dxonline.pscu.com/authorized/`;
-                        } else {
-                            res.innerHTML += `\n> STATUS: NON_DX_COMPATIBLE`;
-                        }
-                    }
-                }
+                if(data.error) res.innerHTML += `> ERROR: ${data.details || 'LOOKUP_FAILED'}`;
+                else res.innerHTML += `> BRAND: ${data.brand || 'UNKNOWN'}\n> TYPE: ${data.type || 'UNKNOWN'}\n> LEVEL: ${data.level || 'UNKNOWN'}\n> ISSUER: ${data.bank || 'UNKNOWN'}\n> COUNTRY: ${data.country || 'UNKNOWN'}`;
             } catch (e) {
                 res.innerHTML += `> EXCEPTION: CONNECTION_FAILED`;
             }
