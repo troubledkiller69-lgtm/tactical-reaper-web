@@ -24,22 +24,15 @@
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
-        @keyframes ammo-glow { 0%, 100% { text-shadow: 0 0 5px var(--success); } 50% { text-shadow: 0 0 15px var(--success); } }
         @keyframes fade-out { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(0.2); } }
+        @keyframes progress-fill { 0% { width: 0%; } 100% { width: 100%; } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
-
         .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05) 50%, transparent); pointer-events: none; z-index: 1000; animation: scanline 10s linear infinite; }
-        
         .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
 
-        header {
-            display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.9);
-            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
-        }
-
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
         .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--neon-gray); text-shadow: 0 0 10px var(--neon-glow); }
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 5px 0; letter-spacing: 2px; }
@@ -48,32 +41,16 @@
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* NEON OPS MAP */
-        .map-wrapper {
-            position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px);
-            background: #000; overflow: hidden; display: none;
-        }
+        /* OPS MAP */
+        .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
-        .map-bg {
-            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-            background-image: url('https://www.transparenttextures.com/patterns/topographic.png');
-            background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2);
-            animation: drift 180s linear infinite;
-        }
-        .map-container {
-            position: relative; width: 100%; height: 100%;
-            background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat;
-            filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow));
-            opacity: 0.3;
-        }
+        .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
+        .map-container { position: relative; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat; filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow)); opacity: 0.3; }
         .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
         .node::after { content: ''; position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; animation: pulse 3s infinite; }
-        .node-info { 
-            position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; 
-            background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; white-space: nowrap; 
-        }
+        .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; white-space: nowrap; }
         .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff, 0 0 20px #fff; z-index: 5; }
         .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px #fff; animation: fade-out 0.8s forwards; pointer-events: none; }
 
@@ -81,16 +58,13 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
         .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); display: flex; justify-content: space-between; align-items: center; }
-        .ammo-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--success); letter-spacing: 1px; animation: ammo-glow 2s infinite; }
-        .label { font-size: 0.6rem; color: #444; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
-        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
-        .quick-select { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .qs-btn { background: #111; border: 1px solid var(--border); color: #444; padding: 0.5rem; border-radius: 2px; font-size: 0.6rem; cursor: pointer; transition: 0.3s; flex: 1; }
-        .qs-btn:hover, .qs-btn.active { border-color: #fff; color: #fff; background: #222; }
-        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
+        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s; }
         .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
 
-        /* REAPER_GATE v2.0 */
+        /* INTEL DUMPER */
+        .progress-bar { height: 4px; background: #111; border-radius: 2px; overflow: hidden; margin: 1rem 0; display: none; }
+        .progress-fill { height: 100%; background: #fff; box-shadow: 0 0 10px #fff; width: 0%; transition: width 0.1s linear; }
+
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: #050505; border: 1px solid var(--border); padding: 0; width: 450px; text-align: center; border-radius: 4px; overflow: hidden; }
         .auth-tabs { display: flex; border-bottom: 1px solid var(--border); }
@@ -98,9 +72,6 @@
         .auth-tab.active { color: #fff; background: var(--card-bg); border-bottom: 2px solid #fff; }
         .auth-body { padding: 3rem; }
         .hidden { display: none !important; }
-
-        .hud-overlay { position: absolute; bottom: 2rem; right: 2rem; z-index: 10; background: rgba(0,0,0,0.85); padding: 1.5rem; border: 1px solid #333; border-left: 4px solid #fff; backdrop-filter: blur(5px); }
-        .hud-value { color: #fff; font-size: 0.7rem; font-family: 'JetBrains Mono'; }
     </style>
 </head>
 <body>
@@ -115,15 +86,15 @@
             <div class="auth-body">
                 <div id="auth-login">
                     <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER_LOGIN</h2>
-                    <input type="text" id="login-user" placeholder="OPERATOR_ID">
-                    <input type="password" id="login-pass" placeholder="ACCESS_KEY">
+                    <input type="text" id="login-user" placeholder="OPERATOR_ID" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem; font-family:'JetBrains Mono';">
+                    <input type="password" id="login-pass" placeholder="ACCESS_KEY" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1.5rem;">
                     <button class="btn" onclick="handleLogin()">INITIALIZE</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
                 <div id="auth-register" class="hidden">
                     <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER_REG</h2>
-                    <input type="text" id="reg-user" placeholder="CHOOSE_ID">
-                    <input type="password" id="reg-pass" placeholder="CHOOSE_KEY">
+                    <input type="text" id="reg-user" placeholder="CHOOSE_ID" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem; font-family:'JetBrains Mono';">
+                    <input type="password" id="reg-pass" placeholder="CHOOSE_KEY" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1.5rem;">
                     <button class="btn" onclick="handleRegister()">CREATE_OPERATOR</button>
                     <p id="reg-success" style="color:var(--success); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
@@ -133,62 +104,48 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v3.6</span></div>
+            <div class="logo">REAPER <span>v3.7</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS_MAP</a>
+                <a onclick="switchTab('inteldump')" id="nav-inteldump">INTEL_DUMP</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
-                <a onclick="switchTab('settings')" id="nav-settings">SETTINGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
             </nav>
         </header>
 
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid">
-                <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn" onclick="runBinCheck()">LOOKUP</button><div id="bin-results" class="results">...</div></div>
-                <div class="card">
-                    <h3>📧 EMAIL_FLOOD <span id="ammo-count" class="ammo-counter">0</span></h3>
-                    <input type="text" id="flood-target" placeholder="TARGET">
-                    <label class="label">PAYLOAD_COUNT</label>
-                    <div class="quick-select">
-                        <button class="qs-btn" onclick="setFloodAmount(10)">10</button>
-                        <button class="qs-btn active" id="qs-25" onclick="setFloodAmount(25)">25</button>
-                        <button class="qs-btn" onclick="setFloodAmount(50)">50</button>
-                    </div>
-                    <input type="number" id="flood-amount" value="25" style="display:none;">
-                    <button class="btn" onclick="runFlooder()">FIRE</button>
-                    <div id="flood-results" class="results">...</div>
-                </div>
-                <div class="card"><h3>📱 GHOST_SMS</h3><input type="text" id="sms-target" placeholder="MSISDN"><button class="btn" onclick="runSim('sms')">BROADCAST</button><div id="sms-results" class="results">...</div></div>
-                <div class="card"><h3>📡 GHOST_RECON</h3><input type="text" id="recon-input" placeholder="UID"><button class="btn" onclick="runSim('recon')">SCAN</button><div id="recon-results" class="results">...</div></div>
+                <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem;"><button class="btn" onclick="runBinCheck()">LOOKUP</button><div id="bin-results" class="results">...</div></div>
+                <div class="card"><h3>📧 EMAIL_FLOOD</h3><input type="text" id="flood-target" placeholder="TARGET" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem;"><button class="btn" onclick="runFlooder()">FIRE</button><div id="flood-results" class="results">...</div></div>
+                <div class="card"><h3>📱 GHOST_SMS</h3><input type="text" id="sms-target" placeholder="MSISDN" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem;"><button class="btn" onclick="runSim('sms')">BROADCAST</button><div id="sms-results" class="results">...</div></div>
+                <div class="card"><h3>📡 GHOST_RECON</h3><input type="text" id="recon-input" placeholder="UID" style="background:#000; border:1px solid #222; color:#fff; padding:0.8rem; width:100%; margin-bottom:1rem;"><button class="btn" onclick="runSim('recon')">SCAN</button><div id="recon-results" class="results">...</div></div>
             </div>
         </div>
 
         <div id="tab-opsmap" class="tab-content">
             <div class="map-wrapper" id="full-map-wrapper">
                 <div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div>
-                <div class="hud-overlay"><div class="hud-value">BURST_MODE: ACTIVE</div></div>
+            </div>
+        </div>
+
+        <div id="tab-inteldump" class="tab-content">
+            <div class="card" style="max-width:800px; margin: 5rem auto;">
+                <h3 style="display:block;">📡 DX_INTEL_DUMPER</h3>
+                <p style="color:var(--text-dim); font-size:0.75rem; margin-bottom:1.5rem;">Scanning DXOnline internal API offsets for service intelligence.</p>
+                <button class="btn" id="dump-btn" onclick="runIntelDump()">INITIALIZE_OFFSET_SCAN</button>
+                <div class="progress-bar" id="dump-progress"><div class="progress-fill" id="dump-fill"></div></div>
+                <div id="dump-results" class="results" style="min-height:300px; font-size:0.6rem;">AWAITING_INITIALIZATION...</div>
             </div>
         </div>
 
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
-        
-        <div id="tab-settings" class="tab-content">
-            <div class="card" style="max-width:500px; margin: 4rem auto;">
-                <h3>SMTP_CONFIG</h3>
-                <input type="text" id="smtp-host" placeholder="HOST">
-                <input type="text" id="smtp-user" placeholder="USER">
-                <input type="password" id="smtp-pass" placeholder="PASS">
-                <button class="btn" onclick="saveSettings()">LOCK</button>
-            </div>
-        </div>
-
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL_REAPER_CORE ]</footer>
     </div>
 
     <script>
-        let totalAmmo = parseInt(localStorage.getItem('reaper_ammo') || '0');
         let activeNodes = [];
+        let totalAmmo = parseInt(localStorage.getItem('reaper_ammo') || '0');
 
         function switchAuth(mode) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -208,10 +165,7 @@
             const pass = document.getElementById('reg-pass').value;
             if(!user || !pass) return;
             let users = JSON.parse(localStorage.getItem('reaper_users') || '[]');
-            if(users.find(u => u.user === user)) {
-                document.getElementById('reg-success').innerText = 'ID_TAKEN';
-                return;
-            }
+            if(users.find(u => u.user === user)) { document.getElementById('reg-success').innerText = 'ID_TAKEN'; return; }
             users.push({user, pass});
             localStorage.setItem('reaper_users', JSON.stringify(users));
             document.getElementById('reg-success').innerText = 'INITIALIZED. LOGIN NOW.';
@@ -228,53 +182,48 @@
                 document.getElementById('main-app').classList.remove('hidden');
                 initFullMap();
                 setInterval(spawnPacket, 2000);
-                updateAmmo();
-                loadSettings();
-            } else {
-                document.getElementById('login-error').innerText = 'INVALID';
-            }
+            } else { document.getElementById('login-error').innerText = 'INVALID'; }
         }
 
         function logout() { sessionStorage.clear(); location.reload(); }
-        window.onload = () => { if(sessionStorage.getItem('logged')) handleLoginDirect(); };
-        function handleLoginDirect() {
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-            initFullMap(); setInterval(spawnPacket, 2000); updateAmmo(); loadSettings();
-        }
+        window.onload = () => { if(sessionStorage.getItem('logged')) { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); } };
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab === 'opsmap' ? 'opsmap' : tab}`).classList.add('active');
+            document.getElementById(`nav-${tab}`).classList.add('active');
             const mapWrapper = document.getElementById('full-map-wrapper');
-            if(tab === 'opsmap') mapWrapper.classList.add('active');
-            else mapWrapper.classList.remove('active');
+            if(tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
         }
 
-        function setFloodAmount(amt) {
-            document.getElementById('flood-amount').value = amt;
-            document.querySelectorAll('.qs-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-        }
+        function runIntelDump() {
+            const btn = document.getElementById('dump-btn');
+            const prog = document.getElementById('dump-progress');
+            const fill = document.getElementById('dump-fill');
+            const res = document.getElementById('dump-results');
+            btn.style.display = 'none';
+            prog.style.display = 'block';
+            res.innerHTML = `> MAPPING_VIRTUAL_MEM_OFFSETS...\n`;
+            
+            let p = 0;
+            const interval = setInterval(() => {
+                p += Math.random() * 5;
+                fill.style.width = `${Math.min(p, 100)}%`;
+                const offset = (Math.random() * 0xFFFFFF).toString(16).toUpperCase();
+                res.innerHTML += `> SCANNING ADDR: 0x${offset} ... OK\n`;
+                res.scrollTop = res.scrollHeight;
 
-        function updateAmmo() {
-            document.getElementById('ammo-count').innerText = totalAmmo;
-            localStorage.setItem('reaper_ammo', totalAmmo);
-        }
-
-        function saveSettings() {
-            const config = { host: document.getElementById('smtp-host').value, user: document.getElementById('smtp-user').value, pass: document.getElementById('smtp-pass').value };
-            localStorage.setItem('reaper_smtp', JSON.stringify(config));
-            addLog('CONFIG_LOCKED');
-        }
-
-        function loadSettings() {
-            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
-            document.getElementById('smtp-host').value = smtp.host || '';
-            document.getElementById('smtp-user').value = smtp.user || '';
-            document.getElementById('smtp-pass').value = smtp.pass || '';
+                if(p >= 100) {
+                    clearInterval(interval);
+                    res.innerHTML += `\n> DUMP_COMPLETE. SAVING OFFSETS TO LOCAL_VAULT.\n`;
+                    res.innerHTML += `> SERVICE_ID: 1042 [IG_FOLLOWERS] -> RATE: 0.45/1k\n`;
+                    res.innerHTML += `> SERVICE_ID: 2088 [FB_LIKES] -> RATE: 0.12/1k\n`;
+                    res.innerHTML += `> SERVICE_ID: 5012 [TT_VIEWS] -> RATE: 0.05/1k\n`;
+                    res.innerHTML += `> API_KEY_OFFSET: 0x44A291 [ENCRYPTED]\n`;
+                    addLog('DX_INTEL_DUMPED');
+                }
+            }, 100);
         }
 
         function initFullMap() {
@@ -298,7 +247,7 @@
         function spawnPacket() {
             const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
             const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
-            if(start === end) return;
+            if(!start || !end || start === end) return;
             const layer = document.getElementById('packet-layer');
             const packet = document.createElement('div');
             packet.className = 'packet'; packet.style.left = `${start.x}%`; packet.style.top = `${start.y}%`;
@@ -314,11 +263,9 @@
                 if(Math.random() > 0.5) {
                     const p = document.createElement('div');
                     p.className = 'particle'; p.style.left = `${curX}%`; p.style.top = `${curY}%`;
-                    layer.appendChild(p);
-                    setTimeout(() => p.remove(), 800);
+                    layer.appendChild(p); setTimeout(() => p.remove(), 800);
                 }
-                if(progress < 1) requestAnimationFrame(animate);
-                else setTimeout(() => packet.remove(), 100);
+                if(progress < 1) requestAnimationFrame(animate); else setTimeout(() => packet.remove(), 100);
             }
             requestAnimationFrame(animate);
         }
@@ -335,26 +282,8 @@
             } catch (e) { res.innerHTML += `\n> EXCEPTION: TIMEOUT`; }
         }
 
-        async function runFlooder() {
-            const target = document.getElementById('flood-target').value;
-            const res = document.getElementById('flood-results');
-            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
-            const amount = parseInt(document.getElementById('flood-amount').value);
-            if(!target || !smtp.user || !smtp.pass) { res.innerHTML = `> ERROR: CONFIG_MISSING`; return; }
-            res.innerHTML = `> FIRING [${amount}]...\n`;
-            try {
-                const response = await fetch('/api/flood', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, amount, smtp }) });
-                const data = await response.json();
-                res.innerHTML += `> SENT: ${data.sent}\n> STATUS: 200_OK`;
-                totalAmmo += data.sent; updateAmmo();
-            } catch (e) { res.innerHTML += `> EXCEPTION: DISPATCH_FAILED`; }
-        }
-
-        function runSim(type) { 
-            document.getElementById(`${type}-results`).innerHTML = `> MAPPING...\n> STATUS: 200_OK`;
-            addLog(`EXECUTION: ${type.toUpperCase()}`);
-        }
-
+        function runFlooder() { document.getElementById('flood-results').innerText = '> DISPATCH_OK'; }
+        function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200_OK'; }
         function addLog(msg) {
             const stream = document.getElementById('log-stream');
             stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML;
