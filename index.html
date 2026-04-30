@@ -145,17 +145,19 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 4px;
-            padding: 2.5rem;
+            padding: 2rem;
             position: relative;
             transition: border-color 0.4s, transform 0.4s;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
@@ -164,7 +166,7 @@
         }
 
         .card h3 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 1rem;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -175,29 +177,30 @@
 
         .card-icon {
             color: var(--text-dim);
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
         .card p {
             color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
             line-height: 1.5;
+            flex-grow: 1;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 0.6rem;
         }
 
         input {
             background: #000;
             border: 1px solid var(--border);
             color: #fff;
-            padding: 1rem;
+            padding: 0.8rem;
             border-radius: 2px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             width: 100%;
             transition: border-color 0.3s;
         }
@@ -211,10 +214,10 @@
             background: #fff;
             color: #000;
             border: none;
-            padding: 1rem;
+            padding: 0.8rem;
             border-radius: 2px;
             font-weight: 900;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
@@ -231,14 +234,14 @@
         }
 
         .results {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             background: #000;
             border: 1px solid var(--border);
-            padding: 1.2rem;
+            padding: 1rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #888;
-            min-height: 120px;
+            min-height: 100px;
             white-space: pre-wrap;
             position: relative;
         }
@@ -250,7 +253,7 @@
             left: 10px;
             background: #000;
             padding: 0 5px;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #444;
             letter-spacing: 1px;
         }
@@ -261,7 +264,7 @@
         }
 
         footer {
-            margin-top: 10rem;
+            margin-top: 8rem;
             text-align: center;
             color: var(--text-dim);
             font-size: 0.7rem;
@@ -270,12 +273,12 @@
             text-transform: uppercase;
         }
 
-        /* Module Specific Colors */
         .module-label {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #444;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
             display: block;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -283,7 +286,7 @@
     <div class="scanline"></div>
     <div class="container">
         <header>
-            <div class="logo">REAPER <span>v2.0</span></div>
+            <div class="logo">REAPER <span>v2.1</span></div>
             <nav class="nav-links">
                 <a href="#">Dashboard</a>
                 <a href="#">Network</a>
@@ -311,7 +314,7 @@
                 <div id="dx-results" class="results">READY...</div>
             </div>
 
-            <!-- EMAIL BOMBER -->
+            <!-- EMAIL FLOODER -->
             <div class="card">
                 <h3><span class="card-icon">02</span> Email Flooder</h3>
                 <p>Distributed SMTP payload delivery with randomized headers and PDF evasion.</p>
@@ -319,19 +322,33 @@
                     <span class="module-label">TARGET_EMAIL</span>
                     <input type="text" id="email-target" placeholder="target@example.com">
                     <span class="module-label">INTENSITY</span>
-                    <input type="number" id="email-count" placeholder="Number of payloads (max 100)">
+                    <input type="number" id="email-count" placeholder="Number of payloads">
                     <button class="btn" onclick="startFlood()">Execute</button>
                 </div>
                 <div id="email-results" class="results">READY...</div>
             </div>
 
-            <!-- OSINT RECON -->
+            <!-- GHOST SMS -->
             <div class="card">
-                <h3><span class="card-icon">03</span> Ghost Recon</h3>
-                <p>Deep-mapping of digital footprints and anonymized social footprint tracking.</p>
+                <h3><span class="card-icon">03</span> Ghost SMS</h3>
+                <p>Stealth message broadcasting via humanized carrier gateways and 1:1 humanization logic.</p>
+                <div class="input-group">
+                    <span class="module-label">PHONE_NUMBER</span>
+                    <input type="text" id="sms-target" placeholder="+1 (555) 000-0000">
+                    <span class="module-label">PAYLOAD</span>
+                    <input type="text" id="sms-msg" placeholder="Message content">
+                    <button class="btn" onclick="sendSMS()">Broadcast</button>
+                </div>
+                <div id="sms-results" class="results">READY...</div>
+            </div>
+
+            <!-- GHOST RECON -->
+            <div class="card">
+                <h3><span class="card-icon">04</span> Ghost Recon</h3>
+                <p>Deep-mapping of digital footprints and anonymized social footprint tracking across 50+ platforms.</p>
                 <div class="input-group">
                     <span class="module-label">IDENTIFIER</span>
-                    <input type="text" id="recon-input" placeholder="Username / ID">
+                    <input type="text" id="recon-input" placeholder="Username / ID / Email">
                     <button class="btn" onclick="startRecon()">Analyze</button>
                 </div>
                 <div id="recon-results" class="results">READY...</div>
@@ -348,11 +365,9 @@
             const input = document.getElementById('dx-input').value;
             const res = document.getElementById('dx-results');
             if(!input) return;
-            
             res.innerHTML = `<span class="status-active">></span> INITIALIZING PSCU_HANDSHAKE...\n`;
-            
             setTimeout(() => {
-                res.innerHTML += `> BANK: Navy Federal Credit Union\n> CARD: Visa Debit (Premium)\n> STATUS: DX_COMPATIBLE\n> PORTAL: dxonline.pscu.com/nfcu/\n> VERIFICATION: [LIVE_CHECKED]`;
+                res.innerHTML += `> BANK: Navy Federal Credit Union\n> CARD: Visa Debit (Premium)\n> STATUS: DX_COMPATIBLE\n> PORTAL: dxonline.pscu.com/nfcu/`;
             }, 1200);
         }
 
@@ -361,21 +376,29 @@
             const count = document.getElementById('email-count').value;
             const res = document.getElementById('email-results');
             if(!email) return;
-
             res.innerHTML = `<span class="status-active">></span> ROTATING SMTP_GATEWAYS...\n`;
             setTimeout(() => {
-                res.innerHTML += `> DISPATCHING ${count || 10} PAYLOADS TO ${email}\n> EHLO RANDOMIZATION: ACTIVE\n> PDF_EVASION: ENABLED\n> STATUS: 200 BROADCASTING`;
+                res.innerHTML += `> DISPATCHING ${count || 10} PAYLOADS TO ${email}\n> EHLO RANDOMIZATION: ACTIVE\n> STATUS: 200 BROADCASTING`;
             }, 1500);
+        }
+
+        function sendSMS() {
+            const phone = document.getElementById('sms-target').value;
+            const res = document.getElementById('sms-results');
+            if(!phone) return;
+            res.innerHTML = `<span class="status-active">></span> BYPASSING CARRIER_FILTER...\n`;
+            setTimeout(() => {
+                res.innerHTML += `> TARGET: ${phone}\n> GATEWAY: VERIZON_NORTH_EAST\n> HUMANIZATION: ENABLED\n> STATUS: DELIVERED`;
+            }, 1400);
         }
 
         function startRecon() {
             const input = document.getElementById('recon-input').value;
             const res = document.getElementById('recon-results');
             if(!input) return;
-
             res.innerHTML = `<span class="status-active">></span> SCANNING SOCIAL_GRAPH...\n`;
             setTimeout(() => {
-                res.innerHTML += `> TARGET: ${input}\n> IP_HISTORY: [REDACTED]\n> ACCOUNTS: 7 DETECTED\n> RISK_LEVEL: HIGH`;
+                res.innerHTML += `> TARGET: ${input}\n> FOOTPRINT: 14 DATA_POINTS\n> ACCOUNTS: 7 DETECTED\n> RISK_LEVEL: CRITICAL`;
             }, 1800);
         }
     </script>
