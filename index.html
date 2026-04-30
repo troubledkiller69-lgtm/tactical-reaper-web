@@ -21,61 +21,82 @@
 
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        @keyframes topo-drift { 0% { background-position: 0 0; } 100% { background-position: 100px 100px; } }
+        @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 500px 500px; } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(224, 224, 224, 0.02) 0%, transparent 70%),
-                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
-        }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
 
         .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(224, 224, 224, 0.03) 50%, transparent); pointer-events: none; z-index: 100; animation: scanline 8s linear infinite; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
 
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
-        .nav-links { display: flex; gap: 2.5rem; }
-        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .nav-links a.active { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-        .tab-content { display: none; }
+        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: var(--text-dim); font-weight: 400; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 5px 0; }
+        .nav-links a.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+
+        .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* OPS MAP */
+        /* FULL SCALE MAP */
+        .map-wrapper {
+            position: fixed;
+            top: 100px; left: 0; width: 100%; height: calc(100vh - 100px);
+            background: #020202;
+            overflow: hidden;
+            display: none;
+        }
+        .map-wrapper.active { display: block; }
+
+        .map-bg {
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background-image: 
+                url('https://www.transparenttextures.com/patterns/topographic.png'),
+                radial-gradient(circle at center, rgba(30, 30, 30, 0.5) 0%, transparent 80%);
+            background-size: 600px 600px, cover;
+            opacity: 0.4;
+            animation: drift 120s linear infinite;
+        }
+
         .map-container {
             position: relative;
-            background: #050505;
-            border: 1px solid var(--border);
-            height: 600px;
-            border-radius: 4px;
-            overflow: hidden;
-            background-image: url('https://www.transparenttextures.com/patterns/topographic.png');
-            background-blend-mode: overlay;
-            animation: topo-drift 60s linear infinite;
+            width: 100%; height: 100%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/80% no-repeat;
+            filter: invert(1) brightness(0.2) contrast(1.5) blur(0.5px);
+            opacity: 0.15;
         }
 
-        .map-overlay {
+        .node-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, #000 95%);
-            pointer-events: none;
+            z-index: 2;
         }
 
-        .node { position: absolute; width: 4px; height: 4px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; }
-        .node::after { content: ''; position: absolute; top: -8px; left: -8px; width: 20px; height: 20px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; animation: pulse 2s infinite; }
-        .node-label { position: absolute; top: 10px; left: 10px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #555; white-space: nowrap; text-transform: uppercase; }
+        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
+        .node::after { content: ''; position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; animation: pulse 2.5s infinite; }
+        .node-info { position: absolute; top: 15px; left: 15px; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; background: rgba(0,0,0,0.8); padding: 5px; border: 1px solid var(--border); border-radius: 2px; }
 
-        /* DASHBOARD */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+        /* DASHBOARD GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 4rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.8rem; border-radius: 4px; }
-        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.7rem; border-radius: 2px; width: 100%; margin-bottom: 0.8rem; font-size: 0.75rem; }
-        .btn { background: #fff; color: #000; border: none; padding: 0.7rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
-        .results { margin-top: 1rem; background: #000; border: 1px solid var(--border); padding: 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; white-space: pre-wrap; }
+        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.7rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; }
+        .btn { background: #fff; color: #000; border: none; padding: 0.8rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; width: 100%; }
+        .results { margin-top: 1.5rem; background: #000; border: 1px solid var(--border); padding: 1rem; font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #888; white-space: pre-wrap; }
 
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; width: 450px; text-align: center; }
@@ -90,93 +111,52 @@
             <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:2rem;">REAPER_GATE</h2>
             <input type="text" id="login-user" placeholder="USERNAME">
             <input type="password" id="login-pass" placeholder="PASSWORD">
-            <button class="btn" style="width: 100%" onclick="handleLogin()">AUTHORIZE</button>
+            <button class="btn" onclick="handleLogin()">AUTHORIZE</button>
         </div>
     </div>
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v3.0</span></div>
+            <div class="logo">REAPER <span>v3.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">Dashboard</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">Ops Map</a>
                 <a onclick="switchTab('logs')" id="nav-logs">Logs</a>
-                <a onclick="switchTab('settings')" id="nav-settings">Settings</a>
                 <a onclick="logout()" style="color:var(--error)">Logout</a>
             </nav>
         </header>
 
+        <!-- DASHBOARD TAB -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid">
-                <div class="card">
-                    <h3>💎 BIN Intel</h3>
-                    <input type="text" id="bin-input" placeholder="6-digit BIN">
-                    <button class="btn" onclick="runBinCheck()">Lookup</button>
-                    <div id="bin-results" class="results">READY...</div>
-                </div>
-                <div class="card">
-                    <h3>📧 Email Flooder</h3>
-                    <input type="text" id="flood-target" placeholder="Target Email">
-                    <button class="btn" onclick="runFlooder()">Dispatch</button>
-                    <div id="flood-results" class="results">READY...</div>
-                </div>
-                <div class="card">
-                    <h3>📱 Ghost SMS</h3>
-                    <input type="text" id="sms-target" placeholder="Phone Number">
-                    <button class="btn" onclick="runSim('sms')">Broadcast</button>
-                    <div id="sms-results" class="results">READY...</div>
-                </div>
-                <div class="card">
-                    <h3>📡 Ghost Recon</h3>
-                    <input type="text" id="recon-input" placeholder="Identifier">
-                    <button class="btn" onclick="runSim('recon')">Analyze</button>
-                    <div id="recon-results" class="results">READY...</div>
-                </div>
+                <div class="card"><h3>💎 BIN Intel</h3><input type="text" id="bin-input" placeholder="6-digit BIN"><button class="btn" onclick="runBinCheck()">Lookup</button><div id="bin-results" class="results">READY...</div></div>
+                <div class="card"><h3>📧 Email Flooder</h3><input type="text" id="flood-target" placeholder="Target Email"><button class="btn" onclick="runFlooder()">Execute</button><div id="flood-results" class="results">READY...</div></div>
+                <div class="card"><h3>📱 Ghost SMS</h3><input type="text" id="sms-target" placeholder="Phone Number"><button class="btn" onclick="runSim('sms')">Broadcast</button><div id="sms-results" class="results">READY...</div></div>
+                <div class="card"><h3>📡 Ghost Recon</h3><input type="text" id="recon-input" placeholder="Identifier"><button class="btn" onclick="runSim('recon')">Analyze</button><div id="recon-results" class="results">READY...</div></div>
             </div>
         </div>
 
+        <!-- FULL SCALE OPS MAP TAB -->
         <div id="tab-opsmap" class="tab-content">
-            <div style="margin-bottom: 2rem;">
-                <h1 style="font-size:2rem; font-weight:900;">Global Operations Map</h1>
-                <p style="color:var(--text-dim); font-size:0.8rem;">Live tactical distribution and node synchronization.</p>
-            </div>
-            <div class="map-container" id="map-frame">
-                <div class="map-overlay"></div>
-                <!-- Nodes will be injected here -->
-            </div>
-            <div class="grid" style="margin-top:2rem;">
-                <div class="card">
-                    <h3>ACTIVE NODES</h3>
-                    <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#555;">
-                        > NODE_NA_01: ONLINE [NY, US]<br>
-                        > NODE_EU_04: ONLINE [LDN, UK]<br>
-                        > NODE_AS_09: ONLINE [TKY, JP]
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>TACTICAL STATS</h3>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; border-bottom:1px solid var(--border); padding:0.5rem 0;">
-                        <span>UPTIME</span><span style="color:var(--success)">99.9%</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:0.5rem 0;">
-                        <span>THREAT_LEVEL</span><span style="color:var(--error)">CRITICAL</span>
+            <div class="map-wrapper" id="full-map-wrapper">
+                <div class="map-bg"></div>
+                <div class="map-container"></div>
+                <div class="node-layer" id="node-layer"></div>
+                <div style="position:absolute; bottom:2rem; left:2rem; z-index:10; background:rgba(0,0,0,0.8); padding:1rem; border:1px solid var(--border);">
+                    <h4 style="font-size:0.8rem; margin-bottom:0.5rem;">GLOBAL TACTICAL FEED</h4>
+                    <div style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555;">
+                        > SYNCHRONIZING WITH 14 NODES...<br>
+                        > STATUS: ALL NODES ONLINE<br>
+                        > ENCRYPTION: TUNNEL_ACTIVE
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- LOGS TAB -->
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:2rem; font-family:'JetBrains Mono'; color:#444;"></div></div>
 
-        <div id="tab-settings" class="tab-content">
-            <div class="card" style="max-width:500px; margin: 4rem auto;">
-                <h3>CONFIG</h3>
-                <input type="text" id="smtp-user" placeholder="SMTP USER">
-                <input type="password" id="smtp-pass" placeholder="SMTP PASS">
-                <button class="btn" style="width:100%" onclick="alert('Settings Saved.')">Lock Settings</button>
-            </div>
-        </div>
-
-        <footer style="margin-top:5rem; text-align:center; color:var(--text-dim); font-size:0.6rem;">[ ENI_SYSTEM_CORE ] // v3.0 // OPS_MAP_ACTIVE</footer>
+        <footer style="margin-top:2rem; text-align:center; color:var(--text-dim); font-size:0.6rem; padding: 2rem 0;">[ ENI_SYSTEM_CORE ] // v3.1 // FULL_SCALE_MAP</footer>
     </div>
 
     <script>
@@ -187,7 +167,7 @@
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             addLog(`OPERATOR ${user.toUpperCase()} ONLINE`);
-            initMap();
+            initFullMap();
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
@@ -197,22 +177,26 @@
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
+            
+            const mapWrapper = document.getElementById('full-map-wrapper');
+            if(tab === 'opsmap') mapWrapper.classList.add('active');
+            else mapWrapper.classList.remove('active');
         }
 
-        function initMap() {
-            const frame = document.getElementById('map-frame');
+        function initFullMap() {
+            const layer = document.getElementById('node-layer');
             const nodes = [
-                {x: 20, y: 30, l: 'NY_NODE'}, {x: 45, y: 25, l: 'LDN_NODE'},
-                {x: 80, y: 40, l: 'TKY_NODE'}, {x: 15, y: 70, l: 'BRZ_NODE'},
-                {x: 50, y: 80, l: 'AFR_NODE'}, {x: 65, y: 35, l: 'RUS_NODE'}
+                {x: 25, y: 35, l: 'NODE_NA_EAST'}, {x: 48, y: 32, l: 'NODE_EU_WEST'},
+                {x: 75, y: 40, l: 'NODE_AS_PAC'}, {x: 20, y: 65, l: 'NODE_SA_SOUTH'},
+                {x: 52, y: 60, l: 'NODE_AFR_MID'}, {x: 62, y: 28, l: 'NODE_RU_NORTH'}
             ];
             nodes.forEach(n => {
                 const node = document.createElement('div');
                 node.className = 'node';
                 node.style.left = `${n.x}%`;
                 node.style.top = `${n.y}%`;
-                node.innerHTML = `<div class="node-label">${n.l}</div>`;
-                frame.appendChild(node);
+                node.innerHTML = `<div class="node-info">${n.l}<br>STATUS: ACTIVE</div>`;
+                layer.appendChild(node);
             });
         }
 
@@ -224,23 +208,17 @@
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                if(data.BIN) {
-                    const b = data.BIN;
-                    res.innerHTML += `> BRAND: ${b.brand}\n> TYPE: ${b.type}\n> ISSUER: ${b.issuer?.name}\n> COUNTRY: ${data.country?.name}`;
-                } else res.innerHTML += `> ERROR: ${data.error}`;
+                if(data.BIN) res.innerHTML += `> BRAND: ${data.BIN.brand}\n> ISSUER: ${data.BIN.issuer?.name}\n> STATUS: 200 OK`;
+                else res.innerHTML += `> ERROR: ${data.error}`;
             } catch (e) { res.innerHTML += `> EXCEPTION: TIMEOUT`; }
         }
 
         function runFlooder() {
-            const res = document.getElementById('flood-results');
-            res.innerHTML = `> DISPATCHING...\n> STATUS: 200 OK`;
             addLog('FLOOD DISPATCHED');
+            document.getElementById('flood-results').innerText = '> DISPATCHING PAYLOADS...';
         }
 
-        function runSim(type) {
-            const res = document.getElementById(`${type}-results`);
-            res.innerHTML = `> INITIALIZING...\n> OPERATION_COMPLETE`;
-        }
+        function runSim(type) { document.getElementById(`${type}-results`).innerText = '> INITIALIZING...'; }
 
         function addLog(msg) {
             const stream = document.getElementById('log-stream');
