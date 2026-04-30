@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical Reaper | Next Gen OSINT & Disruption</title>
+    <style>
+        :root {
+            --primary: #ff3e3e;
+            --primary-glow: rgba(255, 62, 62, 0.5);
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 62, 62, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 6rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .badge {
+            background: rgba(255, 62, 62, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--primary);
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .input-group {
+            margin-top: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.1s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .results {
+            margin-top: 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            min-height: 100px;
+            border-left: 3px solid var(--primary);
+            white-space: pre-wrap;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #44ff44;
+            border-radius: 50%;
+            margin-right: 5px;
+            box-shadow: 0 0 5px #44ff44;
+        }
+
+        footer {
+            margin-top: 6rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            padding-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo"><span>TACTICAL</span> REAPER</div>
+            <nav class="nav-links">
+                <a href="#">SYSTEM</a>
+                <a href="#">NETWORK</a>
+                <a href="#">LOGS</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="badge">FREE ACCESS ENABLED</div>
+            <h1>The Arsenal. Reimagined.</h1>
+            <p>Moving from the shadows of Telegram to a high-fidelity web interface. No keys. No gates. Pure power.</p>
+        </section>
+
+        <div class="grid">
+            <!-- DX SCANNER -->
+            <div class="card">
+                <div class="card-icon">🔍</div>
+                <h3>DXOnline Scanner</h3>
+                <p>Verify BIN compatibility with high-precision PSCU detection.</p>
+                <div class="input-group">
+                    <input type="text" id="dx-input" placeholder="Enter BIN (e.g. 448590)">
+                    <button class="btn" onclick="scanDX()">INITIATE SCAN</button>
+                </div>
+                <div id="dx-results" class="results">Waiting for input...</div>
+            </div>
+
+            <!-- RECON MODULE -->
+            <div class="card">
+                <div class="card-icon">📡</div>
+                <h3>OSINT Recon</h3>
+                <p>De-anonymize targets and map digital footprints instantly.</p>
+                <div class="input-group">
+                    <input type="text" id="recon-input" placeholder="Enter Username or ID">
+                    <button class="btn" onclick="startRecon()">EXECUTE RECON</button>
+                </div>
+                <div id="recon-results" class="results">Awaiting target...</div>
+            </div>
+
+            <!-- GHOST SMS -->
+            <div class="card">
+                <div class="card-icon">📱</div>
+                <h3>Ghost SMS</h3>
+                <p>Stealth message delivery with humanized carrier tracking.</p>
+                <div class="input-group">
+                    <input type="text" id="sms-target" placeholder="Phone Number">
+                    <input type="text" id="sms-msg" placeholder="Payload Message">
+                    <button class="btn" onclick="sendSMS()">BROADCAST</button>
+                </div>
+                <div id="sms-results" class="results">Idle...</div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2026 TACTICAL REAPER SUITE // ENI & LO // EST. ac9fdbc8
+        </footer>
+    </div>
+
+    <script>
+        function scanDX() {
+            const input = document.getElementById('dx-input').value;
+            const res = document.getElementById('dx-results');
+            if(!input) return;
+            
+            res.innerHTML = `<span class="status-dot"></span> SCANNING ${input}...\n`;
+            
+            setTimeout(() => {
+                res.innerHTML += `🏦 BANK: Sentry Credit Union\n💳 CARD: Visa Credit (Infinite)\n✅ DX COMPATIBILITY: Verified\n🔗 PORTAL: dxonline.pscu.com/sentry/`;
+            }, 1500);
+        }
+
+        function startRecon() {
+            const input = document.getElementById('recon-input').value;
+            const res = document.getElementById('recon-results');
+            if(!input) return;
+
+            res.innerHTML = `<span class="status-dot"></span> TRACKING ${input}...\n`;
+            setTimeout(() => {
+                res.innerHTML += `📍 LOCATION: [REDACTED]\n📧 EMAIL: target@example.com\n📱 PHONE: +1 (555) 234-XXXX\n🔗 PROFILES: 4 Detected`;
+            }, 2000);
+        }
+
+        function sendSMS() {
+            const res = document.getElementById('sms-results');
+            res.innerHTML = `<span class="status-dot"></span> DISPATCHING PAYLOAD...`;
+            setTimeout(() => {
+                res.innerHTML = `✅ DELIVERED VIA VERIZON_GW\nLatency: 142ms\nStatus: 200 OK`;
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
