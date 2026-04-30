@@ -1,0 +1,8 @@
+{
+  "name": "tactical-reaper-web",
+  "version": "2.6.1",
+  "description": "Tactical Reaper OSINT & Disruption Platform",
+  "engines": {
+    "node": ">=18"
+  }
+}
