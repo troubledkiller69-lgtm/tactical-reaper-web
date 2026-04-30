@@ -34,16 +34,9 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0,0,0,0.9);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.9);
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
         }
 
         .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--neon-gray); text-shadow: 0 0 10px var(--neon-glow); }
@@ -54,65 +47,57 @@
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* NEON FULL SCALE MAP */
+        /* NEON OPS MAP v3.4 */
         .map-wrapper {
-            position: fixed;
-            top: 75px; left: 0; width: 100%; height: calc(100vh - 75px);
-            background: #000;
-            overflow: hidden;
-            display: none;
+            position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px);
+            background: #000; overflow: hidden; display: none;
         }
         .map-wrapper.active { display: block; }
 
         .map-bg {
-            position: absolute;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
             background-image: url('https://www.transparenttextures.com/patterns/topographic.png');
-            background-size: 800px 800px;
-            opacity: 0.2;
-            filter: invert(1) brightness(2);
+            background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2);
             animation: drift 180s linear infinite;
         }
 
         .map-container {
-            position: relative;
-            width: 100%; height: 100%;
+            position: relative; width: 100%; height: 100%;
             background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat;
             filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow));
             opacity: 0.3;
         }
 
         .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+        .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        .node { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff, 0 0 40px var(--neon-glow); transform: translate(-50%, -50%); }
-        .node::after { content: ''; position: absolute; top: -16px; left: -16px; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.6); border-radius: 50%; animation: pulse 3s infinite; }
+        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
+        .node::after { content: ''; position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; animation: pulse 3s infinite; }
         .node-info { 
-            position: absolute; top: 20px; left: 20px; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #fff; text-transform: uppercase; 
-            background: rgba(10,10,10,0.9); padding: 8px; border: 1px solid #444; border-radius: 2px; white-space: nowrap; 
-            border-left: 3px solid #fff;
+            position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; 
+            background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; white-space: nowrap; 
         }
 
-        /* DASHBOARD GRID */
+        .packet {
+            position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff; transition: all linear;
+        }
+        .packet-tail {
+            position: absolute; width: 30px; height: 1px; background: linear-gradient(to right, transparent, #fff);
+            transform-origin: left center;
+        }
+
+        /* UI ELEMENTS */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
         .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); display: flex; justify-content: space-between; align-items: center; }
-
         .ammo-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--success); letter-spacing: 1px; animation: ammo-glow 2s infinite; }
-
         .label { font-size: 0.6rem; color: #444; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
         input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
-        
         .quick-select { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .qs-btn { background: #111; border: 1px solid var(--border); color: #444; padding: 0.5rem; border-radius: 2px; font-size: 0.6rem; cursor: pointer; transition: 0.3s; flex: 1; letter-spacing: 1px; }
+        .qs-btn { background: #111; border: 1px solid var(--border); color: #444; padding: 0.5rem; border-radius: 2px; font-size: 0.6rem; cursor: pointer; transition: 0.3s; flex: 1; }
         .qs-btn:hover, .qs-btn.active { border-color: #fff; color: #fff; background: #222; }
-
-        .btn { 
-            background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; 
-            cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s;
-        }
-        .btn:hover { background: var(--neon-gray); box-shadow: 0 0 15px var(--neon-glow); }
-        
+        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s; }
         .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
 
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
@@ -132,17 +117,17 @@
             <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:3rem; color:#fff;">REAPER_GATE</h2>
             <input type="text" id="login-user" placeholder="OPERATOR_ID">
             <input type="password" id="login-pass" placeholder="ACCESS_KEY">
-            <button class="btn" onclick="handleLogin()">INITIALIZE_CONNECTION</button>
+            <button class="btn" onclick="handleLogin()">INITIALIZE</button>
         </div>
     </div>
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>SYSTEM_v3.3</span></div>
+            <div class="logo">REAPER <span>SYSTEM_v3.4</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS_MAP</a>
-                <a onclick="switchTab('logs')" id="nav-logs">LOG_STREAM</a>
+                <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
                 <a onclick="switchTab('settings')" id="nav-settings">SETTINGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
             </nav>
@@ -150,54 +135,33 @@
 
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid">
-                <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="BIN_PREFIX"><button class="btn" onclick="runBinCheck()">EXECUTE_LOOKUP</button><div id="bin-results" class="results">AWAITING_INPUT...</div></div>
-                <!-- RESTORED EMAIL FLOODER -->
-                <div class="card">
-                    <h3>📧 EMAIL_FLOOD <span id="ammo-count" class="ammo-counter">DISPATCHED: 0</span></h3>
-                    <input type="text" id="flood-target" placeholder="TARGET_ADDR">
-                    <label class="label">PAYLOAD_COUNT</label>
-                    <div class="quick-select">
-                        <button class="qs-btn" onclick="setFloodAmount(10)">10</button>
-                        <button class="qs-btn active" id="qs-25" onclick="setFloodAmount(25)">25</button>
-                        <button class="qs-btn" onclick="setFloodAmount(50)">50</button>
-                    </div>
-                    <input type="number" id="flood-amount" value="25" style="display:none;">
-                    <button class="btn" onclick="runFlooder()">DISPATCH_PAYLOAD</button>
-                    <div id="flood-results" class="results">AWAITING_INPUT...</div>
-                </div>
-                <div class="card"><h3>📱 GHOST_SMS</h3><input type="text" id="sms-target" placeholder="MSISDN_ADDR"><button class="btn" onclick="runSim('sms')">BROADCAST_GIG</button><div id="sms-results" class="results">AWAITING_INPUT...</div></div>
-                <div class="card"><h3>📡 GHOST_RECON</h3><input type="text" id="recon-input" placeholder="UID_IDENTIFIER"><button class="btn" onclick="runSim('recon')">MAPPING_GRAPH</button><div id="recon-results" class="results">AWAITING_INPUT...</div></div>
+                <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn" onclick="runBinCheck()">LOOKUP</button><div id="bin-results" class="results">...</div></div>
+                <div class="card"><h3>📧 EMAIL_FLOOD <span id="ammo-count" class="ammo-counter">0</span></h3><input type="text" id="flood-target" placeholder="TARGET"><div class="quick-select"><button class="qs-btn" onclick="setFloodAmount(10)">10</button><button class="qs-btn active" onclick="setFloodAmount(25)">25</button><button class="qs-btn" onclick="setFloodAmount(50)">50</button></div><input type="number" id="flood-amount" value="25" style="display:none;"><button class="btn" onclick="runFlooder()">FIRE</button><div id="flood-results" class="results">...</div></div>
+                <div class="card"><h3>📱 GHOST_SMS</h3><input type="text" id="sms-target" placeholder="MSISDN"><button class="btn" onclick="runSim('sms')">BROADCAST</button><div id="sms-results" class="results">...</div></div>
+                <div class="card"><h3>📡 GHOST_RECON</h3><input type="text" id="recon-input" placeholder="UID"><button class="btn" onclick="runSim('recon')">SCAN</button><div id="recon-results" class="results">...</div></div>
             </div>
         </div>
 
         <div id="tab-opsmap" class="tab-content">
             <div class="map-wrapper" id="full-map-wrapper">
-                <div class="map-bg"></div><div class="map-container"></div><div class="node-layer" id="node-layer"></div>
+                <div class="map-bg"></div><div class="map-container"></div>
+                <div class="packet-layer" id="packet-layer"></div>
+                <div class="node-layer" id="node-layer"></div>
                 <div class="hud-overlay">
-                    <div class="hud-label">GLOBAL_OPERATIONS</div><div class="hud-value">14_NODES_ENCRYPTED</div>
-                    <div class="hud-label">NETWORK_STATUS</div><div class="hud-value" style="color:var(--success)">STABLE_LINK</div>
+                    <div class="hud-label">GLOBAL_OPERATIONS</div><div class="hud-value" id="hud-nodes">18_NODES</div>
+                    <div class="hud-label">DATA_TRANSIT</div><div class="hud-value" style="color:var(--success)">ENCRYPTED_BURST_ACTIVE</div>
                 </div>
             </div>
         </div>
 
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
-        
-        <div id="tab-settings" class="tab-content">
-            <div class="card" style="max-width:500px; margin: 4rem auto;">
-                <h3>SMTP_GATEWAY</h3>
-                <input type="text" id="smtp-host" placeholder="SMTP_HOST">
-                <input type="text" id="smtp-port" placeholder="SMTP_PORT">
-                <input type="text" id="smtp-user" placeholder="SMTP_USER">
-                <input type="password" id="smtp-pass" placeholder="APP_PASSWORD">
-                <button class="btn" onclick="saveSettings()">LOCK_CONFIG</button>
-            </div>
-        </div>
-
-        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0; letter-spacing:4px;">[ TACTICAL_REAPER_CORE ]</footer>
+        <div id="tab-settings" class="tab-content"><div class="card" style="max-width:500px; margin:4rem auto;"><h3>SMTP</h3><input type="text" id="smtp-host" placeholder="HOST"><input type="text" id="smtp-user" placeholder="USER"><input type="password" id="smtp-pass" placeholder="PASS"><button class="btn" onclick="saveSettings()">LOCK</button></div></div>
+        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL_REAPER_CORE ]</footer>
     </div>
 
     <script>
         let totalAmmo = parseInt(localStorage.getItem('reaper_ammo') || '0');
+        let activeNodes = [];
 
         function handleLogin() {
             const user = document.getElementById('login-user').value;
@@ -205,10 +169,11 @@
             sessionStorage.setItem('logged', user);
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
-            addLog(`CONNECTION_ESTABLISHED: OPERATOR_${user.toUpperCase()}`);
+            addLog(`ESTABLISHED: OPERATOR_${user.toUpperCase()}`);
             initFullMap();
             loadSettings();
             updateAmmo();
+            setInterval(spawnPacket, 1500);
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
@@ -230,26 +195,19 @@
         }
 
         function updateAmmo() {
-            document.getElementById('ammo-count').innerText = `DISPATCHED: ${totalAmmo}`;
+            document.getElementById('ammo-count').innerText = totalAmmo;
             localStorage.setItem('reaper_ammo', totalAmmo);
         }
 
         function saveSettings() {
-            const config = {
-                host: document.getElementById('smtp-host').value,
-                port: document.getElementById('smtp-port').value,
-                user: document.getElementById('smtp-user').value,
-                pass: document.getElementById('smtp-pass').value
-            };
+            const config = { host: document.getElementById('smtp-host').value, user: document.getElementById('smtp-user').value, pass: document.getElementById('smtp-pass').value };
             localStorage.setItem('reaper_smtp', JSON.stringify(config));
-            addLog('SMTP CONFIGURATION UPDATED');
-            alert('Settings Locked.');
+            addLog('CONFIG UPDATED');
         }
 
         function loadSettings() {
             const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
             document.getElementById('smtp-host').value = smtp.host || '';
-            document.getElementById('smtp-port').value = smtp.port || '';
             document.getElementById('smtp-user').value = smtp.user || '';
             document.getElementById('smtp-pass').value = smtp.pass || '';
         }
@@ -257,33 +215,61 @@
         function initFullMap() {
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
-            const nodes = [
-                {x: 23, y: 35, l: 'NA_REAPER_01'}, {x: 48, y: 30, l: 'EU_REAPER_04'},
-                {x: 78, y: 38, l: 'AS_REAPER_09'}, {x: 32, y: 68, l: 'SA_REAPER_02'},
-                {x: 52, y: 55, l: 'AF_REAPER_07'}, {x: 65, y: 25, l: 'RU_REAPER_03'},
-                {x: 82, y: 75, l: 'AU_REAPER_12'}
+            activeNodes = [
+                {x: 23, y: 35, l: 'NA_EAST'}, {x: 18, y: 40, l: 'NA_CENTRAL'}, {x: 12, y: 35, l: 'NA_WEST'},
+                {x: 48, y: 30, l: 'EU_WEST'}, {x: 55, y: 28, l: 'EU_EAST'}, {x: 52, y: 22, l: 'EU_NORTH'},
+                {x: 78, y: 38, l: 'AS_PAC'}, {x: 82, y: 32, l: 'AS_NORTH'}, {x: 75, y: 48, l: 'AS_SOUTH'},
+                {x: 32, y: 68, l: 'SA_EAST'}, {x: 25, y: 62, l: 'SA_NORTH'},
+                {x: 52, y: 55, l: 'AF_MID'}, {x: 55, y: 70, l: 'AF_SOUTH'},
+                {x: 65, y: 25, l: 'RU_REAPER'}, {x: 62, y: 50, l: 'ME_REAPER'},
+                {x: 82, y: 75, l: 'AU_SOUTH'}, {x: 85, y: 80, l: 'AU_EAST'}
             ];
-            nodes.forEach(n => {
+            activeNodes.forEach(n => {
                 const node = document.createElement('div');
                 node.className = 'node';
                 node.style.left = `${n.x}%`;
                 node.style.top = `${n.y}%`;
-                node.innerHTML = `<div class="node-info">${n.l}<br>PULSE: STABLE</div>`;
+                node.innerHTML = `<div class="node-info">${n.l}</div>`;
                 layer.appendChild(node);
             });
+            document.getElementById('hud-nodes').innerText = `${activeNodes.length}_NODES`;
+        }
+
+        function spawnPacket() {
+            if(!activeNodes.length) return;
+            const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            if(start === end) return;
+
+            const layer = document.getElementById('packet-layer');
+            const packet = document.createElement('div');
+            packet.className = 'packet';
+            packet.style.left = `${start.x}%`;
+            packet.style.top = `${start.y}%`;
+            
+            const duration = Math.random() * 2000 + 1000;
+            layer.appendChild(packet);
+
+            setTimeout(() => {
+                packet.style.transition = `all ${duration}ms linear`;
+                packet.style.left = `${end.x}%`;
+                packet.style.top = `${end.y}%`;
+            }, 10);
+
+            setTimeout(() => { packet.remove(); }, duration + 50);
         }
 
         async function runBinCheck() {
             const bin = document.getElementById('bin-input').value;
             const res = document.getElementById('bin-results');
             if(!bin) return;
-            res.innerHTML = `> SYNCING_WITH_BINCHECK...\n`;
+            res.innerHTML = `> SYNCING...\n`;
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                if(data.BIN) res.innerHTML += `> BRAND: ${data.BIN.brand}\n> ISSUER: ${data.BIN.issuer?.name}\n> ORIGIN: ${data.country?.name || 'US'}\n> STATUS: 200_SUCCESS`;
-                else res.innerHTML += `> ERROR: ${data.error || 'INVALID_BIN'}`;
-            } catch (e) { res.innerHTML += `> EXCEPTION: API_TIMED_OUT`; }
+                if(data.BIN) res.innerHTML += `> BRAND: ${data.BIN.brand}\n> ISSUER: ${data.BIN.issuer?.name}\n> STATUS: 200_OK`;
+                else res.innerHTML += `> ERROR: ${data.error}`;
+            } catch (e) { res.innerHTML += `> EXCEPTION: TIMEOUT`; }
         }
 
         async function runFlooder() {
@@ -291,38 +277,25 @@
             const res = document.getElementById('flood-results');
             const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
             const amount = parseInt(document.getElementById('flood-amount').value);
-            
-            if(!target || !smtp.user || !smtp.pass) {
-                res.innerHTML = `<span style="color:var(--error)">> ERROR: SMTP_CONFIG_REQUIRED</span>`;
-                return;
-            }
-
-            res.innerHTML = `> FIRING_PAYLOADS [${amount}]...\n`;
-            addLog(`FLOOD_FIRE: TARGET=${target} COUNT=${amount}`);
-
+            if(!target || !smtp.user || !smtp.pass) { res.innerHTML = `> ERROR: CONFIG_MISSING`; return; }
+            res.innerHTML = `> FIRING [${amount}]...\n`;
             try {
-                const response = await fetch('/api/flood', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ target, amount, smtp })
-                });
+                const response = await fetch('/api/flood', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, amount, smtp }) });
                 const data = await response.json();
-                res.innerHTML += `> STATUS: ${response.status} OK\n> SENT: ${data.sent}\n> FAILED: ${data.failed}`;
-                totalAmmo += data.sent;
-                updateAmmo();
-                addLog(`FLOOD_IMPACT: SENT=${data.sent}`);
+                res.innerHTML += `> SENT: ${data.sent}\n> STATUS: 200_OK`;
+                totalAmmo += data.sent; updateAmmo();
             } catch (e) { res.innerHTML += `> EXCEPTION: DISPATCH_FAILED`; }
         }
 
         function runSim(type) { 
-            document.getElementById(`${type}-results`).innerHTML = `> MAPPING_VECTORS...\n> STATUS: 200_OK`;
-            addLog(`EXECUTION_COMPLETE: ${type.toUpperCase()}`);
+            document.getElementById(`${type}-results`).innerHTML = `> MAPPING...\n> STATUS: 200_OK`;
+            addLog(`EXECUTION: ${type.toUpperCase()}`);
         }
 
         function addLog(msg) {
             const stream = document.getElementById('log-stream');
             const time = new Date().toLocaleTimeString();
-            stream.innerHTML = `<div style="border-bottom:1px solid #111; padding:5px 0;">[${time}] ${msg}</div>` + stream.innerHTML;
+            stream.innerHTML = `<div>[${time}] ${msg}</div>` + stream.innerHTML;
         }
     </script>
 </body>
