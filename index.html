@@ -40,27 +40,19 @@
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
-        /* CHANGE LOG - v4.9 ALIGNMENT */
+        /* CHANGE LOG */
         .changelog-item { border-left: 1px solid #222; padding-left: 2rem; margin-bottom: 4rem; position: relative; }
         .changelog-item::before { content: ''; position: absolute; left: -3px; top: 0; width: 5px; height: 5px; background: #fff; box-shadow: 0 0 10px #fff; }
         .changelog-version { font-family: 'Inter'; font-weight: 900; letter-spacing: 4px; color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem; }
         .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
         .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
 
-        /* PORTAL RECON */
-        .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
-        .portal-name { font-size: 0.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; }
-        .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
-        .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
-        .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
-
-        /* STORM MATRIX - v4.9 ALIGNMENT */
+        /* STORM MATRIX */
         .matrix-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
         .matrix-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #fff; padding: 2rem; }
         textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
 
-        /* MAP */
+        /* OPS MAP - v5.0 CONSTELLATION */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
         .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
@@ -70,6 +62,15 @@
         .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
         .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; }
         .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; z-index: 5; }
+        .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: fade-out 0.8s forwards; pointer-events: none; }
+
+        /* PORTAL RECON */
+        .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
+        .portal-name { font-size: 0.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; }
+        .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
+        .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
+        .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
 
         /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
@@ -110,7 +111,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v4.9</span></div>
+            <div class="logo">REAPER <span>v5.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -327,9 +328,9 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v4.9 AESTHETIC ALIGNMENT', d: 'APRIL 30, 2026', c: '- Unified visual theme for Storm Matrix & Change Log tabs.<br>- Applied industrial border protocols and JetBrains Mono typography.'},
-                {v: 'v4.8 CHRONICLE PROTOCOL', d: 'APRIL 30, 2026', c: '- Established persistent logging for every turn.<br>- Unified update tracking between operator and dashboard.'},
-                {v: 'v4.7 MASTER RESTORATION', d: 'APRIL 30, 2026', c: '- Restored full 120+ portal database.<br>- Final removal of Ghost Recon from Dashboard.<br>- Optimized deep BIN data readout.'}
+                {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion (tripled density).<br>- Re-implemented Sparkling Shooting Star trails.<br>- Enhanced map physics and data transit aesthetics.'},
+                {v: 'v4.9 AESTHETIC ALIGNMENT', d: 'APRIL 30, 2026', c: '- Unified visual theme for Storm Matrix & Change Log tabs.<br>- Applied industrial border protocols.'},
+                {v: 'v4.8 CHRONICLE PROTOCOL', d: 'APRIL 30, 2026', c: '- Established persistent logging for every turn.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
@@ -337,7 +338,12 @@
         function initFullMap() {
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
-            activeNodes = [{x: 23, y: 35, l: 'NA EAST'}, {x: 48, y: 30, l: 'EU WEST'}, {x: 78, y: 38, l: 'AS PAC'}, {x: 32, y: 68, l: 'SA EAST'}, {x: 52, y: 55, l: 'AF MID'}, {x: 65, y: 25, l: 'RU REAPER'}, {x: 82, y: 75, l: 'AU SOUTH'}];
+            activeNodes = [
+                {x: 23, y: 35, l: 'NA EAST'}, {x: 18, y: 38, l: 'NA WEST'}, {x: 48, y: 30, l: 'EU WEST'},
+                {x: 52, y: 28, l: 'EU CENTRAL'}, {x: 78, y: 38, l: 'AS PAC'}, {x: 72, y: 42, l: 'AS EAST'},
+                {x: 32, y: 68, l: 'SA EAST'}, {x: 52, y: 55, l: 'AF MID'}, {x: 65, y: 25, l: 'RU REAPER'},
+                {x: 82, y: 75, l: 'AU SOUTH'}, {x: 88, y: 80, l: 'AU EAST'}, {x: 60, y: 45, l: 'ME CENTRAL'}
+            ];
             activeNodes.forEach(n => {
                 const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
                 node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
@@ -349,9 +355,9 @@
             const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
             if(!start || !end || start === end) return;
             const layer = document.getElementById('packet-layer');
-            const packet = document.createElement('div'); packet.className = 'packet'; packet.style.left = `${start.x}%`; packet.style.top = `${start.y}%`;
+            const packet = document.createElement('div'); packet.className = 'packet';
             layer.appendChild(packet);
-            const duration = 2000;
+            const duration = 1500;
             const startTime = performance.now();
             function animate() {
                 const now = performance.now();
@@ -359,11 +365,11 @@
                 const curX = start.x + (end.x - start.x) * progress;
                 const curY = start.y + (end.y - start.y) * progress;
                 packet.style.left = `${curX}%`; packet.style.top = `${curY}%`;
-                if(Math.random() > 0.5) {
+                if(Math.random() > 0.4) {
                     const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}%`; p.style.top = `${curY}%`;
-                    layer.appendChild(p); setTimeout(() => p.remove(), 800);
+                    layer.appendChild(p); setTimeout(() => p.remove(), 600);
                 }
-                if(progress < 1) requestAnimationFrame(animate); else setTimeout(() => packet.remove(), 100);
+                if(progress < 1) requestAnimationFrame(animate); else packet.remove();
             }
             requestAnimationFrame(animate);
         }
