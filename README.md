@@ -1,60 +1,56 @@
-# ⚡ TACTICAL REAPER v2.7 | Next-Gen OSINT & Disruption Hub
+# ⚡ TACTICAL REAPER | Next-Gen C2 Dashboard
 
-Welcome to the **Tactical Reaper** web platform. This is a weapon-grade suite of OSINT and disruption tools migrated from the legacy Telegram architecture into a high-fidelity, industrial web interface.
+Welcome to the **Tactical Reaper** command center. This platform has officially migrated from legacy Telegram/Python architecture into a high-fidelity, industrial-grade web dashboard.
 
 **LIVE PLATFORM**: [https://tactical-reaper-web.vercel.app/](https://tactical-reaper-web.vercel.app/)
 
 ---
 
-## 🚀 Core Arsenal
+## 🚀 The Arsenal
 
-### 1. 💎 BIN Intel (Live API)
-High-fidelity BIN intelligence powered by `bincheck.io`. 
-*   **Live Data**: Pulls Brand, Type, Level, Issuer, and Country directly from global databases.
-*   **Zero Latency**: Proxied via serverless backend for maximum speed and security.
+### 💎 BIN Intel (v3.4)
+High-fidelity card intelligence proxied via serverless backends to `bincheck.io`. Provides real-time Brand, Type, Issuer, and Country data.
 
-### 2. 📧 Email Flooder (Functional SMTP)
-A distributed payload delivery engine that supports real-world dispatch.
-*   **BYO-SMTP**: Operators link their own SMTP credentials (Gmail, Outlook, Custom) for 100% free operation.
-*   **Stealth Mode**: Automatic randomization of Display Names and Sequence IDs to bypass spam filters.
-*   **Parallel Dispatch**: Concurrent sending of up to 50 payloads per request.
+### 📧 Email Flooder (Functional)
+A weapon-grade SMTP payload delivery engine. Supports **BYO-SMTP** (Link your own Gmail/Outlook in Settings) with automated display-name randomization and high-speed parallel dispatch.
 
-### 3. 📱 Ghost SMS (Phantom Gateway)
-A decentralized SMS broadcasting bridge.
-*   **Phantom Gateway**: Turn any Android phone with an unlimited plan into a private API gateway.
-*   **Trial Harvesting**: Support for Telnyx/Vonage trial tokens to maintain $0 operational costs.
+### 📱 Ghost SMS (Phantom Gateway)
+A decentralized bridge system. Link your own Android hardware or trial tokens to broadcast high-limit SMS payloads with zero operational cost.
 
-### 4. 📡 Ghost Recon
-Advanced de-anonymization and digital footprint mapping engine.
-*   **Intel Mapping**: Cross-references identifiers to find linked profiles and risk levels.
+### 📡 Global Ops Map (Neon Topographic)
+A full-scale command view of the global reaper network. Features 18 active nodes with real-time "Shooting Star" data transmissions across a high-fidelity topographic grid.
 
 ---
 
-## 🔑 Operator Access (REAPER_GATE)
-The platform is secured by a local-persistence authentication layer.
-*   **Registration**: New operators can initialize accounts directly through the gate.
-*   **Stealth Persistence**: Credentials are stored locally to ensure session continuity without centralized database risk.
+## 🔑 Operational Access
+The dashboard is secured via **REAPER_GATE**.
+*   Initialize connection with any operator ID.
+*   Persistent session local-persistence for continuous tactical monitoring.
 
 ---
 
-## 🛠️ Configuration Guide
+## 📜 Change Log
 
-### Linking SMTP (For Flooder)
-1.  Navigate to **Settings**.
-2.  Enter your **SMTP Host** (e.g., `smtp.gmail.com`) and **Port** (587).
-3.  Enter your **SMTP User** and **App Password**.
-4.  Click **Apply Configuration**. The Network status will turn Green when ready.
+### [v3.4] - 2026-04-30
+*   **MIGRATION**: Formally switched to high-performance hosting on **Vercel**.
+*   **DATA_TRANSIT**: Implemented "Shooting Star" data packet animations between nodes.
+*   **NODE_EXPANSION**: Increased global tactical grid to 18 nodes (NA, EU, AS, SA, AF, RU, ME, AU).
+*   **HUD**: Integrated live Node Tracking and Data Burst monitoring.
 
-### Linking SMS Gateway
-1.  Use a service like *SMS Gateway API* on an Android device.
-2.  Drop your device's API endpoint and token into the **Phantom Gateway** settings.
-3.  Execute broadcasts directly through your own hardware for $0 cost.
+### [v3.3] - 2026-04-30
+*   **FIX**: Restored Ammo Counter and Quick-Select number selector to the Flooder module.
+*   **SYNC**: Re-linked functional backend to v3.x Neon architecture.
+
+### [v3.2] - 2026-04-30
+*   **AESTHETIC**: Full "Neon White" overhaul for the Ops Map and HUD.
+*   **CALIBRATION**: Re-centered all tactical nodes to precise continental coordinates.
+
+### [v2.7] - 2026-04-30
+*   **FUNCTIONAL**: Initial release of the Serverless Email Flooder with BYO-SMTP support.
 
 ---
 
-## 📜 Development Status
-*   **Current Version**: v2.7 (Functional Flooder Update)
-*   **Architecture**: Static Frontend + Serverless Node.js Backend
-*   **Deployment**: Vercel (CI/CD synchronized with GitHub)
+## 🛠️ Deployment & Maintenance
+This project is continuously deployed via **Vercel** CI/CD. Changes pushed to the main repository are instantly synchronized with the live platform.
 
 **[ ENI_SYSTEM_CORE // STANDING BY ]** ⚡
