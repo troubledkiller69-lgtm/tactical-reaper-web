@@ -45,21 +45,9 @@
         .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; position: relative; transition: 0.3s; }
         .portal-card:hover { border-color: #444; }
         .portal-name { font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; color: #fff; margin-bottom: 0.5rem; }
-        .portal-url { font-family: 'JetBrains Mono'; font-size: 0.55rem; color: #555; word-break: break-all; margin-bottom: 1rem; }
+        .portal-meta { font-size: 0.6rem; color: var(--text-dim); margin-bottom: 1rem; }
+        .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
         .portal-btn { background: #fff; color: #000; padding: 0.5rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; }
-
-        /* OPS MAP */
-        .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
-        .map-wrapper.active { display: block; }
-        .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
-        .map-container { position: relative; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat; filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow)); opacity: 0.3; }
-        .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
-        .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
-        .node::after { content: ''; position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; animation: pulse 3s infinite; }
-        .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; white-space: nowrap; }
-        .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff, 0 0 20px #fff; z-index: 5; }
-        .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px #fff; animation: fade-out 0.8s forwards; pointer-events: none; }
 
         /* DASHBOARD GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
@@ -80,7 +68,6 @@
         .guide { margin-top: 3rem; background: #0a0a0a; border: 1px solid #111; padding: 2rem; border-radius: 4px; border-left: 4px solid var(--success); }
         .guide h4 { font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 1rem; color: var(--success); }
         .guide p { font-size: 0.7rem; color: #888; line-height: 1.8; margin-bottom: 1rem; }
-        .guide code { background: #000; padding: 2px 5px; color: #fff; font-family: 'JetBrains Mono'; }
     </style>
 </head>
 <body>
@@ -106,10 +93,9 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v3.8</span></div>
+            <div class="logo">REAPER <span>v3.9</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
-                <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS_MAP</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL_RECON</a>
                 <a onclick="switchTab('inteldump')" id="nav-inteldump">INTEL_DUMP</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
@@ -117,7 +103,6 @@
             </nav>
         </header>
 
-        <!-- DASHBOARD TAB -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid">
                 <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn" onclick="runBinCheck()">LOOKUP</button><div id="bin-results" class="results">...</div></div>
@@ -127,26 +112,18 @@
             </div>
         </div>
 
-        <!-- PORTAL RECON TAB -->
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL_INTELLIGENCE</h2>
-                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION..." oninput="filterPortals()" style="max-width:500px;">
-                <div class="recon-grid" id="portal-list">
-                    <!-- Portals will be injected here -->
-                </div>
-
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">DX_PORTAL_DATABASE</h2>
+                <input type="text" id="portal-search" placeholder="FILTER BY INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
+                <div class="recon-grid" id="portal-list"></div>
                 <div class="guide">
-                    <h4>OPERATIONAL GUIDE: DXONLINE_ACCESS</h4>
-                    <p>These portals are managed via the <code>pscu.com</code> infrastructure. Each <code>req</code> identifier is institution-specific and links a cardholder login directly to the institution's cloud backend.</p>
-                    <p><strong>1. Target Identification:</strong> Locate the institution in the recon list above. Use the <code>SEARCH</code> bar to filter by name.</p>
-                    <p><strong>2. Access Point:</strong> Click <code>INITIALIZE ACCESS</code> to launch the secure login portal. These are direct bridges that bypass generic service homepages.</p>
-                    <p><strong>3. Parameters:</strong> Each portal utilizes a unique Base64-style <code>req</code> token. Do not modify these tokens, as they are hard-coded to the institution's cloud segment.</p>
+                    <h4>DX_ACCESS_PROTOCOL</h4>
+                    <p>These institutions utilize the <strong>PSCU DX Platform</strong>. Select a target to initialize a direct bridge to the institution's cloud segment.</p>
                 </div>
             </div>
         </div>
 
-        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
         <div id="tab-inteldump" class="tab-content"><div class="card" style="max-width:800px; margin: 5rem auto;"><h3>📡 DX_INTEL_DUMPER</h3><button class="btn" onclick="runIntelDump()">START_SCAN</button><div id="dump-results" class="results">...</div></div></div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL_REAPER_CORE ]</footer>
@@ -154,14 +131,134 @@
 
     <script>
         const portals = [
-            {n: 'Natco Credit Union', r: 'MUb6sRYehjJ44Rbi5zHXSQ'},
-            {n: 'Washington Trust Bank', r: '-jdMZ_bxqNDiH3DeHYFRBA'},
-            {n: 'NCMIC Finance Corp', r: 'DMSoLGaYIX91gsesy2-HzQ'},
-            {n: 'Industrial FCU', r: 'oSpzg65yayxRCt7iYlitBQ'},
-            {n: 'Haynes Community FCU', r: 'KRxVqcwV8FwjJ57PXTIB1w'},
-            {n: 'PennCU', r: 'q-7F5YbUTvAnubY-GNwQ6Q'},
-            {n: 'Cashmere Valley Bank', r: 'q-7F5YbUTvAnubY-GNwQ6Q'},
-            {n: 'United Community CU', r: '_wO9rWjGsolWJTl-h45S4w'}
+            {n: 'Baltimore Washington FCU', u: 's1', r: 'CkUWGGb4EmCM8sKV9sq_mg', b: ['480927']},
+            {n: 'Garden Island FCU', u: 's2', r: '_ABOGQM8Yebl7f21AZTK-g', b: ['478643']},
+            {n: 'Georgia\'s Own CU', u: 's2', r: 'drWvsOTJEDwPk8L6oaSRsg', b: ['411255', '412237', '414861']},
+            {n: 'Edwards FCU', u: 's1', r: '6m-OQ7yTNyDPbcTgTDPpZg', b: ['444338', '484342']},
+            {n: 'Houston Texas Fire Fighters', u: 's1', r: 'gWBP0ksYVfielhuFlB8A8A', b: ['400328', '431812']},
+            {n: 'Keys FCU', u: 's2', r: 'P6SQ2hCy8ZGNjiU89bEzXw', b: ['462622']},
+            {n: 'Henrico FCU', u: 's1', r: 'NOA5ddWb2Bd7-6vRYbth4Q', b: ['407050']},
+            {n: 'BayPort CU', u: 's1', r: 'iuopVHeXQAxy4U1gtQxudw', b: ['544630']},
+            {n: 'Firefighters Community CU', u: 's1', r: 'AE-QKORMoAJlgP_gtigZCQ', b: ['430659', '460506']},
+            {n: 'Consolidated Community CU', u: 's1', r: 'bSiB1VqJmQCHFGcBZuhDdA', b: ['410983', '423787']},
+            {n: 'Industrial FCU', u: 's1', r: 'DMSoLGaYIX91gsesy2-HzQ', b: ['409429', '430408']},
+            {n: 'NorthCountry FCU', u: 's1', r: 'nBI13KodbjvAz6ETXCzAfA', b: ['413686', '413734']},
+            {n: 'Five Star of Maryland FCU', u: 's1', r: 'e6JTFX_IGbUVaUOAKnYfvA', b: ['411292', '463008']},
+            {n: 'CODE Credit Union', u: 's1', r: 'fnZmgxA3eZjbpbbBrzXuvg', b: ['441829', '442876']},
+            {n: 'State Department FCU', u: 's2', r: 'in2gtO_wA_6coxYaoRJhnA', b: ['408426', '408427']},
+            {n: 'Jefferson Parish Employees', u: 's2', r: 'YrdbqcuO_c973UJBFn_AiQ', b: ['425222']},
+            {n: 'Fortress FCU', u: 's2', r: 'SwMMLALb4uUagTxJ5MFxpQ', b: ['413679']},
+            {n: 'Mid-Hudson Valley FCU', u: 's2', r: 'lz8IE9FwJ_Sp2tgyqxdUDA', b: ['430125', '465653']},
+            {n: 'tnConnect CU', u: 's2', r: 'n2uzZsPMT6gwJyuqIfntKQ', b: ['430633']},
+            {n: 'Priority First FCU', u: 's2', r: '_-KUbeH9L2Mk-lDemoTKdA', b: ['473541']},
+            {n: 'Credit Union of America', u: 's2', r: 'Ylbxdu5Y8OleqLDXvKPJjA', b: ['446755', '464905']},
+            {n: 'Complex Community FCU', u: 's2', r: 'Rd8coAYDiFfAkbd5JmKong', b: []},
+            {n: 'Community One of Ohio', u: 's1', r: 'cHsEkHCl4TiPS_V-O-9cqw', b: []},
+            {n: 'Salem VA MC FCU', u: 's1', r: 'F7sZb4Aa5mDqYY66KryepA', b: []},
+            {n: 'Tri State Rail FCU', u: 's1', r: 'T6kRrZ2I1osQdUtWGNmLIw', b: []},
+            {n: 'Iron County Community CU', u: 's1', r: 'rrouybFD3uhbceZd2EYYgg', b: []},
+            {n: 'Highway FCU', u: 's1', r: 'FNRLgdfpWe8JAewsDzBmCg', b: []},
+            {n: 'Virginia Educators CU', u: 's1', r: 'UX3yAhgvCbVuALYn91fODA', b: []},
+            {n: 'Cy-Fair FCU', u: 's1', r: 'jjlVz-PR7OeAgFxHK8OSzw', b: []},
+            {n: 'Corry FCU', u: 's1', r: 'rhCn9T9IqQ49nU9Uy811gw', b: []},
+            {n: 'Novation', u: 's2', r: 'liryhnWg2tI6ZmTNovG-Lw', b: []},
+            {n: 'CACL FCU', u: 's1', r: 'JrWOieBi9RP664o4aGSk1w', b: []},
+            {n: 'Hawaii Law Enforcement FCU', u: 's2', r: 'ELdZAXIHtyN2IVxyKdVqdA', b: []},
+            {n: 'Everwise', u: 's1', r: 'IRg8-MhgyvPLWln5oblHfQ', b: []},
+            {n: 'Polish National CU', u: 's2', r: 'cRWQoy8rRNrVcp6vvV2MoA', b: []},
+            {n: 'Commonwealth Utilities', u: 's2', r: 'cbwpVs_lroy9JrVaMTcixA', b: []},
+            {n: 'University Credit Union', u: 's2', r: 'daKKjxdlHRns2IzX1ldeEg', b: []},
+            {n: 'VA Pittsburgh Employees', u: 's2', r: 'BKgbmPv4PlquK8-l24ZDYA', b: []},
+            {n: 'Wellesley Municipal Employees', u: 's2', r: 'G-3blFdiS4U3z522pRGzag', b: []},
+            {n: 'Franklin First FCU', u: 's2', r: 'CaFyqmoPwR7oUpqfowm8NQ', b: []},
+            {n: 'Lewis Clark Credit Union', u: 's1', r: 'p-7DoRRi8rfDm2pfIgndWQ', b: []},
+            {n: 'Liberty Federal Credit Union', u: 's1', r: 'VX3M1nM_VwnLUsQDerJYNg', b: []},
+            {n: 'Irving City Employees FCU', u: 's1', r: 'z2oEbIkLb3bDiHDqev2GLw', b: []},
+            {n: 'Arrha Credit Union', u: 's1', r: 'fIz2i0vBJvbzP0cLu9j7LQ', b: []},
+            {n: 'New Bedford Credit Union', u: 's1', r: 'M4DPXJnyzsDfQekhmEJ6IQ', b: []},
+            {n: 'Worcester Credit Union', u: 's1', r: '614UGLkULjxuFEhuNqezgA', b: []},
+            {n: 'Teamsters Council #37', u: 's1', r: 'AE64KFAw0G4bI9vmQWtkUg', b: []},
+            {n: 'Wyrope Williamsport FCU', u: 's1', r: 'HzgpGsRKBfEggdfSYBdmdg', b: []},
+            {n: 'Tri County Area FCU', u: 's1', r: '2P0TOrXzCIJ0oXK_5DHroQ', b: []},
+            {n: 'Summit Ridge Credit Union', u: 's1', r: 'Y-2J1hm9bybNxat6_76ypQ', b: []},
+            {n: 'MCT Credit Union', u: 's1', r: 'yUJB2BUPn0QELRGm6RLENA', b: []},
+            {n: 'Greenville FCU', u: 's2', r: 'RkiU-UGbQI18qKsOaCLTwQ', b: []},
+            {n: 'Aerospace FCU', u: 's2', r: '6NBqm3Lsbichvp5e07vMow', b: []},
+            {n: 'BP Federal Credit Union', u: 's2', r: '1I-DdZLrloM0FKlavjAH8w', b: ['430662']},
+            {n: 'MidWest America FCU', u: 's2', r: 'sjexTGLMKPGxJR6h712v6Q', b: ['406002', '409484']},
+            {n: 'MECU Credit Union', u: 's2', r: 'dZZXVNJQ_6r78YpI_O72SQ', b: ['476080']},
+            {n: 'West-Aircomm FCU', u: 's2', r: '_2YIbAtTB_lWofZmeNqLhg', b: ['409455']},
+            {n: 'Sterling United', u: 's2', r: 'YxY20eusicwDce0QS72_oQ', b: ['407097']},
+            {n: 'United Community', u: 's2', r: 'hY0H7k_2afNfz7uFfSORJQ', b: ['423707']},
+            {n: 'KEMBA Indianapolis CU', u: 's1', r: 'JXpSoARPMp555lWMiwl29w', b: ['410963']},
+            {n: 'Members Source CU', u: 's1', r: 'R9bi1J_JRd8rZ6xVyirtTw', b: ['410956']},
+            {n: 'Dutch Point', u: 's2', r: 'ZLgl4vqrgH7KQxoVkdBrTw', b: ['435121']},
+            {n: 'Methuen FCU', u: 's1', r: 'AvJwQn_ptLNVlc7bpOSCMg', b: ['462630']},
+            {n: 'Affinity Plus FCU', u: 's1', r: '5U5gxhaQ3hCjeTHVDC3-7w', b: ['407522']},
+            {n: 'Chiphone FCU', u: 's1', r: 'Vr7tZFWJ66x0xlrRB6wZ0g', b: ['403972']},
+            {n: 'Chicago Patrolmen\'s FCU', u: 's2', r: 'too6wrPQKDXhLZlnYZ2HEQ', b: ['439856']},
+            {n: 'CommonWealth One FCU', u: 's1', r: 'Jo8lrdGSsRKyJa4bT9t7qQ', b: ['409435']},
+            {n: 'Illinois Community CU', u: 's1', r: 'yrPRLu3hpOebHe_YfNiV9w', b: ['420272']},
+            {n: 'Midwest Carpenters FCU', u: 's1', r: '_xLXWCrnodUSgwO2UoThFw', b: ['403969']},
+            {n: 'UFCW Community FCU', u: 's2', r: 'mUqxqRC-OLEvCC0KsqokAg', b: ['417810']},
+            {n: 'VyStar', u: 's2', r: '697nYhMYp8H9FBLOJ7prvg', b: ['400519']},
+            {n: 'Jersey Shore', u: 's2', r: '5mk7vk-S1QmbNG-H8onGDA', b: ['441454']},
+            {n: 'Neches FCU', u: 's1', r: 'bB4YOSEdUYEMQN5DTzYW0Q', b: ['433377']},
+            {n: 'HawaiiUSA FCU', u: 's1', r: 'OcmLlLwgs-siIIrKoJ6vww', b: ['461311']},
+            {n: 'Mohawk Progressive', u: 's1', r: 'OPF7WLSmKA46Gdlszw41Qg', b: ['444479']},
+            {n: 'FAIRWINDS', u: 's1', r: '0wmSLn7aFqTe4CwpXBAkXw', b: ['401468']},
+            {n: 'Provident Credit Union', u: 's1', r: '8dcySDwkEZ-dcQcivOwj_g', b: ['400617']},
+            {n: 'Advantage FCU', u: 's1', r: 'djX73s4zCKwsbTkC5w7sSw', b: ['441683']},
+            {n: 'Riverfront FCU', u: 's1', r: 'HYVL2A9Y2qI-2PUcSFlQxg', b: ['454836']},
+            {n: 'Wauna Credit Union', u: 's2', r: 'jwaLitrD7iJpMagErZsYiw', b: ['410904']},
+            {n: 'Corner Post FCU', u: 's2', r: '7yO8qF2Z7HLJ9egv7Xu_EA', b: ['473547']},
+            {n: 'Perfect Circle CU', u: 's2', r: 'qkOPCmXbjH-2x2lj_Lct4A', b: ['400402']},
+            {n: 'Alcoa Tenn FCU', u: 's1', r: '5EHa9j5w-sDU0N-KfYbJAw', b: ['432665']},
+            {n: 'Midwest Members CU', u: 's1', r: 'QIBa7COjaf3NeUKjr9du8A', b: ['409807']},
+            {n: 'Associated Healthcare', u: 's1', r: L-RUh4kXUafloU1ajrAXfQ, b: ['463086']},
+            {n: 'Illinois State CU', u: 's1', r: 'KmDB9gdCtGGtTfGLXKmbUw', b: ['423758']},
+            {n: 'Advance Financial FCU', u: 's1', r: 'dlt8bLKwGKoyQm_b-kOaBw', b: ['401927']},
+            {n: '1st Community CU', u: 's1', r: 'Dg44gg5x2TmL3EAUYI6tkw', b: ['447924']},
+            {n: 'Advantage Plus FCU', u: 's1', r: 'hWVQqeH4vcos6jxp5BA31Q', b: ['460429']},
+            {n: 'Jefferson Credit Union', u: 's2', r: 'gChScrQeHqIH2fNVGOjxbw', b: ['499154']},
+            {n: 'Financial Builders FCU', u: 's2', r: 'l5ccmn1yoGOUfBpWM-eGrg', b: ['402619']},
+            {n: 'Nuvision Credit Union', u: 's2', r: 'EP39kKcfonZBWOotoK-o3Q', b: ['420215']},
+            {n: 'Community West CU', u: 's2', r: 'fQxlMj_uo8ApNvsQB_OBQQ', b: ['402888']},
+            {n: 'PrimeTrust FCU', u: 's2', r: 'URsUlZFkWYtkX-3_qfAzEg', b: ['423720']},
+            {n: 'Chessie FCU', u: 's1', r: 'pU_Jp77lzcq3I_12u4Eotw', b: ['414248']},
+            {n: 'Border FCU', u: 's1', r: 'xOCJD2C0Wmd_HX2KxsueQQ', b: ['426379']},
+            {n: 'Honolulu FCU', u: 's1', r: 'dCg0podKaAFhmZb8Sk_xKg', b: ['403986']},
+            {n: 'Profinance', u: 's1', r: '6_ok7TW6EElyHBW_G6Q02w', b: ['403986']},
+            {n: 'Marshall Community CU', u: 's1', r: 'YdAODg4fUvGIRQqdcd2teg', b: []},
+            {n: 'Burlington Municipal Employees', u: 's1', r: 'r-PxApDfcMURPSmCNA--9A', b: []},
+            {n: 'HTM Credit Union', u: 's1', r: 'kmYarHtGrthGvrMcF9nG3g', b: []},
+            {n: 'Malden FCU', u: 's1', r: '8EBStHSvOQX1-5WhthOWBw', b: []},
+            {n: 'Access Credit Union', u: 's1', r: 'Lf8b9iCpQSluOZop-9LBng', b: []},
+            {n: 'Armstrong Co. Federal', u: 's1', r: 'lFY5vEeNICPXvgVnerHKUA', b: []},
+            {n: 'CU Campus Card Services', u: 's2', r: 'XmCwAYHvRNcF0SITNFz_dA', b: []},
+            {n: 'Southcoast FCU', u: 's2', r: 'C8K_25xVtuTwnyF8PZHp4A', b: []},
+            {n: 'Christian Community CU', u: 's2', r: 'qjBpT9sDxEO2ZZ5brOHiow', b: []},
+            {n: 'InvesTex Credit Union', u: 's2', r: 'MLHmWiKpLGgzRznT3XuT8Q', b: []},
+            {n: 'R-S Bellco', u: 's1', r: 'oVwPJK-B_p67vJXPAS_Utg', b: []},
+            {n: 'Maroon Financial CU', u: 's1', r: 'DPObG1OYaoE-GGN7o2seLQ', b: []},
+            {n: 'Toledo Urban FCU', u: 's2', r: 'gtr8JOH-XtTUz-7PtfdDOQ', b: []},
+            {n: 'Copper & Glass FCU', u: 's1', r: 'IIk--vp1gbWdyLt0UxiOPw', b: []},
+            {n: 'Member One FCU', u: 's2', r: '0jUPrQP-bXly1PjhyVRZmA', b: []},
+            {n: 'Community Spirit', u: 's2', r: '-GeyI9Jt_8giqVLI2MGoTQ', b: []},
+            {n: 'TopLine', u: 's2', r: 'ltkAzEjHquyXEVGExQ0ZrQ', b: []},
+            {n: 'Attleboro Municipal Employees', u: 's1', r: 'bNC1M3-5gkZ-4VzcPqrzag', b: []},
+            {n: 'L & N FCU', u: 's1', r: 'IKRMdXu40xMloIuX3xL5sA', b: []},
+            {n: 'Champions First CU', u: 's1', r: 'LesETeWYdpEt3la3vsyRqw', b: []},
+            {n: 'Avenir Financial', u: 's1', r: 'bGqH8WqnXoSUA6xlqrtBEw', b: []},
+            {n: 'Big Spring Education', u: 's1', r: '0OBV6jkG4R8C00SPy8UJTg', b: []},
+            {n: 'WSSC FCU', u: 's1', r: '4TRwhAZ1SQhLKaSpV8U6Dw', b: []},
+            {n: 'WeStreet', u: 's1', r: 'CqIgV0KChpppEgSVbN_B5w', b: []},
+            {n: 'Your Best Credit Union', u: 's1', r: 'jrQ2CJNGozotLXLjzMf-kA', b: []},
+            {n: 'First Choice Community CU', u: 's1', r: 'Ip93sgy15OiUmqk7yCvIVw', b: []},
+            {n: 'Community CU of Lynn', u: 's1', r: 'Q3qN4KoQK9fqkgiQBfxEgw', b: []},
+            {n: 'Rivertown Credit Union', u: 's1', r: 'GJaWf3WzH08f7xxhoi_n4Q', b: []},
+            {n: 'CT Firefighters FCU', u: 's1', r: 'qgtIZY8Fhva8kPJHuaMx3A', b: []},
+            {n: 'Freedom Credit Union', u: 's1', r: 'bg2EdFhXb1LQ-h3WzIAmOA', b: []}
         ];
 
         function handleLogin() {
@@ -172,7 +269,7 @@
                 sessionStorage.setItem('logged', user);
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                initFullMap(); setInterval(spawnPacket, 2000); renderPortals();
+                renderPortals();
             } else { document.getElementById('login-error').innerText = 'INVALID'; }
         }
         function handleRegister() {
@@ -185,16 +282,20 @@
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLoginDirect(); };
-        function handleLoginDirect() { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); }
+        function handleLoginDirect() { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); renderPortals(); }
 
         function renderPortals(filter = '') {
             const list = document.getElementById('portal-list');
             list.innerHTML = '';
-            portals.filter(p => p.n.toLowerCase().includes(filter.toLowerCase())).forEach(p => {
-                const url = `https://dxonline-apps-s2-cloud.pscu.com/wps/portal/accesspoint/login?req=${p.r}`;
+            portals.filter(p => p.n.toLowerCase().includes(filter.toLowerCase()) || p.b.some(bin => bin.includes(filter))).forEach(p => {
+                const url = `https://dxonline-apps-${p.u}-cloud.pscu.com/wps/portal/accesspoint/login?req=${p.r}`;
                 const card = document.createElement('div');
                 card.className = 'portal-card';
-                card.innerHTML = `<div class="portal-name">${p.n}</div><div class="portal-url">${url}</div><button class="portal-btn" onclick="window.open('${url}')">INITIALIZE ACCESS</button>`;
+                card.innerHTML = `
+                    <div class="portal-name">${p.n}</div>
+                    <div class="portal-meta">INFRASTRUCTURE: <span>${p.u.toUpperCase()}_CLOUD</span> | BINS: <span>${p.b.join(', ') || 'N/A'}</span></div>
+                    <button class="portal-btn" onclick="window.open('${url}')">INITIALIZE ACCESS</button>
+                `;
                 list.appendChild(card);
             });
         }
@@ -205,8 +306,6 @@
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
-            const mapWrapper = document.getElementById('full-map-wrapper');
-            if(tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
         }
 
         function switchAuth(mode) {
@@ -217,19 +316,20 @@
             else { document.querySelector('.auth-tab:nth-child(2)').classList.add('active'); document.getElementById('auth-register').classList.remove('hidden'); }
         }
 
-        function initFullMap() {
-            const layer = document.getElementById('node-layer');
-            const activeNodes = [{x: 23, y: 35, l: 'NA_EAST'}, {x: 48, y: 30, l: 'EU_WEST'}, {x: 78, y: 38, l: 'AS_PAC'}, {x: 32, y: 68, l: 'SA_EAST'}, {x: 52, y: 55, l: 'AF_MID'}, {x: 65, y: 25, l: 'RU_REAPER'}, {x: 82, y: 75, l: 'AU_SOUTH'}];
-            activeNodes.forEach(n => {
-                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
-                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
-            });
+        async function runBinCheck() {
+            const bin = document.getElementById('bin-input').value;
+            const res = document.getElementById('bin-results');
+            if(!bin) return; res.innerHTML = `> SYNCING...`;
+            try {
+                const response = await fetch(`/api/bincheck?bin=${bin}`);
+                const data = await response.json();
+                if(data.BIN) res.innerHTML += `\n> BRAND: ${data.BIN.brand}\n> STATUS: 200_OK`;
+                else res.innerHTML += `\n> ERROR: ${data.error}`;
+            } catch (e) { res.innerHTML += `\n> EXCEPTION: TIMEOUT`; }
         }
-        function spawnPacket() { /* Logic simplified for space */ }
-        async function runBinCheck() { /* Logic simplified for space */ }
-        function runFlooder() { addLog('FLOOD_FIRE'); }
+
+        function runFlooder() { document.getElementById('flood-results').innerText = '> DISPATCH_OK'; }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200_OK'; }
-        function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
     </script>
 </body>
 </html>
