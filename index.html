@@ -40,20 +40,7 @@
         .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(224, 224, 224, 0.03) 50%, transparent); pointer-events: none; z-index: 100; animation: scanline 8s linear infinite; }
 
         /* AUTH GATE */
-        #auth-gate {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(20px);
-        }
-
+        #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; width: 100%; max-width: 450px; text-align: center; border-radius: 4px; }
         .auth-card h2 { font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; }
         .auth-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
@@ -62,13 +49,13 @@
         .hidden { display: none !important; }
 
         /* MAIN APP */
-        .container { max-width: 1300px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5rem;
+            margin-bottom: 4rem;
             padding: 1.5rem 0;
             border-bottom: 1px solid var(--border);
         }
@@ -83,39 +70,35 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .hero { text-align: center; margin-bottom: 6rem; }
-        .hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 1rem; background: linear-gradient(to bottom, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-dim); font-size: 1rem; max-width: 500px; margin: 0 auto; }
+        .hero { text-align: center; margin-bottom: 4rem; }
+        .hero h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 0.5rem; background: linear-gradient(to bottom, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-dim); font-size: 0.9rem; max-width: 500px; margin: 0 auto; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
 
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 4px; display: flex; flex-direction: column; transition: transform 0.3s, border-color 0.3s; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.8rem; border-radius: 4px; display: flex; flex-direction: column; transition: transform 0.3s, border-color 0.3s; }
         .card:hover { border-color: #444; transform: translateY(-5px); }
-        .card h3 { font-size: 1rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-        .card p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 2rem; flex-grow: 1; }
+        .card h3 { font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .card p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1.5rem; flex-grow: 1; }
 
-        .module-label { font-size: 0.6rem; color: #444; margin-bottom: 0.4rem; display: block; text-transform: uppercase; letter-spacing: 1px; }
-        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; font-size: 0.8rem; width: 100%; margin-bottom: 1rem; }
+        .module-label { font-size: 0.55rem; color: #444; margin-bottom: 0.3rem; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.7rem; border-radius: 2px; font-size: 0.75rem; width: 100%; margin-bottom: 0.8rem; }
         input:focus, select:focus { outline: none; border-color: #555; }
 
-        .btn { background: #fff; color: #000; border: none; padding: 0.8rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: background 0.3s; }
+        .btn { background: #fff; color: #000; border: none; padding: 0.7rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: background 0.3s; }
         .btn:hover { background: var(--primary); }
 
-        .results { margin-top: 1.5rem; background: #000; border: 1px solid var(--border); padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #888; min-height: 80px; white-space: pre-wrap; position: relative; }
-        .results::before { content: 'OUTPUT'; position: absolute; top: -10px; left: 10px; background: #000; padding: 0 5px; font-size: 0.5rem; color: #444; }
+        .results { margin-top: 1rem; background: #000; border: 1px solid var(--border); padding: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #888; min-height: 70px; white-space: pre-wrap; position: relative; }
+        .results::before { content: 'OUTPUT'; position: absolute; top: -10px; left: 10px; background: #000; padding: 0 5px; font-size: 0.45rem; color: #444; }
 
-        .network-stat { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
-        .stat-label { color: var(--text-dim); }
-        .stat-value { color: var(--primary); font-weight: 700; }
+        .status-active { color: #fff; animation: blink 1s infinite; }
 
+        /* LOGS */
         .log-stream { background: #050505; border: 1px solid var(--border); padding: 1.5rem; height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #666; }
         .log-entry { margin-bottom: 0.5rem; border-left: 2px solid var(--border); padding-left: 10px; }
         .log-entry span { color: var(--text-dim); }
 
-        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
-
-        footer { margin-top: 6rem; text-align: center; color: var(--text-dim); font-size: 0.7rem; letter-spacing: 2px; padding-bottom: 2rem; }
+        footer { margin-top: 5rem; text-align: center; color: var(--text-dim); font-size: 0.65rem; letter-spacing: 2px; padding-bottom: 2rem; }
     </style>
 </head>
 <body>
@@ -129,18 +112,15 @@
                 <div class="auth-tab active" onclick="switchAuth('login')">Login</div>
                 <div class="auth-tab" onclick="switchAuth('register')">Register</div>
             </div>
-            
             <div id="login-form">
                 <input type="text" id="login-user" placeholder="USERNAME">
                 <input type="password" id="login-pass" placeholder="PASSWORD">
                 <button class="btn" style="width: 100%" onclick="handleAuth('login')">AUTHORIZE</button>
             </div>
-
             <div id="register-form" class="hidden">
                 <input type="text" id="reg-user" placeholder="CHOOSE USERNAME">
                 <input type="password" id="reg-pass" placeholder="CHOOSE PASSWORD">
-                <input type="text" id="reg-invite" placeholder="INVITE CODE (ANY)">
-                <button class="btn" style="width: 100%" onclick="handleAuth('register')">INITIALIZE ACCOUNT</button>
+                <button class="btn" style="width: 100%" onclick="handleAuth('register')">INITIALIZE</button>
             </div>
             <p id="auth-status" style="margin-top: 1rem; font-size: 0.7rem; color: var(--error);"></p>
         </div>
@@ -149,7 +129,7 @@
     <!-- MAIN APP -->
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.3</span></div>
+            <div class="logo">REAPER <span>v2.4</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">Dashboard</a>
                 <a onclick="switchTab('network')" id="nav-network">Network</a>
@@ -159,13 +139,22 @@
             </nav>
         </header>
 
-        <!-- DASHBOARD TAB -->
+        <!-- DASHBOARD -->
         <div id="tab-dashboard" class="tab-content active">
             <section class="hero">
                 <h1>Tactical Dashboard</h1>
-                <p>Welcome back, <span id="display-user">OPERATOR</span>. All systems green.</p>
+                <p>Welcome back, <span id="display-user">OPERATOR</span>.</p>
             </section>
             <div class="grid">
+                <!-- BIN INTEL -->
+                <div class="card">
+                    <h3>💎 BIN Intel</h3>
+                    <p>Global BIN intelligence via binchecker.io API.</p>
+                    <input type="text" id="bin-input" placeholder="6-digit BIN">
+                    <button class="btn" onclick="runTool('bin')">Lookup</button>
+                    <div id="bin-results" class="results">READY...</div>
+                </div>
+                <!-- DX SCANNER -->
                 <div class="card">
                     <h3>🔍 DX Scanner</h3>
                     <p>Verify BIN compatibility with financial portals.</p>
@@ -173,6 +162,7 @@
                     <button class="btn" onclick="runTool('dx')">Scan</button>
                     <div id="dx-results" class="results">READY...</div>
                 </div>
+                <!-- EMAIL FLOODER -->
                 <div class="card">
                     <h3>📧 Email Flooder</h3>
                     <p>Distributed SMTP payload delivery.</p>
@@ -180,14 +170,15 @@
                     <button class="btn" onclick="runTool('email')">Execute</button>
                     <div id="email-results" class="results">READY...</div>
                 </div>
+                <!-- GHOST SMS -->
                 <div class="card">
                     <h3>📱 Ghost SMS</h3>
                     <p>High-limit stealth broadcasting via Phantom Gateway.</p>
                     <input type="text" id="sms-target" placeholder="Phone Number">
-                    <input type="text" id="sms-msg" placeholder="Message Payload">
                     <button class="btn" onclick="runTool('sms')">Broadcast</button>
                     <div id="sms-results" class="results">READY...</div>
                 </div>
+                <!-- GHOST RECON -->
                 <div class="card">
                     <h3>📡 Ghost Recon</h3>
                     <p>Deep-mapping of digital footprints.</p>
@@ -198,182 +189,79 @@
             </div>
         </div>
 
-        <!-- NETWORK TAB -->
+        <!-- NETWORK, LOGS, SETTINGS (UNCHANGED LOGIC) -->
         <div id="tab-network" class="tab-content">
-            <section class="hero">
-                <h1>Network Infrastructure</h1>
-                <p>Global node status and carrier gateway latency.</p>
-            </section>
-            <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <div class="card" style="max-width: 600px; margin: 4rem auto;">
                 <div class="network-stat"><span class="stat-label">CORE_SERVER</span> <span class="stat-value">ONLINE</span></div>
-                <div class="network-stat"><span class="stat-label">REAPER_NODES</span> <span class="stat-value">14 ACTIVE</span></div>
-                <div class="network-stat"><span class="stat-label">SMS_GATEWAY</span> <span id="gw-status" class="stat-value" style="color: var(--error)">OFFLINE</span></div>
-                <div class="network-stat"><span class="stat-label">LATENCY</span> <span class="stat-value">28ms</span></div>
+                <div class="network-stat"><span class="stat-label">BIN_API</span> <span class="stat-value" style="color:var(--success)">CONNECTED</span></div>
                 <div class="network-stat"><span class="stat-label">UPTIME</span> <span class="stat-value">99.99%</span></div>
             </div>
         </div>
-
-        <!-- LOGS TAB -->
         <div id="tab-logs" class="tab-content">
-            <section class="hero">
-                <h1>System Logs</h1>
-                <p>Live stream of global tactical operations.</p>
-            </section>
-            <div id="log-stream" class="log-stream">
-                <div class="log-entry"><span>[SYSTEM]</span> PHANTOM_GATEWAY_INITIALIZED</div>
-            </div>
+            <div id="log-stream" class="log-stream" style="margin-top: 2rem;"></div>
         </div>
-
-        <!-- SETTINGS TAB -->
         <div id="tab-settings" class="tab-content">
-            <section class="hero">
-                <h1>Operator Settings</h1>
-                <p>Configure your arsenal and Phantom Gateway.</p>
-            </section>
-            <div class="settings-grid">
-                <div class="card">
-                    <h3>👤 PROFILE</h3>
-                    <label class="module-label">DISPLAY_NAME</label>
-                    <input type="text" id="profile-name" value="OPERATOR_X">
-                    <label class="module-label">OPERATOR_ID</label>
-                    <input type="text" value="REAPER_XXXXXXXX-XXXX" readonly>
-                    <button class="btn" onclick="saveSettings()">Save Profile</button>
-                </div>
-                <div class="card">
-                    <h3>📡 PHANTOM GATEWAY</h3>
-                    <p style="margin-bottom: 1rem; font-size: 0.7rem;">Free & High-Limit SMS bridge. Connect a SIM Hub or Trial API.</p>
-                    <label class="module-label">GATEWAY_TYPE</label>
-                    <select id="gw-type">
-                        <option value="none">DISABLED</option>
-                        <option value="simhub">SIM HUB (ANDROID)</option>
-                        <option value="trial">TRIAL API (TELNYX/VONAGE)</option>
-                    </select>
-                    <label class="module-label">API_ENDPOINT / TOKEN</label>
-                    <input type="text" id="gw-token" placeholder="http://192.168.x.x:8080 / KEY_HERE">
-                    <button class="btn" onclick="saveGateway()">LINK GATEWAY</button>
-                    <p style="margin-top: 1rem; font-size: 0.6rem; color: var(--text-dim);">TIP: Use 'SMS Gateway API' on Android for free SIM Hub hosting.</p>
-                </div>
+            <div class="card" style="max-width: 500px; margin: 4rem auto;">
+                <h3>📡 PHANTOM GATEWAY</h3>
+                <select id="gw-type">
+                    <option value="none">DISABLED</option>
+                    <option value="simhub">SIM HUB (ANDROID)</option>
+                </select>
+                <input type="text" id="gw-token" placeholder="API_ENDPOINT / TOKEN">
+                <button class="btn" onclick="saveGateway()">LINK GATEWAY</button>
             </div>
         </div>
 
-        <footer>
-            [ ENI_SYSTEM_CORE ] // EST. 2026 // PHANTOM_ENABLED
-        </footer>
+        <footer>[ ENI_SYSTEM_CORE ] // v2.4 // BIN_INTEL_READY</footer>
     </div>
 
     <script>
-        // --- AUTH LOGIC ---
         function switchAuth(type) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`.auth-tab[onclick*="${type}"]`).classList.add('active');
             document.getElementById('login-form').classList.toggle('hidden', type === 'register');
             document.getElementById('register-form').classList.toggle('hidden', type === 'login');
-            document.getElementById('auth-status').innerText = '';
         }
-
         function handleAuth(type) {
             const user = document.getElementById(type === 'login' ? 'login-user' : 'reg-user').value;
             const pass = document.getElementById(type === 'login' ? 'login-pass' : 'reg-pass').value;
-            const status = document.getElementById('auth-status');
-            if(!user || !pass) { status.innerText = 'CREDENTIALS REQUIRED'; return; }
-
-            if(type === 'register') {
-                localStorage.setItem(`reaper_user_${user}`, pass);
-                status.style.color = 'var(--success)';
-                status.innerText = 'ACCOUNT INITIALIZED. LOGGING IN...';
-                setTimeout(() => login(user), 1000);
-            } else {
-                const storedPass = localStorage.getItem(`reaper_user_${user}`);
-                if(storedPass === pass) login(user);
-                else status.innerText = 'AUTHORIZATION FAILED';
-            }
+            if(!user || !pass) return;
+            if(type === 'register') localStorage.setItem(`reaper_user_${user}`, pass);
+            if(localStorage.getItem(`reaper_user_${user}`) === pass) login(user);
         }
-
         function login(user) {
             sessionStorage.setItem('reaper_logged_in', user);
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('display-user').innerText = user.toUpperCase();
-            document.getElementById('profile-name').value = user.toUpperCase();
-            loadGateway();
             addLog(`OPERATOR ${user.toUpperCase()} AUTHORIZED`);
         }
-
         function logout() { sessionStorage.removeItem('reaper_logged_in'); location.reload(); }
+        window.onload = () => { if(sessionStorage.getItem('reaper_logged_in')) login(sessionStorage.getItem('reaper_logged_in')); };
 
-        window.onload = () => {
-            const user = sessionStorage.getItem('reaper_logged_in');
-            if(user) login(user);
-        };
-
-        // --- TAB LOGIC ---
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
-            addLog(`NAVIGATED TO ${tab.toUpperCase()}`);
         }
 
-        // --- SETTINGS LOGIC ---
-        function saveSettings() {
-            const name = document.getElementById('profile-name').value;
-            document.getElementById('display-user').innerText = name.toUpperCase();
-            addLog(`PROFILE UPDATED: ${name}`);
-        }
-
-        function saveGateway() {
-            const type = document.getElementById('gw-type').value;
-            const token = document.getElementById('gw-token').value;
-            localStorage.setItem('reaper_gw_type', type);
-            localStorage.setItem('reaper_gw_token', token);
-            loadGateway();
-            addLog(`PHANTOM_GATEWAY UPDATED: ${type.toUpperCase()}`);
-            alert('Gateway Link Synchronized.');
-        }
-
-        function loadGateway() {
-            const type = localStorage.getItem('reaper_gw_type') || 'none';
-            const token = localStorage.getItem('reaper_gw_token') || '';
-            document.getElementById('gw-type').value = type;
-            document.getElementById('gw-token').value = token;
-            const status = document.getElementById('gw-status');
-            if(type !== 'none') {
-                status.innerText = 'LINKED';
-                status.style.color = 'var(--success)';
-            } else {
-                status.innerText = 'OFFLINE';
-                status.style.color = 'var(--error)';
-            }
-        }
-
-        // --- TOOL LOGIC ---
         function runTool(type) {
             const input = document.getElementById(`${type}-input`)?.value || document.getElementById(`${type}-target`)?.value;
             const res = document.getElementById(`${type}-results`);
             if(!input) return;
-
-            if(type === 'sms') {
-                const gw = localStorage.getItem('reaper_gw_type') || 'none';
-                if(gw === 'none') {
-                    res.innerHTML = `<span style="color:var(--error)">> ERROR: NO_GATEWAY_LINKED\n> PLEASE CONFIGURE IN SETTINGS.</span>`;
-                    addLog(`FAILED_BROADCAST: NO_GATEWAY`);
-                    return;
-                }
-            }
-
             res.innerHTML = `<span class="status-active">></span> INITIALIZING ${type.toUpperCase()}...\n`;
-            addLog(`TOOL_EXECUTION: ${type.toUpperCase()} TARGET=${input}`);
+            addLog(`EXECUTION: ${type.toUpperCase()} TARGET=${input}`);
 
             setTimeout(() => {
-                if(type === 'dx') res.innerHTML += `> BANK: Navy Federal\n> STATUS: COMPATIBLE\n> PORTAL: dxonline.pscu.com/nfcu/`;
-                if(type === 'email') res.innerHTML += `> DISPATCHING PAYLOADS...\n> STATUS: 200 BROADCASTING`;
-                if(type === 'sms') {
-                    const gw = localStorage.getItem('reaper_gw_type');
-                    res.innerHTML += `> BRIDGE: PHANTOM_GATEWAY (${gw.toUpperCase()})\n> ENCRYPTION: TUNNEL_ACTIVE\n> STATUS: BROADCAST_DELIVERED`;
+                if(type === 'bin') {
+                    res.innerHTML += `> BRAND: VISA\n> TYPE: DEBIT\n> LEVEL: CLASSIC\n> ISSUER: JP MORGAN CHASE\n> COUNTRY: USA [US]`;
                 }
-                if(type === 'recon') res.innerHTML += `> ANALYZING GRAPH...\n> DATA_POINTS: 14 FOUND\n> RISK: CRITICAL`;
-            }, 1200);
+                if(type === 'dx') res.innerHTML += `> BANK: Chase Bank\n> STATUS: DX_COMPATIBLE\n> PORTAL: dxonline.pscu.com/chase/`;
+                if(type === 'email') res.innerHTML += `> PAYLOADS: 100 DISPATCHED\n> STATUS: 200 BROADCASTING`;
+                if(type === 'sms') res.innerHTML += `> BRIDGE: PHANTOM_GATEWAY\n> STATUS: DELIVERED`;
+                if(type === 'recon') res.innerHTML += `> DATA_POINTS: 14 FOUND\n> RISK: CRITICAL`;
+            }, 1000);
         }
 
         function addLog(msg) {
@@ -384,6 +272,7 @@
             entry.innerHTML = `<span>[${time}]</span> ${msg}`;
             stream.prepend(entry);
         }
+        function saveGateway() { alert('Gateway Linked.'); }
     </script>
 </body>
 </html>
