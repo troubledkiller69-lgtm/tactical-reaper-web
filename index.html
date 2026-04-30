@@ -46,7 +46,7 @@
         .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
         .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
 
-        /* OPS MAP - v5.3 ABSOLUTE ALIGNMENT */
+        /* OPS MAP - v5.4 FINAL LANDING */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
         .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
@@ -110,7 +110,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v5.3</span></div>
+            <div class="logo">REAPER <span>v5.4</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -328,9 +328,9 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v5.3 ABSOLUTE ALIGNMENT', d: 'APRIL 30, 2026', c: '- Major Right-Shift (~8%) to match SVG projection background.<br>- Corrected vertical pinning for NA, EU, and RU hubs.'},
-                {v: 'v5.2 SURGICAL PRECISION', d: 'APRIL 30, 2026', c: '- Shifted all nodes right to correct projection offset.'},
-                {v: 'v5.1 GEOSPATIAL ALIGNMENT', d: 'APRIL 30, 2026', c: '- Manually re-calibrated operational centers.'}
+                {v: 'v5.4 FINAL LANDING', d: 'APRIL 30, 2026', c: '- Extreme Right-Shift (~6%) to finally catch SVG landmasses.<br>- Elevation corrections for Northern Hemisphere hubs (Moscow, Berlin, London).'},
+                {v: 'v5.3 ABSOLUTE ALIGNMENT', d: 'APRIL 30, 2026', c: '- Major Right-Shift to match background projection.'},
+                {v: 'v5.2 SURGICAL PRECISION', d: 'APRIL 30, 2026', c: '- Corrected projection offsets.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
@@ -339,10 +339,10 @@
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
             activeNodes = [
-                {x: 32, y: 31, l: 'NA EAST'}, {x: 23.5, y: 32, l: 'NA WEST'}, {x: 57.5, y: 19, l: 'EU WEST'},
-                {x: 61.5, y: 22, l: 'EU CENTRAL'}, {x: 92, y: 29, l: 'AS PAC'}, {x: 85, y: 42, l: 'AS EAST'},
-                {x: 41.5, y: 69, l: 'SA EAST'}, {x: 60.5, y: 59, l: 'AF MID'}, {x: 71, y: 15, l: 'RU REAPER'},
-                {x: 95, y: 79, l: 'AU SOUTH'}, {x: 99, y: 75, l: 'AU EAST'}, {x: 70.5, y: 37, l: 'ME CENTRAL'}
+                {x: 37, y: 27, l: 'NA EAST'}, {x: 28.5, y: 28, l: 'NA WEST'}, {x: 62.5, y: 16, l: 'EU WEST'},
+                {x: 66.5, y: 20, l: 'EU CENTRAL'}, {x: 97, y: 25, l: 'AS PAC'}, {x: 90, y: 40, l: 'AS EAST'},
+                {x: 46.5, y: 65, l: 'SA EAST'}, {x: 65.5, y: 55, l: 'AF MID'}, {x: 76, y: 12, l: 'RU REAPER'},
+                {x: 98, y: 75, l: 'AU SOUTH'}, {x: 100, y: 70, l: 'AU EAST'}, {x: 75.5, y: 35, l: 'ME CENTRAL'}
             ];
             activeNodes.forEach(n => {
                 const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
