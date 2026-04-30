@@ -46,7 +46,7 @@
         .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
         .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
 
-        /* OPS MAP - v5.7 PRECISION LOCK */
+        /* OPS MAP - v5.8 PIXEL PROTOCOL */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
         .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
@@ -110,7 +110,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v5.7</span></div>
+            <div class="logo">REAPER <span>v5.8</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -328,8 +328,8 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v5.7 PRECISION LOCK', d: 'APRIL 30, 2026', c: '- Total Reset pullback (~15% left) to escape the Atlantic overshoot.<br>- continent Pinning: NA WEST at 17%, NA EAST at 26%, EU WEST at 48%.'},
-                {v: 'v5.6 ZERO DRIFT', d: 'APRIL 30, 2026', c: '- Surgical Pullback attempt.'},
+                {v: 'v5.8 PIXEL PROTOCOL', d: 'APRIL 30, 2026', c: '- Migrated grid from percentage (%) to absolute pixel (px) coordinates.<br>- Fixed projection drift caused by relative scaling.'},
+                {v: 'v5.7 PRECISION LOCK', d: 'APRIL 30, 2026', c: '- Pullback attempt.'},
                 {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion & Sparkling Shooting Star trails.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
@@ -339,13 +339,13 @@
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
             activeNodes = [
-                {x: 26, y: 34, l: 'NA EAST'}, {x: 17, y: 35, l: 'NA WEST'}, {x: 48, y: 22, l: 'EU WEST'},
-                {x: 52, y: 26, l: 'EU CENTRAL'}, {x: 83, y: 32, l: 'AS PAC'}, {x: 76, y: 46, l: 'AS EAST'},
-                {x: 32, y: 72, l: 'SA EAST'}, {x: 51, y: 62, l: 'AF MID'}, {x: 62, y: 18, l: 'RU REAPER'},
-                {x: 86, y: 82, l: 'AU SOUTH'}, {x: 90, y: 78, l: 'AU EAST'}, {x: 61.5, y: 40, l: 'ME CENTRAL'}
+                {x: 580, y: 320, l: 'NA EAST'}, {x: 440, y: 330, l: 'NA WEST'}, {x: 940, y: 200, l: 'EU WEST'},
+                {x: 1020, y: 240, l: 'EU CENTRAL'}, {x: 1600, y: 300, l: 'AS PAC'}, {x: 1480, y: 440, l: 'AS EAST'},
+                {x: 650, y: 680, l: 'SA EAST'}, {x: 1000, y: 580, l: 'AF MID'}, {x: 1200, y: 160, l: 'RU REAPER'},
+                {x: 1680, y: 780, l: 'AU SOUTH'}, {x: 1740, y: 740, l: 'AU EAST'}, {x: 1180, y: 380, l: 'ME CENTRAL'}
             ];
             activeNodes.forEach(n => {
-                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
+                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}px`; node.style.top = `${n.y}px`;
                 node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
             });
         }
@@ -364,9 +364,9 @@
                 const progress = Math.min((now - startTime) / duration, 1);
                 const curX = start.x + (end.x - start.x) * progress;
                 const curY = start.y + (end.y - start.y) * progress;
-                packet.style.left = `${curX}%`; packet.style.top = `${curY}%`;
+                packet.style.left = `${curX}px`; packet.style.top = `${curY}px`;
                 if(Math.random() > 0.4) {
-                    const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}%`; p.style.top = `${curY}%`;
+                    const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}px`; p.style.top = `${curY}px`;
                     layer.appendChild(p); setTimeout(() => p.remove(), 600);
                 }
                 if(progress < 1) requestAnimationFrame(animate); else packet.remove();
