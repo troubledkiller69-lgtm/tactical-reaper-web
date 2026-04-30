@@ -78,7 +78,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.6</span></div>
+            <div class="logo">REAPER <span>v2.6.2</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" class="active">Dashboard</a>
                 <a onclick="switchTab('network')">Network</a>
@@ -131,7 +131,7 @@
         </div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:2rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
 
-        <footer>[ ENI_SYSTEM_CORE ] // v2.6 // DASHBOARD_OPTIMIZED</footer>
+        <footer>[ ENI_SYSTEM_CORE ] // v2.6.2 // MAPPING_FIXED</footer>
     </div>
 
     <script>
@@ -155,14 +155,21 @@
             const bin = document.getElementById(`${type}-input`).value;
             const res = document.getElementById(`${type}-results`);
             if(!bin) return;
-            res.innerHTML = `<span class="status-active">></span> FETCHING LIVE_DATA FROM BINCHECK.IO...\n`;
-            addLog(`API_CALL: BINCHECK.IO TARGET=${bin}`);
+            res.innerHTML = `<span class="status-active">></span> FETCHING LIVE_DATA...\n`;
+            addLog(`API_CALL: BINCHECK TARGET=${bin}`);
 
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                if(data.error) res.innerHTML += `> ERROR: ${data.details || 'LOOKUP_FAILED'}`;
-                else res.innerHTML += `> BRAND: ${data.brand || 'UNKNOWN'}\n> TYPE: ${data.type || 'UNKNOWN'}\n> LEVEL: ${data.level || 'UNKNOWN'}\n> ISSUER: ${data.bank || 'UNKNOWN'}\n> COUNTRY: ${data.country || 'UNKNOWN'}`;
+                
+                if(data.error) {
+                    res.innerHTML += `> ERROR: ${data.details || 'LOOKUP_FAILED'}`;
+                } else if(data.BIN) {
+                    const b = data.BIN;
+                    res.innerHTML += `> BRAND: ${b.brand || b.scheme || 'UNKNOWN'}\n> TYPE: ${b.type || 'UNKNOWN'}\n> LEVEL: ${b.level || 'UNKNOWN'}\n> ISSUER: ${b.issuer?.name || 'UNKNOWN'}\n> COUNTRY: ${data.country?.name || 'UNKNOWN'}`;
+                } else {
+                    res.innerHTML += `> ERROR: INVALID_RESPONSE_STRUCTURE`;
+                }
             } catch (e) {
                 res.innerHTML += `> EXCEPTION: CONNECTION_FAILED`;
             }
