@@ -40,6 +40,13 @@
         .tab-content { display: none; min-height: calc(100vh - 100px); }
         .tab-content.active { display: block; }
 
+        /* CHANGE LOG - v4.9 ALIGNMENT */
+        .changelog-item { border-left: 1px solid #222; padding-left: 2rem; margin-bottom: 4rem; position: relative; }
+        .changelog-item::before { content: ''; position: absolute; left: -3px; top: 0; width: 5px; height: 5px; background: #fff; box-shadow: 0 0 10px #fff; }
+        .changelog-version { font-family: 'Inter'; font-weight: 900; letter-spacing: 4px; color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
+        .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
+
         /* PORTAL RECON */
         .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
         .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
@@ -47,6 +54,11 @@
         .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
         .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
         .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
+
+        /* STORM MATRIX - v4.9 ALIGNMENT */
+        .matrix-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
+        .matrix-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #fff; padding: 2rem; }
+        textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
 
         /* MAP */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
@@ -98,7 +110,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v4.7</span></div>
+            <div class="logo">REAPER <span>v4.9</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -118,26 +130,26 @@
             </div>
         </div>
 
+        <div id="tab-storm" class="tab-content">
+            <div style="margin-top:4rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">STORM MATRIX</h2>
+                <div class="matrix-container">
+                    <div class="matrix-card"><h3>📥 BULK INPUT</h3><textarea id="storm-input" placeholder="NUMBER|MM|YY|CVV"></textarea><button class="btn" style="margin-top:1.5rem;" onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button></div>
+                    <div class="matrix-card"><h3>📊 STATS</h3><div id="storm-stats" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--success); margin-bottom:1.5rem;">A: 0 | R: 0</div><h3>💎 HIT VAULT</h3><div id="storm-vault" class="results" style="height:250px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div></div>
+                </div>
+            </div>
+        </div>
+
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON MATRIX</h2>
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON</h2>
                 <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
                 <div class="recon-grid" id="portal-list"></div>
             </div>
         </div>
 
-        <div id="tab-storm" class="tab-content">
-            <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">STORM MATRIX</h2>
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2rem;">
-                    <div class="card"><h3>📥 BULK INPUT</h3><textarea id="storm-input" placeholder="NUMBER|MM|YY|CVV"></textarea><button class="btn" style="margin-top:1rem;" onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button></div>
-                    <div class="card"><h3>💎 HIT VAULT</h3><div id="storm-vault" class="results" style="height:350px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div></div>
-                </div>
-            </div>
-        </div>
-
         <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
-        <div id="tab-changelog" class="tab-content"><div style="margin-top:5rem; max-width:800px;" id="changelog-container"></div></div>
+        <div id="tab-changelog" class="tab-content"><div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div></div>
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL REAPER CORE ]</footer>
     </div>
@@ -313,11 +325,11 @@
         function filterPortals() { renderPortals(document.getElementById('portal-search').value); }
 
         function renderChangeLog() {
-            const container = document.getElementById('changelog-container');
+            const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v4.7 MASTER RESTORATION', d: 'APRIL 30, 2026', c: '- Restored full 120+ portal database.<br>- Final removal of Ghost Recon from Dashboard.<br>- Optimized deep BIN data readout.'},
-                {v: 'v4.4 RECONSTRUCTION', d: 'APRIL 30, 2026', c: '- Restored Map/BIN/Flooder core logic.<br>- Added Change Log tab.'},
-                {v: 'v4.3 STORM MATRIX', d: 'APRIL 30, 2026', c: '- Integrated Stormcheck API.<br>- Clean UI (No Underscores).'}
+                {v: 'v4.9 AESTHETIC ALIGNMENT', d: 'APRIL 30, 2026', c: '- Unified visual theme for Storm Matrix & Change Log tabs.<br>- Applied industrial border protocols and JetBrains Mono typography.'},
+                {v: 'v4.8 CHRONICLE PROTOCOL', d: 'APRIL 30, 2026', c: '- Established persistent logging for every turn.<br>- Unified update tracking between operator and dashboard.'},
+                {v: 'v4.7 MASTER RESTORATION', d: 'APRIL 30, 2026', c: '- Restored full 120+ portal database.<br>- Final removal of Ghost Recon from Dashboard.<br>- Optimized deep BIN data readout.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
