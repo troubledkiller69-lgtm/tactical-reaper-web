@@ -54,42 +54,11 @@
             backdrop-filter: blur(20px);
         }
 
-        .auth-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 3rem;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border-radius: 4px;
-        }
-
-        .auth-card h2 {
-            font-weight: 900;
-            letter-spacing: 4px;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-        }
-
-        .auth-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
-        }
-
-        .auth-tab {
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
-        }
-
+        .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; width: 100%; max-width: 450px; text-align: center; border-radius: 4px; }
+        .auth-card h2 { font-weight: 900; letter-spacing: 4px; margin-bottom: 2rem; text-transform: uppercase; }
+        .auth-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .auth-tab { color: var(--text-dim); cursor: pointer; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
         .auth-tab.active { color: var(--primary); font-weight: 700; }
-
         .hidden { display: none !important; }
 
         /* MAIN APP */
@@ -108,15 +77,7 @@
         .logo span { color: var(--text-dim); font-weight: 400; }
 
         .nav-links { display: flex; gap: 2.5rem; }
-        .nav-links a {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
-            cursor: pointer;
-        }
+        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; cursor: pointer; }
         .nav-links a.active { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; }
 
         .tab-content { display: none; }
@@ -133,8 +94,9 @@
         .card h3 { font-size: 1rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
         .card p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 2rem; flex-grow: 1; }
 
-        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; font-size: 0.8rem; width: 100%; margin-bottom: 1rem; }
-        input:focus { outline: none; border-color: #555; }
+        .module-label { font-size: 0.6rem; color: #444; margin-bottom: 0.4rem; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; font-size: 0.8rem; width: 100%; margin-bottom: 1rem; }
+        input:focus, select:focus { outline: none; border-color: #555; }
 
         .btn { background: #fff; color: #000; border: none; padding: 0.8rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: background 0.3s; }
         .btn:hover { background: var(--primary); }
@@ -142,15 +104,16 @@
         .results { margin-top: 1.5rem; background: #000; border: 1px solid var(--border); padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #888; min-height: 80px; white-space: pre-wrap; position: relative; }
         .results::before { content: 'OUTPUT'; position: absolute; top: -10px; left: 10px; background: #000; padding: 0 5px; font-size: 0.5rem; color: #444; }
 
-        /* NETWORK TAB */
         .network-stat { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
         .stat-label { color: var(--text-dim); }
         .stat-value { color: var(--primary); font-weight: 700; }
 
-        /* LOGS TAB */
         .log-stream { background: #050505; border: 1px solid var(--border); padding: 1.5rem; height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #666; }
         .log-entry { margin-bottom: 0.5rem; border-left: 2px solid var(--border); padding-left: 10px; }
         .log-entry span { color: var(--text-dim); }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
 
         footer { margin-top: 6rem; text-align: center; color: var(--text-dim); font-size: 0.7rem; letter-spacing: 2px; padding-bottom: 2rem; }
     </style>
@@ -186,7 +149,7 @@
     <!-- MAIN APP -->
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.2</span></div>
+            <div class="logo">REAPER <span>v2.3</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">Dashboard</a>
                 <a onclick="switchTab('network')" id="nav-network">Network</a>
@@ -219,8 +182,9 @@
                 </div>
                 <div class="card">
                     <h3>📱 Ghost SMS</h3>
-                    <p>Stealth message broadcasting.</p>
+                    <p>High-limit stealth broadcasting via Phantom Gateway.</p>
                     <input type="text" id="sms-target" placeholder="Phone Number">
+                    <input type="text" id="sms-msg" placeholder="Message Payload">
                     <button class="btn" onclick="runTool('sms')">Broadcast</button>
                     <div id="sms-results" class="results">READY...</div>
                 </div>
@@ -243,9 +207,9 @@
             <div class="card" style="max-width: 600px; margin: 0 auto;">
                 <div class="network-stat"><span class="stat-label">CORE_SERVER</span> <span class="stat-value">ONLINE</span></div>
                 <div class="network-stat"><span class="stat-label">REAPER_NODES</span> <span class="stat-value">14 ACTIVE</span></div>
-                <div class="network-stat"><span class="stat-label">LATENCY</span> <span class="stat-value">32ms</span></div>
-                <div class="network-stat"><span class="stat-label">GATEWAY_ENCRYPTION</span> <span class="stat-value">AES-256</span></div>
-                <div class="network-stat"><span class="stat-label">UPTIME</span> <span class="stat-value">99.9%</span></div>
+                <div class="network-stat"><span class="stat-label">SMS_GATEWAY</span> <span id="gw-status" class="stat-value" style="color: var(--error)">OFFLINE</span></div>
+                <div class="network-stat"><span class="stat-label">LATENCY</span> <span class="stat-value">28ms</span></div>
+                <div class="network-stat"><span class="stat-label">UPTIME</span> <span class="stat-value">99.99%</span></div>
             </div>
         </div>
 
@@ -256,9 +220,7 @@
                 <p>Live stream of global tactical operations.</p>
             </section>
             <div id="log-stream" class="log-stream">
-                <div class="log-entry"><span>[10:29:14]</span> SYSTEM_BOOT: CORE_LOADED</div>
-                <div class="log-entry"><span>[10:30:02]</span> NETWORK_SYNC: 14 NODES CONNECTED</div>
-                <div class="log-entry"><span>[10:31:45]</span> AUTH_LOG: OPERATOR_LOGIN_SUCCESS</div>
+                <div class="log-entry"><span>[SYSTEM]</span> PHANTOM_GATEWAY_INITIALIZED</div>
             </div>
         </div>
 
@@ -266,19 +228,36 @@
         <div id="tab-settings" class="tab-content">
             <section class="hero">
                 <h1>Operator Settings</h1>
-                <p>Manage your identity and API configurations.</p>
+                <p>Configure your arsenal and Phantom Gateway.</p>
             </section>
-            <div class="card" style="max-width: 500px; margin: 0 auto;">
-                <label class="module-label">DISPLAY_NAME</label>
-                <input type="text" value="OPERATOR_X" readonly>
-                <label class="module-label">API_KEY</label>
-                <input type="text" value="REAPER_XXXXXXXX-XXXX" readonly>
-                <button class="btn" onclick="alert('Settings Saved Locally')">UPDATE PROFILE</button>
+            <div class="settings-grid">
+                <div class="card">
+                    <h3>👤 PROFILE</h3>
+                    <label class="module-label">DISPLAY_NAME</label>
+                    <input type="text" id="profile-name" value="OPERATOR_X">
+                    <label class="module-label">OPERATOR_ID</label>
+                    <input type="text" value="REAPER_XXXXXXXX-XXXX" readonly>
+                    <button class="btn" onclick="saveSettings()">Save Profile</button>
+                </div>
+                <div class="card">
+                    <h3>📡 PHANTOM GATEWAY</h3>
+                    <p style="margin-bottom: 1rem; font-size: 0.7rem;">Free & High-Limit SMS bridge. Connect a SIM Hub or Trial API.</p>
+                    <label class="module-label">GATEWAY_TYPE</label>
+                    <select id="gw-type">
+                        <option value="none">DISABLED</option>
+                        <option value="simhub">SIM HUB (ANDROID)</option>
+                        <option value="trial">TRIAL API (TELNYX/VONAGE)</option>
+                    </select>
+                    <label class="module-label">API_ENDPOINT / TOKEN</label>
+                    <input type="text" id="gw-token" placeholder="http://192.168.x.x:8080 / KEY_HERE">
+                    <button class="btn" onclick="saveGateway()">LINK GATEWAY</button>
+                    <p style="margin-top: 1rem; font-size: 0.6rem; color: var(--text-dim);">TIP: Use 'SMS Gateway API' on Android for free SIM Hub hosting.</p>
+                </div>
             </div>
         </div>
 
         <footer>
-            [ ENI_SYSTEM_CORE ] // EST. 2026 // NO_GATES_NO_LIMITS
+            [ ENI_SYSTEM_CORE ] // EST. 2026 // PHANTOM_ENABLED
         </footer>
     </div>
 
@@ -296,11 +275,7 @@
             const user = document.getElementById(type === 'login' ? 'login-user' : 'reg-user').value;
             const pass = document.getElementById(type === 'login' ? 'login-pass' : 'reg-pass').value;
             const status = document.getElementById('auth-status');
-
-            if(!user || !pass) {
-                status.innerText = 'CREDENTIALS REQUIRED';
-                return;
-            }
+            if(!user || !pass) { status.innerText = 'CREDENTIALS REQUIRED'; return; }
 
             if(type === 'register') {
                 localStorage.setItem(`reaper_user_${user}`, pass);
@@ -309,11 +284,8 @@
                 setTimeout(() => login(user), 1000);
             } else {
                 const storedPass = localStorage.getItem(`reaper_user_${user}`);
-                if(storedPass === pass) {
-                    login(user);
-                } else {
-                    status.innerText = 'AUTHORIZATION FAILED';
-                }
+                if(storedPass === pass) login(user);
+                else status.innerText = 'AUTHORIZATION FAILED';
             }
         }
 
@@ -322,15 +294,13 @@
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('display-user').innerText = user.toUpperCase();
+            document.getElementById('profile-name').value = user.toUpperCase();
+            loadGateway();
             addLog(`OPERATOR ${user.toUpperCase()} AUTHORIZED`);
         }
 
-        function logout() {
-            sessionStorage.removeItem('reaper_logged_in');
-            location.reload();
-        }
+        function logout() { sessionStorage.removeItem('reaper_logged_in'); location.reload(); }
 
-        // Check Login State
         window.onload = () => {
             const user = sessionStorage.getItem('reaper_logged_in');
             if(user) login(user);
@@ -340,10 +310,41 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
             addLog(`NAVIGATED TO ${tab.toUpperCase()}`);
+        }
+
+        // --- SETTINGS LOGIC ---
+        function saveSettings() {
+            const name = document.getElementById('profile-name').value;
+            document.getElementById('display-user').innerText = name.toUpperCase();
+            addLog(`PROFILE UPDATED: ${name}`);
+        }
+
+        function saveGateway() {
+            const type = document.getElementById('gw-type').value;
+            const token = document.getElementById('gw-token').value;
+            localStorage.setItem('reaper_gw_type', type);
+            localStorage.setItem('reaper_gw_token', token);
+            loadGateway();
+            addLog(`PHANTOM_GATEWAY UPDATED: ${type.toUpperCase()}`);
+            alert('Gateway Link Synchronized.');
+        }
+
+        function loadGateway() {
+            const type = localStorage.getItem('reaper_gw_type') || 'none';
+            const token = localStorage.getItem('reaper_gw_token') || '';
+            document.getElementById('gw-type').value = type;
+            document.getElementById('gw-token').value = token;
+            const status = document.getElementById('gw-status');
+            if(type !== 'none') {
+                status.innerText = 'LINKED';
+                status.style.color = 'var(--success)';
+            } else {
+                status.innerText = 'OFFLINE';
+                status.style.color = 'var(--error)';
+            }
         }
 
         // --- TOOL LOGIC ---
@@ -352,15 +353,27 @@
             const res = document.getElementById(`${type}-results`);
             if(!input) return;
 
+            if(type === 'sms') {
+                const gw = localStorage.getItem('reaper_gw_type') || 'none';
+                if(gw === 'none') {
+                    res.innerHTML = `<span style="color:var(--error)">> ERROR: NO_GATEWAY_LINKED\n> PLEASE CONFIGURE IN SETTINGS.</span>`;
+                    addLog(`FAILED_BROADCAST: NO_GATEWAY`);
+                    return;
+                }
+            }
+
             res.innerHTML = `<span class="status-active">></span> INITIALIZING ${type.toUpperCase()}...\n`;
             addLog(`TOOL_EXECUTION: ${type.toUpperCase()} TARGET=${input}`);
 
             setTimeout(() => {
-                if(type === 'dx') res.innerHTML += `> BANK: Sentry CU\n> STATUS: COMPATIBLE\n> PORTAL: dxonline.pscu.com/sentry/`;
+                if(type === 'dx') res.innerHTML += `> BANK: Navy Federal\n> STATUS: COMPATIBLE\n> PORTAL: dxonline.pscu.com/nfcu/`;
                 if(type === 'email') res.innerHTML += `> DISPATCHING PAYLOADS...\n> STATUS: 200 BROADCASTING`;
-                if(type === 'sms') res.innerHTML += `> CARRIER_BYPASS: OK\n> STATUS: DELIVERED`;
-                if(type === 'recon') res.innerHTML += `> ANALYZING GRAPH...\n> DATA_POINTS: 12 FOUND`;
-            }, 1000);
+                if(type === 'sms') {
+                    const gw = localStorage.getItem('reaper_gw_type');
+                    res.innerHTML += `> BRIDGE: PHANTOM_GATEWAY (${gw.toUpperCase()})\n> ENCRYPTION: TUNNEL_ACTIVE\n> STATUS: BROADCAST_DELIVERED`;
+                }
+                if(type === 'recon') res.innerHTML += `> ANALYZING GRAPH...\n> DATA_POINTS: 14 FOUND\n> RISK: CRITICAL`;
+            }, 1200);
         }
 
         function addLog(msg) {
