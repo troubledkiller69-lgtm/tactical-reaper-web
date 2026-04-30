@@ -46,7 +46,7 @@
         .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
         .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
 
-        /* OPS MAP - v5.5 HYPER SHIFT */
+        /* OPS MAP - v5.6 ZERO DRIFT */
         .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
         .map-wrapper.active { display: block; }
         .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
@@ -110,7 +110,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v5.5</span></div>
+            <div class="logo">REAPER <span>v5.6</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -328,8 +328,8 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v5.5 HYPER SHIFT', d: 'APRIL 30, 2026', c: '- Shifted all nodes an additional 12% right to account for SVG scaling mismatch.<br>- Elevation lock: NA at 22, RU at 10 to hit landmasses perfectly.'},
-                {v: 'v5.4 FINAL LANDING', d: 'APRIL 30, 2026', c: '- Corrected Northern Hemisphere drift.'},
+                {v: 'v5.6 ZERO DRIFT', d: 'APRIL 30, 2026', c: '- Surgical Pullback (~7% left) to correct v5.5 overshoot.<br>-continent Lock: Pinned NA WEST to 34%, EU WEST to 66%, and AS PAC to 96%.'},
+                {v: 'v5.5 HYPER SHIFT', d: 'APRIL 30, 2026', c: '- Compensated for SVG scaling mismatch.'},
                 {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion & Sparkling Shooting Star trails.'}
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
@@ -339,10 +339,10 @@
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
             activeNodes = [
-                {x: 49, y: 21, l: 'NA EAST'}, {x: 40.5, y: 22, l: 'NA WEST'}, {x: 74.5, y: 10, l: 'EU WEST'},
-                {x: 78.5, y: 14, l: 'EU CENTRAL'}, {x: 100, y: 19, l: 'AS PAC'}, {x: 100, y: 34, l: 'AS EAST'},
-                {x: 58.5, y: 59, l: 'SA EAST'}, {x: 77.5, y: 49, l: 'AF MID'}, {x: 88, y: 6, l: 'RU REAPER'},
-                {x: 100, y: 69, l: 'AU SOUTH'}, {x: 100, y: 64, l: 'AU EAST'}, {x: 87.5, y: 29, l: 'ME CENTRAL'}
+                {x: 42, y: 26, l: 'NA EAST'}, {x: 34, y: 27, l: 'NA WEST'}, {x: 66, y: 15, l: 'EU WEST'},
+                {x: 70, y: 19, l: 'EU CENTRAL'}, {x: 96, y: 24, l: 'AS PAC'}, {x: 90, y: 38, l: 'AS EAST'},
+                {x: 50, y: 64, l: 'SA EAST'}, {x: 68, y: 54, l: 'AF MID'}, {x: 80, y: 11, l: 'RU REAPER'},
+                {x: 98, y: 74, l: 'AU SOUTH'}, {x: 100, y: 69, l: 'AU EAST'}, {x: 79.5, y: 34, l: 'ME CENTRAL'}
             ];
             activeNodes.forEach(n => {
                 const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}%`; node.style.top = `${n.y}%`;
