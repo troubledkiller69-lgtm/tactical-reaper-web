@@ -24,7 +24,7 @@
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
-        @keyframes neon-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } 51% { opacity: 1; } 52% { opacity: 0.9; } }
+        @keyframes ammo-glow { 0%, 100% { text-shadow: 0 0 5px var(--success); } 50% { text-shadow: 0 0 15px var(--success); } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
@@ -85,34 +85,40 @@
 
         .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
-        .node { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff, 0 0 40px var(--neon-glow); transform: translate(-50%, -50%); cursor: crosshair; }
+        .node { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff, 0 0 40px var(--neon-glow); transform: translate(-50%, -50%); }
         .node::after { content: ''; position: absolute; top: -16px; left: -16px; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.6); border-radius: 50%; animation: pulse 3s infinite; }
         .node-info { 
             position: absolute; top: 20px; left: 20px; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #fff; text-transform: uppercase; 
             background: rgba(10,10,10,0.9); padding: 8px; border: 1px solid #444; border-radius: 2px; white-space: nowrap; 
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.5); border-left: 3px solid #fff;
+            border-left: 3px solid #fff;
         }
 
         /* DASHBOARD GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; position: relative; transition: 0.3s; }
-        .card:hover { border-color: #444; box-shadow: 0 0 20px rgba(255,255,255,0.05); }
-        .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
+        .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); display: flex; justify-content: space-between; align-items: center; }
 
+        .ammo-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--success); letter-spacing: 1px; animation: ammo-glow 2s infinite; }
+
+        .label { font-size: 0.6rem; color: #444; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
         input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
+        
+        .quick-select { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .qs-btn { background: #111; border: 1px solid var(--border); color: #444; padding: 0.5rem; border-radius: 2px; font-size: 0.6rem; cursor: pointer; transition: 0.3s; flex: 1; letter-spacing: 1px; }
+        .qs-btn:hover, .qs-btn.active { border-color: #fff; color: #fff; background: #222; }
+
         .btn { 
             background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; 
             cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; transition: 0.3s;
         }
         .btn:hover { background: var(--neon-gray); box-shadow: 0 0 15px var(--neon-glow); }
         
-        .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; line-height: 1.6; }
+        .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
 
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #050505; border: 1px solid var(--border); padding: 4rem; width: 500px; text-align: center; box-shadow: 0 0 50px rgba(255,255,255,0.05); }
+        .auth-card { background: #050505; border: 1px solid var(--border); padding: 4rem; width: 500px; text-align: center; }
         .hidden { display: none !important; }
 
-        /* FOOTER HUD */
         .hud-overlay { position: absolute; bottom: 2rem; right: 2rem; z-index: 10; background: rgba(0,0,0,0.85); padding: 1.5rem; border: 1px solid #333; border-left: 4px solid #fff; backdrop-filter: blur(5px); }
         .hud-label { color: #555; font-size: 0.55rem; letter-spacing: 2px; margin-bottom: 5px; }
         .hud-value { color: #fff; font-size: 0.7rem; font-family: 'JetBrains Mono'; margin-bottom: 10px; }
@@ -132,11 +138,12 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>SYSTEM_v3.2</span></div>
+            <div class="logo">REAPER <span>SYSTEM_v3.3</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS_MAP</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOG_STREAM</a>
+                <a onclick="switchTab('settings')" id="nav-settings">SETTINGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
             </nav>
         </header>
@@ -144,7 +151,20 @@
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid">
                 <div class="card"><h3>💎 BIN_INTEL</h3><input type="text" id="bin-input" placeholder="BIN_PREFIX"><button class="btn" onclick="runBinCheck()">EXECUTE_LOOKUP</button><div id="bin-results" class="results">AWAITING_INPUT...</div></div>
-                <div class="card"><h3>📧 EMAIL_FLOOD</h3><input type="text" id="flood-target" placeholder="TARGET_ADDR"><button class="btn" onclick="runFlooder()">DISPATCH_PAYLOAD</button><div id="flood-results" class="results">AWAITING_INPUT...</div></div>
+                <!-- RESTORED EMAIL FLOODER -->
+                <div class="card">
+                    <h3>📧 EMAIL_FLOOD <span id="ammo-count" class="ammo-counter">DISPATCHED: 0</span></h3>
+                    <input type="text" id="flood-target" placeholder="TARGET_ADDR">
+                    <label class="label">PAYLOAD_COUNT</label>
+                    <div class="quick-select">
+                        <button class="qs-btn" onclick="setFloodAmount(10)">10</button>
+                        <button class="qs-btn active" id="qs-25" onclick="setFloodAmount(25)">25</button>
+                        <button class="qs-btn" onclick="setFloodAmount(50)">50</button>
+                    </div>
+                    <input type="number" id="flood-amount" value="25" style="display:none;">
+                    <button class="btn" onclick="runFlooder()">DISPATCH_PAYLOAD</button>
+                    <div id="flood-results" class="results">AWAITING_INPUT...</div>
+                </div>
                 <div class="card"><h3>📱 GHOST_SMS</h3><input type="text" id="sms-target" placeholder="MSISDN_ADDR"><button class="btn" onclick="runSim('sms')">BROADCAST_GIG</button><div id="sms-results" class="results">AWAITING_INPUT...</div></div>
                 <div class="card"><h3>📡 GHOST_RECON</h3><input type="text" id="recon-input" placeholder="UID_IDENTIFIER"><button class="btn" onclick="runSim('recon')">MAPPING_GRAPH</button><div id="recon-results" class="results">AWAITING_INPUT...</div></div>
             </div>
@@ -152,27 +172,33 @@
 
         <div id="tab-opsmap" class="tab-content">
             <div class="map-wrapper" id="full-map-wrapper">
-                <div class="map-bg"></div>
-                <div class="map-container"></div>
-                <div class="node-layer" id="node-layer"></div>
-                
+                <div class="map-bg"></div><div class="map-container"></div><div class="node-layer" id="node-layer"></div>
                 <div class="hud-overlay">
-                    <div class="hud-label">GLOBAL_OPERATIONS</div>
-                    <div class="hud-value">14_NODES_ENCRYPTED</div>
-                    <div class="hud-label">NETWORK_STATUS</div>
-                    <div class="hud-value" style="color:var(--success)">STABLE_OSPREY_LINK</div>
-                    <div class="hud-label">THREAT_VECTOR</div>
-                    <div class="hud-value" style="color:var(--error)">CRITICAL_ALERT_LEVEL</div>
+                    <div class="hud-label">GLOBAL_OPERATIONS</div><div class="hud-value">14_NODES_ENCRYPTED</div>
+                    <div class="hud-label">NETWORK_STATUS</div><div class="hud-value" style="color:var(--success)">STABLE_LINK</div>
                 </div>
             </div>
         </div>
 
-        <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555; line-height:2;"></div></div>
+        <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
+        
+        <div id="tab-settings" class="tab-content">
+            <div class="card" style="max-width:500px; margin: 4rem auto;">
+                <h3>SMTP_GATEWAY</h3>
+                <input type="text" id="smtp-host" placeholder="SMTP_HOST">
+                <input type="text" id="smtp-port" placeholder="SMTP_PORT">
+                <input type="text" id="smtp-user" placeholder="SMTP_USER">
+                <input type="password" id="smtp-pass" placeholder="APP_PASSWORD">
+                <button class="btn" onclick="saveSettings()">LOCK_CONFIG</button>
+            </div>
+        </div>
 
-        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0; letter-spacing:4px;">[ TACTICAL_REAPER_CORE_AUTHORIZED ]</footer>
+        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0; letter-spacing:4px;">[ TACTICAL_REAPER_CORE ]</footer>
     </div>
 
     <script>
+        let totalAmmo = parseInt(localStorage.getItem('reaper_ammo') || '0');
+
         function handleLogin() {
             const user = document.getElementById('login-user').value;
             if(!user) return;
@@ -181,6 +207,8 @@
             document.getElementById('main-app').classList.remove('hidden');
             addLog(`CONNECTION_ESTABLISHED: OPERATOR_${user.toUpperCase()}`);
             initFullMap();
+            loadSettings();
+            updateAmmo();
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
@@ -195,25 +223,52 @@
             else mapWrapper.classList.remove('active');
         }
 
+        function setFloodAmount(amt) {
+            document.getElementById('flood-amount').value = amt;
+            document.querySelectorAll('.qs-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function updateAmmo() {
+            document.getElementById('ammo-count').innerText = `DISPATCHED: ${totalAmmo}`;
+            localStorage.setItem('reaper_ammo', totalAmmo);
+        }
+
+        function saveSettings() {
+            const config = {
+                host: document.getElementById('smtp-host').value,
+                port: document.getElementById('smtp-port').value,
+                user: document.getElementById('smtp-user').value,
+                pass: document.getElementById('smtp-pass').value
+            };
+            localStorage.setItem('reaper_smtp', JSON.stringify(config));
+            addLog('SMTP CONFIGURATION UPDATED');
+            alert('Settings Locked.');
+        }
+
+        function loadSettings() {
+            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
+            document.getElementById('smtp-host').value = smtp.host || '';
+            document.getElementById('smtp-port').value = smtp.port || '';
+            document.getElementById('smtp-user').value = smtp.user || '';
+            document.getElementById('smtp-pass').value = smtp.pass || '';
+        }
+
         function initFullMap() {
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
-            // CORRECTED COORDINATES FOR WORLD MAP ALIGNMENT
             const nodes = [
-                {x: 23, y: 35, l: 'NA_REAPER_01'}, // US East
-                {x: 48, y: 30, l: 'EU_REAPER_04'}, // Europe
-                {x: 78, y: 38, l: 'AS_REAPER_09'}, // East Asia
-                {x: 32, y: 68, l: 'SA_REAPER_02'}, // Brazil
-                {x: 52, y: 55, l: 'AF_REAPER_07'}, // Africa
-                {x: 65, y: 25, l: 'RU_REAPER_03'}, // Russia
-                {x: 82, y: 75, l: 'AU_REAPER_12'}  // Australia
+                {x: 23, y: 35, l: 'NA_REAPER_01'}, {x: 48, y: 30, l: 'EU_REAPER_04'},
+                {x: 78, y: 38, l: 'AS_REAPER_09'}, {x: 32, y: 68, l: 'SA_REAPER_02'},
+                {x: 52, y: 55, l: 'AF_REAPER_07'}, {x: 65, y: 25, l: 'RU_REAPER_03'},
+                {x: 82, y: 75, l: 'AU_REAPER_12'}
             ];
             nodes.forEach(n => {
                 const node = document.createElement('div');
                 node.className = 'node';
                 node.style.left = `${n.x}%`;
                 node.style.top = `${n.y}%`;
-                node.innerHTML = `<div class="node-info">${n.l}<br>PULSE: STABLE<br>LAT: ${n.x}.00 / LNG: ${n.y}.00</div>`;
+                node.innerHTML = `<div class="node-info">${n.l}<br>PULSE: STABLE</div>`;
                 layer.appendChild(node);
             });
         }
@@ -226,21 +281,41 @@
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                if(data.BIN) {
-                    const b = data.BIN;
-                    res.innerHTML += `> BRAND: ${b.brand}\n> ISSUER: ${b.issuer?.name}\n> ORIGIN: ${data.country?.name || 'US'}\n> STATUS: 200_SUCCESS`;
-                } else res.innerHTML += `> ERROR: ${data.error || 'INVALID_BIN'}`;
+                if(data.BIN) res.innerHTML += `> BRAND: ${data.BIN.brand}\n> ISSUER: ${data.BIN.issuer?.name}\n> ORIGIN: ${data.country?.name || 'US'}\n> STATUS: 200_SUCCESS`;
+                else res.innerHTML += `> ERROR: ${data.error || 'INVALID_BIN'}`;
             } catch (e) { res.innerHTML += `> EXCEPTION: API_TIMED_OUT`; }
         }
 
-        function runFlooder() {
-            addLog(`FLOOD_DISPATCHED: TARGET=${document.getElementById('flood-target').value}`);
-            document.getElementById('flood-results').innerText = '> INITIALIZING_FLOOD...\n> STATUS: DISPATCH_OK';
+        async function runFlooder() {
+            const target = document.getElementById('flood-target').value;
+            const res = document.getElementById('flood-results');
+            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
+            const amount = parseInt(document.getElementById('flood-amount').value);
+            
+            if(!target || !smtp.user || !smtp.pass) {
+                res.innerHTML = `<span style="color:var(--error)">> ERROR: SMTP_CONFIG_REQUIRED</span>`;
+                return;
+            }
+
+            res.innerHTML = `> FIRING_PAYLOADS [${amount}]...\n`;
+            addLog(`FLOOD_FIRE: TARGET=${target} COUNT=${amount}`);
+
+            try {
+                const response = await fetch('/api/flood', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target, amount, smtp })
+                });
+                const data = await response.json();
+                res.innerHTML += `> STATUS: ${response.status} OK\n> SENT: ${data.sent}\n> FAILED: ${data.failed}`;
+                totalAmmo += data.sent;
+                updateAmmo();
+                addLog(`FLOOD_IMPACT: SENT=${data.sent}`);
+            } catch (e) { res.innerHTML += `> EXCEPTION: DISPATCH_FAILED`; }
         }
 
         function runSim(type) { 
-            const res = document.getElementById(`${type}-results`);
-            res.innerHTML = `> MAPPING_VECTORS...\n> STATUS: 200_OK`;
+            document.getElementById(`${type}-results`).innerHTML = `> MAPPING_VECTORS...\n> STATUS: 200_OK`;
             addLog(`EXECUTION_COMPLETE: ${type.toUpperCase()}`);
         }
 
