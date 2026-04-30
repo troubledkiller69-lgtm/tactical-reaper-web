@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical Reaper | Next Gen OSINT & Disruption</title>
+    <title>Tactical Reaper | Industrial OSINT & Disruption</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -17,24 +17,14 @@
             --text-dim: #888888;
             --border: #1a1a1a;
             --accent: #333333;
+            --error: #ff4444;
+            --success: #44ff44;
         }
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
+        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
             background-color: var(--bg);
@@ -47,25 +37,63 @@
             background-size: 100% 100%, 40px 40px, 40px 40px;
         }
 
-        .scanline {
+        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(224, 224, 224, 0.03) 50%, transparent); pointer-events: none; z-index: 100; animation: scanline 8s linear infinite; }
+
+        /* AUTH GATE */
+        #auth-gate {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(224, 224, 224, 0.03) 50%, transparent);
-            pointer-events: none;
-            z-index: 100;
-            animation: scanline 8s linear infinite;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
         }
 
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border-radius: 4px;
         }
+
+        .auth-card h2 {
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .auth-tab {
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .auth-tab.active { color: var(--primary); font-weight: 700; }
+
+        .hidden { display: none !important; }
+
+        /* MAIN APP */
+        .container { max-width: 1300px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
 
         header {
             display: flex;
@@ -76,23 +104,10 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: var(--text-dim); font-weight: 400; }
 
-        .logo span {
-            color: var(--text-dim);
-            font-weight: 400;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-        }
-
+        .nav-links { display: flex; gap: 2.5rem; }
         .nav-links a {
             color: var(--text-dim);
             text-decoration: none;
@@ -100,258 +115,165 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .hero {
-            text-align: center;
-            margin-bottom: 8rem;
-        }
-
-        .hero h1 {
-            font-size: 5rem;
-            font-weight: 900;
-            margin-bottom: 1rem;
-            letter-spacing: -2px;
-            background: linear-gradient(to bottom, #fff, #444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            color: var(--text-dim);
-            font-size: 1.1rem;
-            max-width: 550px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.6;
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--primary);
-            padding: 0.6rem 1.2rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: 1px solid var(--border);
-            display: inline-block;
-            margin-bottom: 2rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 2rem;
-            position: relative;
-            transition: border-color 0.4s, transform 0.4s;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            border-color: #444;
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .card-icon {
-            color: var(--text-dim);
-            font-size: 1rem;
-        }
-
-        .card p {
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        input {
-            background: #000;
-            border: 1px solid var(--border);
-            color: #fff;
-            padding: 0.8rem;
-            border-radius: 2px;
-            font-size: 0.8rem;
-            width: 100%;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #555;
-        }
-
-        .btn {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 2px;
-            font-weight: 900;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
             cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
-            margin-top: 0.5rem;
         }
+        .nav-links a.active { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; }
 
-        .btn:hover {
-            background: var(--primary);
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+        .hero { text-align: center; margin-bottom: 6rem; }
+        .hero h1 { font-size: 4rem; font-weight: 900; margin-bottom: 1rem; background: linear-gradient(to bottom, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-dim); font-size: 1rem; max-width: 500px; margin: 0 auto; }
 
-        .results {
-            margin-top: 1.5rem;
-            background: #000;
-            border: 1px solid var(--border);
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #888;
-            min-height: 100px;
-            white-space: pre-wrap;
-            position: relative;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
 
-        .results::before {
-            content: 'SYSTEM_OUTPUT';
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            background: #000;
-            padding: 0 5px;
-            font-size: 0.55rem;
-            color: #444;
-            letter-spacing: 1px;
-        }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 4px; display: flex; flex-direction: column; transition: transform 0.3s, border-color 0.3s; }
+        .card:hover { border-color: #444; transform: translateY(-5px); }
+        .card h3 { font-size: 1rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .card p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 2rem; flex-grow: 1; }
 
-        .status-active {
-            color: #fff;
-            animation: blink 1s infinite;
-        }
+        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; font-size: 0.8rem; width: 100%; margin-bottom: 1rem; }
+        input:focus { outline: none; border-color: #555; }
 
-        footer {
-            margin-top: 8rem;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            padding-bottom: 3rem;
-            text-transform: uppercase;
-        }
+        .btn { background: #fff; color: #000; border: none; padding: 0.8rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: background 0.3s; }
+        .btn:hover { background: var(--primary); }
 
-        .module-label {
-            font-size: 0.55rem;
-            color: #444;
-            margin-bottom: 0.2rem;
-            display: block;
-            text-transform: uppercase;
-        }
+        .results { margin-top: 1.5rem; background: #000; border: 1px solid var(--border); padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #888; min-height: 80px; white-space: pre-wrap; position: relative; }
+        .results::before { content: 'OUTPUT'; position: absolute; top: -10px; left: 10px; background: #000; padding: 0 5px; font-size: 0.5rem; color: #444; }
+
+        /* NETWORK TAB */
+        .network-stat { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+        .stat-label { color: var(--text-dim); }
+        .stat-value { color: var(--primary); font-weight: 700; }
+
+        /* LOGS TAB */
+        .log-stream { background: #050505; border: 1px solid var(--border); padding: 1.5rem; height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #666; }
+        .log-entry { margin-bottom: 0.5rem; border-left: 2px solid var(--border); padding-left: 10px; }
+        .log-entry span { color: var(--text-dim); }
+
+        footer { margin-top: 6rem; text-align: center; color: var(--text-dim); font-size: 0.7rem; letter-spacing: 2px; padding-bottom: 2rem; }
     </style>
 </head>
 <body>
     <div class="scanline"></div>
-    <div class="container">
+
+    <!-- AUTH GATE -->
+    <div id="auth-gate">
+        <div class="auth-card">
+            <h2>REAPER_GATE</h2>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuth('login')">Login</div>
+                <div class="auth-tab" onclick="switchAuth('register')">Register</div>
+            </div>
+            
+            <div id="login-form">
+                <input type="text" id="login-user" placeholder="USERNAME">
+                <input type="password" id="login-pass" placeholder="PASSWORD">
+                <button class="btn" style="width: 100%" onclick="handleAuth('login')">AUTHORIZE</button>
+            </div>
+
+            <div id="register-form" class="hidden">
+                <input type="text" id="reg-user" placeholder="CHOOSE USERNAME">
+                <input type="password" id="reg-pass" placeholder="CHOOSE PASSWORD">
+                <input type="text" id="reg-invite" placeholder="INVITE CODE (ANY)">
+                <button class="btn" style="width: 100%" onclick="handleAuth('register')">INITIALIZE ACCOUNT</button>
+            </div>
+            <p id="auth-status" style="margin-top: 1rem; font-size: 0.7rem; color: var(--error);"></p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.1</span></div>
+            <div class="logo">REAPER <span>v2.2</span></div>
             <nav class="nav-links">
-                <a href="#">Dashboard</a>
-                <a href="#">Network</a>
-                <a href="#">Logs</a>
-                <a href="#">Settings</a>
+                <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">Dashboard</a>
+                <a onclick="switchTab('network')" id="nav-network">Network</a>
+                <a onclick="switchTab('logs')" id="nav-logs">Logs</a>
+                <a onclick="switchTab('settings')" id="nav-settings">Settings</a>
+                <a onclick="logout()" style="color: var(--error)">Logout</a>
             </nav>
         </header>
 
-        <section class="hero">
-            <div class="badge">Universal Free Access</div>
-            <h1>Tactical Superiority.</h1>
-            <p>High-fidelity OSINT and network disruption tools delivered through a decentralized web interface.</p>
-        </section>
-
-        <div class="grid">
-            <!-- DX SCANNER -->
-            <div class="card">
-                <h3><span class="card-icon">01</span> DX Scanner</h3>
-                <p>Verify BIN compatibility with PSCU/DXOnline financial portals with real-time link validation.</p>
-                <div class="input-group">
-                    <span class="module-label">TARGET_BIN</span>
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-content active">
+            <section class="hero">
+                <h1>Tactical Dashboard</h1>
+                <p>Welcome back, <span id="display-user">OPERATOR</span>. All systems green.</p>
+            </section>
+            <div class="grid">
+                <div class="card">
+                    <h3>🔍 DX Scanner</h3>
+                    <p>Verify BIN compatibility with financial portals.</p>
                     <input type="text" id="dx-input" placeholder="6-digit BIN">
-                    <button class="btn" onclick="scanDX()">Initialize</button>
+                    <button class="btn" onclick="runTool('dx')">Scan</button>
+                    <div id="dx-results" class="results">READY...</div>
                 </div>
-                <div id="dx-results" class="results">READY...</div>
+                <div class="card">
+                    <h3>📧 Email Flooder</h3>
+                    <p>Distributed SMTP payload delivery.</p>
+                    <input type="text" id="email-target" placeholder="Target Email">
+                    <button class="btn" onclick="runTool('email')">Execute</button>
+                    <div id="email-results" class="results">READY...</div>
+                </div>
+                <div class="card">
+                    <h3>📱 Ghost SMS</h3>
+                    <p>Stealth message broadcasting.</p>
+                    <input type="text" id="sms-target" placeholder="Phone Number">
+                    <button class="btn" onclick="runTool('sms')">Broadcast</button>
+                    <div id="sms-results" class="results">READY...</div>
+                </div>
+                <div class="card">
+                    <h3>📡 Ghost Recon</h3>
+                    <p>Deep-mapping of digital footprints.</p>
+                    <input type="text" id="recon-input" placeholder="Identifier">
+                    <button class="btn" onclick="runTool('recon')">Analyze</button>
+                    <div id="recon-results" class="results">READY...</div>
+                </div>
             </div>
+        </div>
 
-            <!-- EMAIL FLOODER -->
-            <div class="card">
-                <h3><span class="card-icon">02</span> Email Flooder</h3>
-                <p>Distributed SMTP payload delivery with randomized headers and PDF evasion.</p>
-                <div class="input-group">
-                    <span class="module-label">TARGET_EMAIL</span>
-                    <input type="text" id="email-target" placeholder="target@example.com">
-                    <span class="module-label">INTENSITY</span>
-                    <input type="number" id="email-count" placeholder="Number of payloads">
-                    <button class="btn" onclick="startFlood()">Execute</button>
-                </div>
-                <div id="email-results" class="results">READY...</div>
+        <!-- NETWORK TAB -->
+        <div id="tab-network" class="tab-content">
+            <section class="hero">
+                <h1>Network Infrastructure</h1>
+                <p>Global node status and carrier gateway latency.</p>
+            </section>
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <div class="network-stat"><span class="stat-label">CORE_SERVER</span> <span class="stat-value">ONLINE</span></div>
+                <div class="network-stat"><span class="stat-label">REAPER_NODES</span> <span class="stat-value">14 ACTIVE</span></div>
+                <div class="network-stat"><span class="stat-label">LATENCY</span> <span class="stat-value">32ms</span></div>
+                <div class="network-stat"><span class="stat-label">GATEWAY_ENCRYPTION</span> <span class="stat-value">AES-256</span></div>
+                <div class="network-stat"><span class="stat-label">UPTIME</span> <span class="stat-value">99.9%</span></div>
             </div>
+        </div>
 
-            <!-- GHOST SMS -->
-            <div class="card">
-                <h3><span class="card-icon">03</span> Ghost SMS</h3>
-                <p>Stealth message broadcasting via humanized carrier gateways and 1:1 humanization logic.</p>
-                <div class="input-group">
-                    <span class="module-label">PHONE_NUMBER</span>
-                    <input type="text" id="sms-target" placeholder="+1 (555) 000-0000">
-                    <span class="module-label">PAYLOAD</span>
-                    <input type="text" id="sms-msg" placeholder="Message content">
-                    <button class="btn" onclick="sendSMS()">Broadcast</button>
-                </div>
-                <div id="sms-results" class="results">READY...</div>
+        <!-- LOGS TAB -->
+        <div id="tab-logs" class="tab-content">
+            <section class="hero">
+                <h1>System Logs</h1>
+                <p>Live stream of global tactical operations.</p>
+            </section>
+            <div id="log-stream" class="log-stream">
+                <div class="log-entry"><span>[10:29:14]</span> SYSTEM_BOOT: CORE_LOADED</div>
+                <div class="log-entry"><span>[10:30:02]</span> NETWORK_SYNC: 14 NODES CONNECTED</div>
+                <div class="log-entry"><span>[10:31:45]</span> AUTH_LOG: OPERATOR_LOGIN_SUCCESS</div>
             </div>
+        </div>
 
-            <!-- GHOST RECON -->
-            <div class="card">
-                <h3><span class="card-icon">04</span> Ghost Recon</h3>
-                <p>Deep-mapping of digital footprints and anonymized social footprint tracking across 50+ platforms.</p>
-                <div class="input-group">
-                    <span class="module-label">IDENTIFIER</span>
-                    <input type="text" id="recon-input" placeholder="Username / ID / Email">
-                    <button class="btn" onclick="startRecon()">Analyze</button>
-                </div>
-                <div id="recon-results" class="results">READY...</div>
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="tab-content">
+            <section class="hero">
+                <h1>Operator Settings</h1>
+                <p>Manage your identity and API configurations.</p>
+            </section>
+            <div class="card" style="max-width: 500px; margin: 0 auto;">
+                <label class="module-label">DISPLAY_NAME</label>
+                <input type="text" value="OPERATOR_X" readonly>
+                <label class="module-label">API_KEY</label>
+                <input type="text" value="REAPER_XXXXXXXX-XXXX" readonly>
+                <button class="btn" onclick="alert('Settings Saved Locally')">UPDATE PROFILE</button>
             </div>
         </div>
 
@@ -361,45 +283,93 @@
     </div>
 
     <script>
-        function scanDX() {
-            const input = document.getElementById('dx-input').value;
-            const res = document.getElementById('dx-results');
+        // --- AUTH LOGIC ---
+        function switchAuth(type) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.auth-tab[onclick*="${type}"]`).classList.add('active');
+            document.getElementById('login-form').classList.toggle('hidden', type === 'register');
+            document.getElementById('register-form').classList.toggle('hidden', type === 'login');
+            document.getElementById('auth-status').innerText = '';
+        }
+
+        function handleAuth(type) {
+            const user = document.getElementById(type === 'login' ? 'login-user' : 'reg-user').value;
+            const pass = document.getElementById(type === 'login' ? 'login-pass' : 'reg-pass').value;
+            const status = document.getElementById('auth-status');
+
+            if(!user || !pass) {
+                status.innerText = 'CREDENTIALS REQUIRED';
+                return;
+            }
+
+            if(type === 'register') {
+                localStorage.setItem(`reaper_user_${user}`, pass);
+                status.style.color = 'var(--success)';
+                status.innerText = 'ACCOUNT INITIALIZED. LOGGING IN...';
+                setTimeout(() => login(user), 1000);
+            } else {
+                const storedPass = localStorage.getItem(`reaper_user_${user}`);
+                if(storedPass === pass) {
+                    login(user);
+                } else {
+                    status.innerText = 'AUTHORIZATION FAILED';
+                }
+            }
+        }
+
+        function login(user) {
+            sessionStorage.setItem('reaper_logged_in', user);
+            document.getElementById('auth-gate').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('display-user').innerText = user.toUpperCase();
+            addLog(`OPERATOR ${user.toUpperCase()} AUTHORIZED`);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('reaper_logged_in');
+            location.reload();
+        }
+
+        // Check Login State
+        window.onload = () => {
+            const user = sessionStorage.getItem('reaper_logged_in');
+            if(user) login(user);
+        };
+
+        // --- TAB LOGIC ---
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            addLog(`NAVIGATED TO ${tab.toUpperCase()}`);
+        }
+
+        // --- TOOL LOGIC ---
+        function runTool(type) {
+            const input = document.getElementById(`${type}-input`)?.value || document.getElementById(`${type}-target`)?.value;
+            const res = document.getElementById(`${type}-results`);
             if(!input) return;
-            res.innerHTML = `<span class="status-active">></span> INITIALIZING PSCU_HANDSHAKE...\n`;
+
+            res.innerHTML = `<span class="status-active">></span> INITIALIZING ${type.toUpperCase()}...\n`;
+            addLog(`TOOL_EXECUTION: ${type.toUpperCase()} TARGET=${input}`);
+
             setTimeout(() => {
-                res.innerHTML += `> BANK: Navy Federal Credit Union\n> CARD: Visa Debit (Premium)\n> STATUS: DX_COMPATIBLE\n> PORTAL: dxonline.pscu.com/nfcu/`;
-            }, 1200);
+                if(type === 'dx') res.innerHTML += `> BANK: Sentry CU\n> STATUS: COMPATIBLE\n> PORTAL: dxonline.pscu.com/sentry/`;
+                if(type === 'email') res.innerHTML += `> DISPATCHING PAYLOADS...\n> STATUS: 200 BROADCASTING`;
+                if(type === 'sms') res.innerHTML += `> CARRIER_BYPASS: OK\n> STATUS: DELIVERED`;
+                if(type === 'recon') res.innerHTML += `> ANALYZING GRAPH...\n> DATA_POINTS: 12 FOUND`;
+            }, 1000);
         }
 
-        function startFlood() {
-            const email = document.getElementById('email-target').value;
-            const count = document.getElementById('email-count').value;
-            const res = document.getElementById('email-results');
-            if(!email) return;
-            res.innerHTML = `<span class="status-active">></span> ROTATING SMTP_GATEWAYS...\n`;
-            setTimeout(() => {
-                res.innerHTML += `> DISPATCHING ${count || 10} PAYLOADS TO ${email}\n> EHLO RANDOMIZATION: ACTIVE\n> STATUS: 200 BROADCASTING`;
-            }, 1500);
-        }
-
-        function sendSMS() {
-            const phone = document.getElementById('sms-target').value;
-            const res = document.getElementById('sms-results');
-            if(!phone) return;
-            res.innerHTML = `<span class="status-active">></span> BYPASSING CARRIER_FILTER...\n`;
-            setTimeout(() => {
-                res.innerHTML += `> TARGET: ${phone}\n> GATEWAY: VERIZON_NORTH_EAST\n> HUMANIZATION: ENABLED\n> STATUS: DELIVERED`;
-            }, 1400);
-        }
-
-        function startRecon() {
-            const input = document.getElementById('recon-input').value;
-            const res = document.getElementById('recon-results');
-            if(!input) return;
-            res.innerHTML = `<span class="status-active">></span> SCANNING SOCIAL_GRAPH...\n`;
-            setTimeout(() => {
-                res.innerHTML += `> TARGET: ${input}\n> FOOTPRINT: 14 DATA_POINTS\n> ACCOUNTS: 7 DETECTED\n> RISK_LEVEL: CRITICAL`;
-            }, 1800);
+        function addLog(msg) {
+            const stream = document.getElementById('log-stream');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span>[${time}]</span> ${msg}`;
+            stream.prepend(entry);
         }
     </script>
 </body>
