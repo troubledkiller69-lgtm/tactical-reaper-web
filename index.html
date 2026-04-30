@@ -51,8 +51,10 @@
         .card h3 { font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .card p { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem; flex-grow: 1; }
 
+        .label { font-size: 0.6rem; color: #444; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
         input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.7rem; border-radius: 2px; font-size: 0.75rem; width: 100%; margin-bottom: 0.8rem; }
-        .btn { background: #fff; color: #000; border: none; padding: 0.7rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; }
+        .btn { background: #fff; color: #000; border: none; padding: 0.7rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #ccc; }
         .results { margin-top: 1rem; background: #000; border: 1px solid var(--border); padding: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #888; min-height: 80px; white-space: pre-wrap; }
 
         .status-active { color: #fff; animation: blink 1s infinite; }
@@ -72,48 +74,49 @@
             <input type="text" id="login-user" placeholder="USERNAME">
             <input type="password" id="login-pass" placeholder="PASSWORD">
             <button class="btn" style="width: 100%" onclick="handleLogin()">AUTHORIZE</button>
-            <p style="margin-top:1rem; font-size:0.7rem; color:var(--text-dim);">NO ACCOUNT? TYPE ANY CREDENTIALS TO INITIALIZE.</p>
         </div>
     </div>
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.6.2</span></div>
+            <div class="logo">REAPER <span>v2.7</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" class="active">Dashboard</a>
                 <a onclick="switchTab('network')">Network</a>
                 <a onclick="switchTab('logs')">Logs</a>
+                <a onclick="switchTab('settings')">Settings</a>
                 <a onclick="logout()" style="color:var(--error)">Logout</a>
             </nav>
         </header>
 
         <div id="tab-dashboard" class="tab-content active">
-            <section class="hero"><h1>Live Tactical Hub</h1></section>
+            <section class="hero"><h1>Tactical Dashboard</h1></section>
             <div class="grid">
                 <div class="card">
                     <h3>💎 BIN Intel</h3>
-                    <p>Live BIN intelligence via bincheck.io API.</p>
+                    <p>Live BIN intelligence via bincheck.io.</p>
                     <input type="text" id="bin-input" placeholder="6-digit BIN">
                     <button class="btn" onclick="runBinCheck('bin')">Lookup</button>
                     <div id="bin-results" class="results">READY...</div>
                 </div>
                 <div class="card">
                     <h3>📧 Email Flooder</h3>
-                    <p>Distributed SMTP payload delivery.</p>
-                    <input type="text" id="email-target" placeholder="Target Email">
-                    <button class="btn" onclick="runSim('email')">Execute</button>
-                    <div id="email-results" class="results">READY...</div>
+                    <p>Functional SMTP payload delivery.</p>
+                    <input type="text" id="flood-target" placeholder="Target Email">
+                    <input type="text" id="flood-subject" placeholder="Subject (Optional)">
+                    <input type="number" id="flood-amount" placeholder="Amount (Max 50)" value="1">
+                    <button class="btn" onclick="runFlooder()">Execute Flood</button>
+                    <div id="flood-results" class="results">READY...</div>
                 </div>
                 <div class="card">
                     <h3>📱 Ghost SMS</h3>
-                    <p>High-limit stealth broadcasting via Phantom Gateway.</p>
+                    <p>Stealth broadcasting via Phantom Gateway.</p>
                     <input type="text" id="sms-target" placeholder="Phone Number">
                     <button class="btn" onclick="runSim('sms')">Broadcast</button>
                     <div id="sms-results" class="results">READY...</div>
                 </div>
                 <div class="card">
                     <h3>📡 Ghost Recon</h3>
-                    <p>Deep-mapping of digital footprints.</p>
                     <input type="text" id="recon-input" placeholder="Identifier">
                     <button class="btn" onclick="runSim('recon')">Analyze</button>
                     <div id="recon-results" class="results">READY...</div>
@@ -125,13 +128,39 @@
             <div class="card" style="max-width:600px; margin:4rem auto;">
                 <h3>SYSTEM_HEALTH</h3>
                 <div style="display:flex; justify-content:space-between; padding:1rem 0; border-bottom:1px solid var(--border);">
-                    <span>BIN_API</span><span style="color:var(--success)">LIVE_CONNECTED</span>
+                    <span>BIN_API</span><span style="color:var(--success)">CONNECTED</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:1rem 0; border-bottom:1px solid var(--border);">
+                    <span>SMTP_GATEWAY</span><span id="smtp-status" style="color:var(--error)">UNCONFIGURED</span>
                 </div>
             </div>
         </div>
+        
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:2rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
 
-        <footer>[ ENI_SYSTEM_CORE ] // v2.6.2 // MAPPING_FIXED</footer>
+        <div id="tab-settings" class="tab-content">
+            <div class="grid" style="margin-top:2rem;">
+                <div class="card">
+                    <h3>📡 PHANTOM GATEWAY (SMS)</h3>
+                    <input type="text" id="gw-token" placeholder="API_ENDPOINT / TOKEN">
+                    <button class="btn" onclick="saveSettings()">Link Gateway</button>
+                </div>
+                <div class="card">
+                    <h3>📧 SMTP CONFIG (FLOODER)</h3>
+                    <label class="label">SMTP HOST</label>
+                    <input type="text" id="smtp-host" placeholder="smtp.gmail.com">
+                    <label class="label">SMTP PORT</label>
+                    <input type="text" id="smtp-port" placeholder="587">
+                    <label class="label">SMTP USER</label>
+                    <input type="text" id="smtp-user" placeholder="user@gmail.com">
+                    <label class="label">SMTP PASS (APP PASSWORD)</label>
+                    <input type="password" id="smtp-pass" placeholder="xxxx xxxx xxxx xxxx">
+                    <button class="btn" onclick="saveSettings()">Apply Configuration</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>[ ENI_SYSTEM_CORE ] // v2.7 // FLOODER_ACTIVE</footer>
     </div>
 
     <script>
@@ -142,6 +171,7 @@
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             addLog(`OPERATOR ${user.toUpperCase()} ONLINE`);
+            loadSettings();
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
@@ -151,28 +181,75 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
         }
 
-        async function runBinCheck(type) {
-            const bin = document.getElementById(`${type}-input`).value;
-            const res = document.getElementById(`${type}-results`);
+        function saveSettings() {
+            const config = {
+                host: document.getElementById('smtp-host').value,
+                port: document.getElementById('smtp-port').value,
+                user: document.getElementById('smtp-user').value,
+                pass: document.getElementById('smtp-pass').value
+            };
+            localStorage.setItem('reaper_smtp', JSON.stringify(config));
+            addLog('SMTP CONFIGURATION UPDATED');
+            loadSettings();
+            alert('Settings Locked.');
+        }
+
+        function loadSettings() {
+            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
+            document.getElementById('smtp-host').value = smtp.host || '';
+            document.getElementById('smtp-port').value = smtp.port || '';
+            document.getElementById('smtp-user').value = smtp.user || '';
+            document.getElementById('smtp-pass').value = smtp.pass || '';
+            const status = document.getElementById('smtp-status');
+            if(smtp.user && smtp.pass) {
+                status.innerText = 'READY';
+                status.style.color = 'var(--success)';
+            }
+        }
+
+        async function runBinCheck() {
+            const bin = document.getElementById('bin-input').value;
+            const res = document.getElementById('bin-results');
             if(!bin) return;
             res.innerHTML = `<span class="status-active">></span> FETCHING LIVE_DATA...\n`;
-            addLog(`API_CALL: BINCHECK TARGET=${bin}`);
-
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                
-                if(data.error) {
-                    res.innerHTML += `> ERROR: ${data.details || 'LOOKUP_FAILED'}`;
-                } else if(data.BIN) {
+                if(data.BIN) {
                     const b = data.BIN;
-                    res.innerHTML += `> BRAND: ${b.brand || b.scheme || 'UNKNOWN'}\n> TYPE: ${b.type || 'UNKNOWN'}\n> LEVEL: ${b.level || 'UNKNOWN'}\n> ISSUER: ${b.issuer?.name || 'UNKNOWN'}\n> COUNTRY: ${data.country?.name || 'UNKNOWN'}`;
-                } else {
-                    res.innerHTML += `> ERROR: INVALID_RESPONSE_STRUCTURE`;
-                }
-            } catch (e) {
-                res.innerHTML += `> EXCEPTION: CONNECTION_FAILED`;
+                    res.innerHTML += `> BRAND: ${b.brand || 'UNKNOWN'}\n> TYPE: ${b.type || 'UNKNOWN'}\n> ISSUER: ${b.issuer?.name || 'UNKNOWN'}\n> COUNTRY: ${data.country?.name || 'UNKNOWN'}`;
+                } else res.innerHTML += `> ERROR: ${data.error || 'INVALID_RESPONSE'}`;
+            } catch (e) { res.innerHTML += `> EXCEPTION: CONNECTION_FAILED`; }
+        }
+
+        async function runFlooder() {
+            const target = document.getElementById('flood-target').value;
+            const res = document.getElementById('flood-results');
+            const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
+            
+            if(!target || !smtp.user || !smtp.pass) {
+                res.innerHTML = `<span style="color:var(--error)">> ERROR: SMTP_CONFIG_REQUIRED</span>`;
+                return;
             }
+
+            res.innerHTML = `<span class="status-active">></span> DISPATCHING PAYLOADS...\n`;
+            addLog(`FLOOD_START: TARGET=${target}`);
+
+            try {
+                const response = await fetch('/api/flood', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target,
+                        subject: document.getElementById('flood-subject').value,
+                        amount: document.getElementById('flood-amount').value,
+                        smtp
+                    })
+                });
+                const data = await response.json();
+                res.innerHTML += `> STATUS: ${response.status} OK\n> SENT: ${data.sent}\n> FAILED: ${data.failed}`;
+                addLog(`FLOOD_COMPLETE: SENT=${data.sent}`);
+            } catch (e) { res.innerHTML += `> EXCEPTION: DISPATCH_FAILED`; }
         }
 
         function runSim(type) {
