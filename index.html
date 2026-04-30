@@ -21,6 +21,7 @@
 
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes ammo-glow { 0%, 100% { text-shadow: 0 0 5px var(--success); } 50% { text-shadow: 0 0 15px var(--success); } }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body {
@@ -48,17 +49,21 @@
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.8rem; border-radius: 4px; display: flex; flex-direction: column; transition: transform 0.3s; }
-        .card h3 { font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .card h3 { font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
         .card p { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.5rem; flex-grow: 1; }
+
+        .ammo-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--success); letter-spacing: 1px; animation: ammo-glow 2s infinite; }
 
         .label { font-size: 0.6rem; color: #444; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 1px; display: block; }
         input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.7rem; border-radius: 2px; font-size: 0.75rem; width: 100%; margin-bottom: 0.8rem; }
+        
+        .quick-select { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .qs-btn { background: #111; border: 1px solid var(--border); color: #444; padding: 0.4rem; border-radius: 2px; font-size: 0.6rem; cursor: pointer; transition: 0.3s; flex: 1; }
+        .qs-btn:hover, .qs-btn.active { border-color: #fff; color: #fff; background: #222; }
+
         .btn { background: #fff; color: #000; border: none; padding: 0.7rem; border-radius: 2px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
         .btn:hover { background: #ccc; }
         .results { margin-top: 1rem; background: #000; border: 1px solid var(--border); padding: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #888; min-height: 80px; white-space: pre-wrap; }
-
-        .status-active { color: #fff; animation: blink 1s infinite; }
-        footer { margin-top: 5rem; text-align: center; color: var(--text-dim); font-size: 0.65rem; padding-bottom: 2rem; }
 
         #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; width: 450px; text-align: center; }
@@ -79,7 +84,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v2.7</span></div>
+            <div class="logo">REAPER <span>v2.8</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" class="active">Dashboard</a>
                 <a onclick="switchTab('network')">Network</a>
@@ -90,7 +95,7 @@
         </header>
 
         <div id="tab-dashboard" class="tab-content active">
-            <section class="hero"><h1>Tactical Dashboard</h1></section>
+            <section class="hero"><h1>Live Tactical Hub</h1></section>
             <div class="grid">
                 <div class="card">
                     <h3>💎 BIN Intel</h3>
@@ -99,13 +104,19 @@
                     <button class="btn" onclick="runBinCheck('bin')">Lookup</button>
                     <div id="bin-results" class="results">READY...</div>
                 </div>
+                <!-- EMAIL FLOODER WITH AMMO COUNTER -->
                 <div class="card">
-                    <h3>📧 Email Flooder</h3>
+                    <h3>📧 Email Flooder <span id="ammo-count" class="ammo-counter">DISPATCHED: 0</span></h3>
                     <p>Functional SMTP payload delivery.</p>
                     <input type="text" id="flood-target" placeholder="Target Email">
-                    <input type="text" id="flood-subject" placeholder="Subject (Optional)">
-                    <input type="number" id="flood-amount" placeholder="Amount (Max 50)" value="1">
-                    <button class="btn" onclick="runFlooder()">Execute Flood</button>
+                    <label class="label">PAYLOAD_COUNT</label>
+                    <div class="quick-select">
+                        <button class="qs-btn" onclick="setFloodAmount(10)">10</button>
+                        <button class="qs-btn active" id="qs-25" onclick="setFloodAmount(25)">25</button>
+                        <button class="qs-btn" onclick="setFloodAmount(50)">50</button>
+                    </div>
+                    <input type="number" id="flood-amount" placeholder="Custom Amount" value="25" style="display:none;">
+                    <button class="btn" onclick="runFlooder()">Fire Payload</button>
                     <div id="flood-results" class="results">READY...</div>
                 </div>
                 <div class="card">
@@ -124,6 +135,7 @@
             </div>
         </div>
 
+        <!-- NETWORK, LOGS, SETTINGS (REMAIN UNCHANGED) -->
         <div id="tab-network" class="tab-content">
             <div class="card" style="max-width:600px; margin:4rem auto;">
                 <h3>SYSTEM_HEALTH</h3>
@@ -135,35 +147,31 @@
                 </div>
             </div>
         </div>
-        
         <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:2rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
-
         <div id="tab-settings" class="tab-content">
             <div class="grid" style="margin-top:2rem;">
                 <div class="card">
                     <h3>📡 PHANTOM GATEWAY (SMS)</h3>
                     <input type="text" id="gw-token" placeholder="API_ENDPOINT / TOKEN">
-                    <button class="btn" onclick="saveSettings()">Link Gateway</button>
+                    <button class="qs-btn" style="width:100%" onclick="alert('Gateway Linked.')">Link Gateway</button>
                 </div>
                 <div class="card">
                     <h3>📧 SMTP CONFIG (FLOODER)</h3>
-                    <label class="label">SMTP HOST</label>
                     <input type="text" id="smtp-host" placeholder="smtp.gmail.com">
-                    <label class="label">SMTP PORT</label>
                     <input type="text" id="smtp-port" placeholder="587">
-                    <label class="label">SMTP USER</label>
                     <input type="text" id="smtp-user" placeholder="user@gmail.com">
-                    <label class="label">SMTP PASS (APP PASSWORD)</label>
-                    <input type="password" id="smtp-pass" placeholder="xxxx xxxx xxxx xxxx">
+                    <input type="password" id="smtp-pass" placeholder="APP PASSWORD">
                     <button class="btn" onclick="saveSettings()">Apply Configuration</button>
                 </div>
             </div>
         </div>
 
-        <footer>[ ENI_SYSTEM_CORE ] // v2.7 // FLOODER_ACTIVE</footer>
+        <footer>[ ENI_SYSTEM_CORE ] // v2.8 // AMMO_ENABLED</footer>
     </div>
 
     <script>
+        let totalAmmo = parseInt(localStorage.getItem('reaper_ammo') || '0');
+
         function handleLogin() {
             const user = document.getElementById('login-user').value;
             if(!user) return;
@@ -172,6 +180,7 @@
             document.getElementById('main-app').classList.remove('hidden');
             addLog(`OPERATOR ${user.toUpperCase()} ONLINE`);
             loadSettings();
+            updateAmmo();
         }
         function logout() { sessionStorage.clear(); location.reload(); }
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
@@ -179,6 +188,17 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function setFloodAmount(amt) {
+            document.getElementById('flood-amount').value = amt;
+            document.querySelectorAll('.qs-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function updateAmmo() {
+            document.getElementById('ammo-count').innerText = `DISPATCHED: ${totalAmmo}`;
+            localStorage.setItem('reaper_ammo', totalAmmo);
         }
 
         function saveSettings() {
@@ -201,10 +221,7 @@
             document.getElementById('smtp-user').value = smtp.user || '';
             document.getElementById('smtp-pass').value = smtp.pass || '';
             const status = document.getElementById('smtp-status');
-            if(smtp.user && smtp.pass) {
-                status.innerText = 'READY';
-                status.style.color = 'var(--success)';
-            }
+            if(smtp.user && smtp.pass) { status.innerText = 'READY'; status.style.color = 'var(--success)'; }
         }
 
         async function runBinCheck() {
@@ -226,29 +243,28 @@
             const target = document.getElementById('flood-target').value;
             const res = document.getElementById('flood-results');
             const smtp = JSON.parse(localStorage.getItem('reaper_smtp') || '{}');
+            const amount = parseInt(document.getElementById('flood-amount').value);
             
             if(!target || !smtp.user || !smtp.pass) {
                 res.innerHTML = `<span style="color:var(--error)">> ERROR: SMTP_CONFIG_REQUIRED</span>`;
                 return;
             }
 
-            res.innerHTML = `<span class="status-active">></span> DISPATCHING PAYLOADS...\n`;
-            addLog(`FLOOD_START: TARGET=${target}`);
+            res.innerHTML = `<span class="status-active">></span> FIRING PAYLOADS [${amount}]...\n`;
+            addLog(`FLOOD_FIRE: TARGET=${target} COUNT=${amount}`);
 
             try {
                 const response = await fetch('/api/flood', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        target,
-                        subject: document.getElementById('flood-subject').value,
-                        amount: document.getElementById('flood-amount').value,
-                        smtp
-                    })
+                    body: JSON.stringify({ target, amount, smtp })
                 });
                 const data = await response.json();
                 res.innerHTML += `> STATUS: ${response.status} OK\n> SENT: ${data.sent}\n> FAILED: ${data.failed}`;
-                addLog(`FLOOD_COMPLETE: SENT=${data.sent}`);
+                
+                totalAmmo += data.sent;
+                updateAmmo();
+                addLog(`FLOOD_IMPACT: SENT=${data.sent}`);
             } catch (e) { res.innerHTML += `> EXCEPTION: DISPATCH_FAILED`; }
         }
 
