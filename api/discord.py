@@ -2,15 +2,38 @@ from http.server import BaseHTTPRequestHandler
 import json
 import os
 import uuid
+import urllib.request
+import urllib.parse
 from discord_interactions import verify_key
-from supabase import create_client
 
 # Load environment variables
 DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY", "5220a38079df1ca3d1815354a55633d6a0a6d4df9316dc213d9fd253333bb824")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://smxpzldbxewcgrakaqhn.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+def supabase_insert(table, data):
+    """Lightweight Supabase insert using raw HTTP instead of the heavy SDK."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}"
+    payload = json.dumps(data).encode('utf-8')
+    req = urllib.request.Request(url, data=payload, method='POST')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('apikey', SUPABASE_KEY)
+    req.add_header('Authorization', f'Bearer {SUPABASE_KEY}')
+    req.add_header('Prefer', 'return=minimal')
+    with urllib.request.urlopen(req, timeout=3) as resp:
+        return resp.getcode()
+
+def supabase_update(table, match_col, match_val, data):
+    """Lightweight Supabase update using raw HTTP."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}?{match_col}=eq.{urllib.parse.quote(match_val)}"
+    payload = json.dumps(data).encode('utf-8')
+    req = urllib.request.Request(url, data=payload, method='PATCH')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('apikey', SUPABASE_KEY)
+    req.add_header('Authorization', f'Bearer {SUPABASE_KEY}')
+    req.add_header('Prefer', 'return=minimal')
+    with urllib.request.urlopen(req, timeout=3) as resp:
+        return resp.getcode()
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -81,7 +104,7 @@ class handler(BaseHTTPRequestHandler):
                 }
                 
                 try:
-                    supabase.table("keys").insert(db_data).execute()
+                    supabase_insert("keys", db_data)
                     reply = {
                         "type": 4, # InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
                         "data": {
@@ -113,7 +136,7 @@ class handler(BaseHTTPRequestHandler):
                 if target_key:
                     try:
                         # Revoke the key
-                        supabase.table("keys").update({"status": "revoked"}).eq("key", target_key).execute()
+                        supabase_update("keys", "key", target_key, {"status": "revoked"})
                         reply = {
                             "type": 4,
                             "data": {
