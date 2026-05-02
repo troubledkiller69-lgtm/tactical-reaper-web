@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tactical Reaper | Industrial OSINT & Disruption</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #ffffff;
@@ -21,88 +25,508 @@
             --success: #44ff44;
         }
 
-        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-        @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
-        @keyframes fade-out { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(0.2); } }
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
-        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05) 50%, transparent); pointer-events: none; z-index: 1000; animation: scanline 10s linear infinite; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+            100% {
+                transform: translateY(100%);
+            }
+        }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.9); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--neon-gray); text-shadow: 0 0 10px var(--neon-glow); }
-        .nav-links { display: flex; gap: 1.5rem; }
-        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.6rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 5px 0; letter-spacing: 2px; }
-        .nav-links a.active { color: var(--primary); border-bottom: 2px solid var(--primary); text-shadow: 0 0 10px var(--neon-glow); }
+        @keyframes drift {
+            0% {
+                background-position: 0 0;
+            }
 
-        .tab-content { display: none; min-height: calc(100vh - 100px); }
-        .tab-content.active { display: block; }
+            100% {
+                background-position: 1000px 1000px;
+            }
+        }
+
+        @keyframes fade-out {
+            from {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05) 50%, transparent);
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanline 10s linear infinite;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--neon-gray);
+            text-shadow: 0 0 10px var(--neon-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 5px 0;
+            letter-spacing: 2px;
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            text-shadow: 0 0 10px var(--neon-glow);
+        }
+
+        .tab-content {
+            display: none;
+            min-height: calc(100vh - 100px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
 
         /* CHANGE LOG */
-        .changelog-item { border-left: 1px solid #222; padding-left: 2rem; margin-bottom: 4rem; position: relative; }
-        .changelog-item::before { content: ''; position: absolute; left: -3px; top: 0; width: 5px; height: 5px; background: #fff; box-shadow: 0 0 10px #fff; }
-        .changelog-version { font-family: 'Inter'; font-weight: 900; letter-spacing: 4px; color: #fff; font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .changelog-date { color: #555; font-size: 0.6rem; font-family: 'JetBrains Mono'; margin-bottom: 1rem; }
-        .changelog-desc { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #888; border-top: 1px solid #111; padding-top: 1rem; margin-top: 0.5rem; line-height: 1.8; }
+        .changelog-item {
+            border-left: 1px solid #222;
+            padding-left: 2rem;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .changelog-item::before {
+            content: '';
+            position: absolute;
+            left: -3px;
+            top: 0;
+            width: 5px;
+            height: 5px;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .changelog-version {
+            font-family: 'Inter';
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .changelog-date {
+            color: #555;
+            font-size: 0.6rem;
+            font-family: 'JetBrains Mono';
+            margin-bottom: 1rem;
+        }
+
+        .changelog-desc {
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            color: #888;
+            border-top: 1px solid #111;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            line-height: 1.8;
+        }
 
         /* OPS MAP - v6.2 PRECISION STRIKE */
-        .map-wrapper { position: fixed; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); background: #000; overflow: hidden; display: none; }
-        .map-wrapper.active { display: block; }
-        .map-bg { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: url('https://www.transparenttextures.com/patterns/topographic.png'); background-size: 800px 800px; opacity: 0.2; filter: invert(1) brightness(2); animation: drift 180s linear infinite; }
-        .map-container { position: relative; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat; filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow)); opacity: 0.3; }
-        .node-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
-        .packet-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .node { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; transform: translate(-50%, -50%); }
-        .node-info { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #fff; text-transform: uppercase; background: rgba(10,10,10,0.9); padding: 4px 6px; border: 1px solid #333; border-radius: 1px; }
-        .packet { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; z-index: 5; }
-        .particle { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: fade-out 0.8s forwards; pointer-events: none; }
+        .map-wrapper {
+            position: fixed;
+            top: 75px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 75px);
+            background: #000;
+            overflow: hidden;
+            display: none;
+        }
+
+        .map-wrapper.active {
+            display: block;
+        }
+
+        .map-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: url('https://www.transparenttextures.com/patterns/topographic.png');
+            background-size: 800px 800px;
+            opacity: 0.2;
+            filter: invert(1) brightness(2);
+            animation: drift 180s linear infinite;
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/90% no-repeat;
+            filter: invert(1) brightness(0.4) contrast(2) drop-shadow(0 0 5px var(--neon-glow));
+            opacity: 0.3;
+        }
+
+        .node-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .packet-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #fff;
+            transform: translate(-50%, -50%);
+        }
+
+        .node-info {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 4px 6px;
+            border: 1px solid #333;
+            border-radius: 1px;
+        }
+
+        .packet {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
+            z-index: 5;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: fade-out 0.8s forwards;
+            pointer-events: none;
+        }
 
         /* PORTAL RECON */
-        .recon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .portal-card { background: #050505; border: 1px solid var(--border); padding: 1.5rem; border-left: 3px solid #fff; transition: 0.3s; }
-        .portal-name { font-size: 0.8rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; }
-        .portal-meta { font-size: 0.55rem; color: #555; margin-bottom: 1rem; }
-        .portal-meta span { color: var(--success); font-family: 'JetBrains Mono'; }
-        .portal-btn { background: #fff; color: #000; padding: 0.6rem 1rem; font-size: 0.6rem; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
+        .recon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .portal-card {
+            background: #050505;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-left: 3px solid #fff;
+            transition: 0.3s;
+        }
+
+        .portal-name {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .portal-meta {
+            font-size: 0.55rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .portal-meta span {
+            color: var(--success);
+            font-family: 'JetBrains Mono';
+        }
+
+        .portal-btn {
+            background: #fff;
+            color: #000;
+            padding: 0.6rem 1rem;
+            font-size: 0.6rem;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            transition: 0.3s;
+        }
 
         /* STORM MATRIX */
-        .matrix-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem; }
-        .matrix-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid #fff; padding: 2rem; }
-        textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 1rem; width: 100%; height: 400px; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .matrix-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 3px solid #fff;
+            padding: 2rem;
+        }
+
+        textarea {
+            background: #000;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 1rem;
+            width: 100%;
+            height: 400px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+        }
 
         /* DASHBOARD */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 5rem; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; border-radius: 2px; }
-        .card h3 { font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--neon-gray); }
-        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; border-radius: 2px; width: 100%; margin-bottom: 1rem; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
-        .btn { background: #fff; color: #000; border: none; padding: 0.9rem; border-radius: 2px; font-weight: 900; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; width: 100%; letter-spacing: 2px; }
-        .results { margin-top: 1.5rem; background: #050505; border: 1px solid var(--border); padding: 1.2rem; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; white-space: pre-wrap; min-height: 80px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 5rem;
+        }
 
-        #auth-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #050505; border: 1px solid var(--border); padding: 0; width: 450px; text-align: center; border-radius: 4px; overflow: hidden; }
-        .auth-tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .auth-tab { flex: 1; padding: 1.2rem; font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; color: var(--text-dim); }
-        .auth-tab.active { color: #fff; background: var(--card-bg); border-bottom: 2px solid #fff; }
-        .auth-body { padding: 3rem; }
-        .hidden { display: none !important; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 2px;
+        }
+
+        .card h3 {
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            color: var(--neon-gray);
+        }
+
+        input {
+            background: #000;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.8rem;
+            border-radius: 2px;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono';
+        }
+
+        .btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 2px;
+            font-weight: 900;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            letter-spacing: 2px;
+        }
+
+        .results {
+            margin-top: 1.5rem;
+            background: #050505;
+            border: 1px solid var(--border);
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono';
+            font-size: 0.7rem;
+            color: #aaa;
+            white-space: pre-wrap;
+            min-height: 80px;
+        }
+
+        #auth-gate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: #050505;
+            border: 1px solid var(--border);
+            padding: 0;
+            width: 450px;
+            text-align: center;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1.2rem;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            color: var(--text-dim);
+        }
+
+        .auth-tab.active {
+            color: #fff;
+            background: var(--card-bg);
+            border-bottom: 2px solid #fff;
+        }
+
+        .auth-body {
+            padding: 3rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* TG OPS */
+        .tg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+        .tg-panel { background: #050505; border: 1px solid var(--border); padding: 2rem; border-left: 3px solid #fff; }
+        .tg-panel h3 { font-size: 0.85rem; font-weight: 900; letter-spacing: 3px; color: #fff; margin-bottom: 1.5rem; text-transform: uppercase; }
+        .tg-panel label { display: block; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; margin-top: 1rem; }
+        .tg-panel select { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; width: 100%; font-family: 'JetBrains Mono'; font-size: 0.75rem; margin-bottom: 0.5rem; appearance: none; cursor: pointer; }
+        .tg-panel select option { background: #0a0a0a; }
+        .tg-settings { margin-top: 2rem; background: #050505; border: 1px solid var(--border); padding: 2rem; border-top: 3px solid #fff; }
+        .tg-settings h3 { font-size: 0.85rem; font-weight: 900; letter-spacing: 3px; color: #fff; margin-bottom: 1.5rem; }
+        .tg-acct-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .tg-acct-card { background: #0a0a0a; border: 1px solid var(--border); padding: 1.2rem; position: relative; transition: 0.3s; }
+        .tg-acct-card:hover { border-color: #444; }
+        .tg-acct-name { font-weight: 900; font-size: 0.75rem; color: #fff; margin-bottom: 0.3rem; }
+        .tg-acct-meta { font-family: 'JetBrains Mono'; font-size: 0.55rem; color: #555; line-height: 1.8; }
+        .tg-acct-meta span { color: var(--success); }
+        .tg-acct-remove { position: absolute; top: 10px; right: 12px; background: none; border: 1px solid #333; color: var(--error); font-size: 0.55rem; padding: 3px 8px; cursor: pointer; font-family: 'JetBrains Mono'; transition: 0.3s; }
+        .tg-acct-remove:hover { background: var(--error); color: #000; border-color: var(--error); }
+        .tg-acct-status { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+        .tg-acct-status.active { background: var(--success); box-shadow: 0 0 6px var(--success); }
+        .tg-add-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 0.8rem; align-items: end; margin-top: 1.5rem; }
+        .tg-add-row input { margin-bottom: 0; }
+        .tg-add-btn { background: #fff; color: #000; border: none; padding: 0.8rem 1.5rem; font-weight: 900; font-size: 0.65rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; transition: 0.3s; }
+        .tg-add-btn:hover { background: #ccc; }
+        .tg-console { background: #000; border: 1px solid var(--border); padding: 1rem; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #666; min-height: 120px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; margin-top: 1rem; }
+        .tg-reason-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+        .tg-reason-btn { background: #0a0a0a; border: 1px solid var(--border); color: #888; padding: 0.6rem; font-family: 'JetBrains Mono'; font-size: 0.55rem; cursor: pointer; text-align: center; transition: 0.3s; text-transform: uppercase; }
+        .tg-reason-btn:hover, .tg-reason-btn.selected { border-color: #fff; color: #fff; background: #111; }
+        @media (max-width: 900px) { .tg-layout { grid-template-columns: 1fr; } .tg-add-row { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
+
 <body>
     <div class="scanline"></div>
 
     <div id="auth-gate">
         <div class="auth-card">
-            <div class="auth-tabs"><div class="auth-tab active" onclick="switchAuth('login')">LOGIN</div><div class="auth-tab" onclick="switchAuth('register')">REGISTER</div></div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuth('login')">LOGIN</div>
+                <div class="auth-tab" onclick="switchAuth('register')">REGISTER</div>
+            </div>
             <div class="auth-body">
                 <div id="auth-login">
-                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER LOGIN</h2>
-                    <input type="text" id="login-user" placeholder="OPERATOR ID"><input type="password" id="login-pass" placeholder="ACCESS KEY"><button class="btn" onclick="handleLogin()">INITIALIZE</button>
+                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER LOGIN
+                    </h2>
+                    <input type="text" id="login-user" placeholder="OPERATOR ID"><input type="password" id="login-pass"
+                        placeholder="ACCESS KEY"><button class="btn" onclick="handleLogin()">INITIALIZE</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
                 <div id="auth-register" class="hidden">
-                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER REG</h2>
-                    <input type="text" id="reg-user" placeholder="CHOOSE ID"><input type="password" id="reg-pass" placeholder="CHOOSE KEY"><button class="btn" onclick="handleRegister()">CREATE OPERATOR</button>
+                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER REG
+                    </h2>
+                    <input type="text" id="reg-user" placeholder="CHOOSE ID"><input type="password" id="reg-pass"
+                        placeholder="CHOOSE KEY"><button class="btn" onclick="handleRegister()">CREATE OPERATOR</button>
                 </div>
             </div>
         </div>
@@ -116,6 +540,7 @@
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
+                <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                 <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
@@ -124,18 +549,38 @@
 
         <div id="tab-dashboard" class="tab-content active">
             <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
-                <div class="card"><h3>💎 BIN INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn" onclick="runBinCheck()">LOOKUP</button><div id="bin-results" class="results">...</div></div>
-                <div class="card"><h3>📧 EMAIL FLOOD</h3><input type="text" id="flood-target" placeholder="TARGET"><button class="btn" onclick="runFlooder()">FIRE</button><div id="flood-results" class="results">...</div></div>
-                <div class="card"><h3>📱 GHOST SMS</h3><input type="text" id="sms-target" placeholder="MSISDN"><button class="btn" onclick="runSim('sms')">BROADCAST</button><div id="sms-results" class="results">...</div></div>
+                <div class="card">
+                    <h3>💎 BIN INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn"
+                        onclick="runBinCheck()">LOOKUP</button>
+                    <div id="bin-results" class="results">...</div>
+                </div>
+                <div class="card">
+                    <h3>📧 EMAIL FLOOD</h3><input type="text" id="flood-target" placeholder="TARGET"><button class="btn"
+                        onclick="runFlooder()">FIRE</button>
+                    <div id="flood-results" class="results">...</div>
+                </div>
+                <div class="card">
+                    <h3>📱 GHOST SMS</h3><input type="text" id="sms-target" placeholder="MSISDN"><button class="btn"
+                        onclick="runSim('sms')">BROADCAST</button>
+                    <div id="sms-results" class="results">...</div>
+                </div>
             </div>
         </div>
 
-        <div id="tab-opsmap" class="tab-content"><div class="map-wrapper" id="full-map-wrapper"><div class="map-bg"></div><div class="map-container"></div><div class="packet-layer" id="packet-layer"></div><div class="node-layer" id="node-layer"></div></div></div>
+        <div id="tab-opsmap" class="tab-content">
+            <div class="map-wrapper" id="full-map-wrapper">
+                <div class="map-bg"></div>
+                <div class="map-container"></div>
+                <div class="packet-layer" id="packet-layer"></div>
+                <div class="node-layer" id="node-layer"></div>
+            </div>
+        </div>
 
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">PORTAL RECON</h2>
-                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..." oninput="filterPortals()" style="max-width:500px;">
+                <input type="text" id="portal-search" placeholder="FILTER INSTITUTION OR BIN..."
+                    oninput="filterPortals()" style="max-width:500px;">
                 <div class="recon-grid" id="portal-list"></div>
             </div>
         </div>
@@ -144,156 +589,270 @@
             <div style="margin-top:4rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">STORM MATRIX</h2>
                 <div class="matrix-container">
-                    <div class="matrix-card"><h3>📥 BULK INPUT</h3><textarea id="storm-input" placeholder="NUMBER|MM|YY|CVV"></textarea><button class="btn" style="margin-top:1.5rem;" onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button></div>
-                    <div class="matrix-card"><h3>📊 STATS</h3><div id="storm-stats" style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--success); margin-bottom:1.5rem;">A: 0 | R: 0</div><h3>💎 HIT VAULT</h3><div id="storm-vault" class="results" style="height:250px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div></div>
+                    <div class="matrix-card">
+                        <h3>📥 BULK INPUT</h3><textarea id="storm-input"
+                            placeholder="NUMBER|MM|YY|CVV"></textarea><button class="btn" style="margin-top:1.5rem;"
+                            onclick="runStormMatrix()">EXECUTE AUTH CHARGE</button>
+                    </div>
+                    <div class="matrix-card">
+                        <h3>📊 STATS</h3>
+                        <div id="storm-stats"
+                            style="font-family:'JetBrains Mono'; font-size:1rem; color:var(--success); margin-bottom:1.5rem;">
+                            A: 0 | R: 0</div>
+                        <h3>💎 HIT VAULT</h3>
+                        <div id="storm-vault" class="results"
+                            style="height:250px; overflow-y:auto; color:var(--success);">AWAITING HITS...</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="tab-changelog" class="tab-content"><div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div></div>
-        <div id="tab-logs" class="tab-content"><div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div></div>
-        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL REAPER CORE ]</footer>
+        <div id="tab-tgops" class="tab-content">
+            <div style="margin-top:4rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:0.5rem;">TG OPS</h2>
+                <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">TELEGRAM MASS REPORTING &amp; SPAM ENGINE</p>
+                <div class="tg-layout">
+                    <div class="tg-panel">
+                        <h3>🎯 REPORTER</h3>
+                        <label>TARGET (USERNAME OR LINK)</label>
+                        <input type="text" id="tg-report-target" placeholder="@channel or t.me/target">
+                        <label>REPORT REASON</label>
+                        <div class="tg-reason-grid">
+                            <div class="tg-reason-btn selected" onclick="selectReason(this)" data-reason="spam">SPAM</div>
+                            <div class="tg-reason-btn" onclick="selectReason(this)" data-reason="violence">VIOLENCE</div>
+                            <div class="tg-reason-btn" onclick="selectReason(this)" data-reason="pornography">PORNOGRAPHY</div>
+                            <div class="tg-reason-btn" onclick="selectReason(this)" data-reason="child_abuse">CHILD ABUSE</div>
+                            <div class="tg-reason-btn" onclick="selectReason(this)" data-reason="copyright">COPYRIGHT</div>
+                            <div class="tg-reason-btn" onclick="selectReason(this)" data-reason="other">OTHER</div>
+                        </div>
+                        <label>REPORT COUNT PER ACCOUNT</label>
+                        <input type="number" id="tg-report-count" placeholder="10" value="10" min="1" max="50">
+                        <label>CUSTOM MESSAGE (OPTIONAL)</label>
+                        <input type="text" id="tg-report-msg" placeholder="Auto-randomized if empty">
+                        <button class="btn" style="margin-top:1rem;" onclick="launchTgReport()">EXECUTE REPORTS</button>
+                        <div class="tg-console" id="tg-report-console">&gt; AWAITING TARGET...</div>
+                    </div>
+                    <div class="tg-panel">
+                        <h3>💀 SPAMMER</h3>
+                        <label>TARGET (USERNAME OR LINK)</label>
+                        <input type="text" id="tg-spam-target" placeholder="@channel or t.me/target">
+                        <label>SPAM MODE</label>
+                        <select id="tg-spam-mode">
+                            <option value="channel">CHANNEL FLOOD</option>
+                            <option value="dm">DM BLAST</option>
+                            <option value="join">MASS JOIN</option>
+                        </select>
+                        <label>MESSAGE</label>
+                        <textarea style="height:100px; margin-bottom:0.5rem;" id="tg-spam-msg" placeholder="Message to spam (auto-spun per account)"></textarea>
+                        <label>VOLUME</label>
+                        <input type="number" id="tg-spam-count" placeholder="25" value="25" min="1" max="500">
+                        <button class="btn" style="margin-top:1rem;" onclick="launchTgSpam()">DEPLOY SPAM</button>
+                        <div class="tg-console" id="tg-spam-console">&gt; AWAITING PAYLOAD...</div>
+                    </div>
+                </div>
+                <div class="tg-settings">
+                    <h3>⚙️ ACCOUNT TOKENS</h3>
+                    <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">IMPORT TELEGRAM ACCOUNTS FOR POOL ROTATION. EACH ACCOUNT NEEDS API_ID, API_HASH, AND PHONE NUMBER.</p>
+                    <div class="tg-add-row">
+                        <div><label>SESSION NAME</label><input type="text" id="tg-add-name" placeholder="acc_01"></div>
+                        <div><label>API ID</label><input type="text" id="tg-add-apiid" placeholder="12345678"></div>
+                        <div><label>API HASH</label><input type="text" id="tg-add-apihash" placeholder="a1b2c3d4e5f6..."></div>
+                        <div><label>PHONE</label><input type="text" id="tg-add-phone" placeholder="+1234567890"></div>
+                        <button class="tg-add-btn" onclick="addTgAccount()">+ ADD</button>
+                    </div>
+                    <div class="tg-acct-grid" id="tg-acct-list"></div>
+                    <p id="tg-acct-count" style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#444; margin-top:1rem;"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-changelog" class="tab-content">
+            <div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div>
+        </div>
+        <div id="tab-logs" class="tab-content">
+            <div id="log-stream" style="padding:4rem; font-family:'JetBrains Mono'; color:#555;"></div>
+        </div>
+        <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL
+            REAPER CORE ]</footer>
     </div>
 
     <script>
         const portals = [
-            {n: 'Baltimore Washington FCU', u: 's1', r: 'CkUWGGb4EmCM8sKV9sq_mg', b: ['480927']},
-            {n: 'Garden Island FCU', u: 's2', r: '_ABOGQM8Yebl7f21AZTK-g', b: ['478643']},
-            {n: 'Georgia\'s Own CU', u: 's2', r: 'drWvsOTJEDwPk8L6oaSRsg', b: ['411255', '412237', '414861']},
-            {n: 'Edwards FCU', u: 's1', r: '6m-OQ7yTNyDPbcTgTDPpZg', b: ['444338', '484342']},
-            {n: 'Houston Texas Fire Fighters', u: 's1', r: 'gWBP0ksYVfielhuFlB8A8A', b: ['400328', '431812']},
-            {n: 'Keys FCU', u: 's2', r: 'P6SQ2hCy8ZGNjiU89bEzXw', b: ['462622']},
-            {n: 'Henrico FCU', u: 's1', r: 'NOA5ddWb2Bd7-6vRYbth4Q', b: ['407050']},
-            {n: 'BayPort CU', u: 's1', r: 'iuopVHeXQAxy4U1gtQxudw', b: ['544630']},
-            {n: 'Firefighters Community CU', u: 's1', r: 'AE-QKORMoAJlgP_gtigZCQ', b: ['430659', '460506']},
-            {n: 'Consolidated Community CU', u: 's1', r: 'bSiB1VqJmQCHFGcBZuhDdA', b: ['410983', '423787']},
-            {n: 'Industrial FCU', u: 's1', r: 'DMSoLGaYIX91gsesy2-HzQ', b: ['409429', '430408']},
-            {n: 'NorthCountry FCU', u: 's1', r: 'nBI13KodbjvAz6ETXCzAfA', b: ['413686', '413734']},
-            {n: 'Five Star of Maryland FCU', u: 's1', r: 'e6JTFX_IGbUVaUOAKnYfvA', b: ['411292', '463008']},
-            {n: 'CODE Credit Union', u: 's1', r: 'fnZmgxA3eZjbpbbBrzXuvg', b: ['441829', '442876']},
-            {n: 'State Department FCU', u: 's2', r: 'in2gtO_wA_6coxYaoRJhnA', b: ['408426', '408427']},
-            {n: 'Jefferson Parish Employees', u: 's2', r: 'YrdbqcuO_c973UJBFn_AiQ', b: ['425222']},
-            {n: 'Fortress FCU', u: 's2', r: 'SwMMLALb4uUagTxJ5MFxpQ', b: ['413679']},
-            {n: 'Mid-Hudson Valley FCU', u: 's2', r: 'lz8IE9FwJ_Sp2tgyqxdUDA', b: ['430125', '465653']},
-            {n: 'tnConnect CU', u: 's2', r: 'n2uzZsPMT6gwJyuqIfntKQ', b: ['430633']},
-            {n: 'Priority First FCU', u: 's2', r: '_-KUbeH9L2Mk-lDemoTKdA', b: ['473541']},
-            {n: 'Credit Union of America', u: 's2', r: 'Ylbxdu5Y8OleqLDXvKPJjA', b: ['446755', '464905']},
-            {n: 'Complex Community FCU', u: 's2', r: 'Rd8coAYDiFfAkbd5JmKong', b: []},
-            {n: 'Community One of Ohio', u: 's1', r: 'cHsEkHCl4TiPS_V-O-9cqw', b: []},
-            {n: 'Salem VA MC FCU', u: 's1', r: 'F7sZb4Aa5mDqYY66KryepA', b: []},
-            {n: 'Tri State Rail FCU', u: 's1', r: 'T6kRrZ2I1osQdUtWGNmLIw', b: []},
-            {n: 'Iron County Community CU', u: 's1', r: 'rrouybFD3uhbceZd2EYYgg', b: []},
-            {n: 'Highway FCU', u: 's1', r: 'FNRLgdfpWe8JAewsDzBmCg', b: []},
-            {n: 'Virginia Educators CU', u: 's1', r: 'UX3yAhgvCbVuALYn91fODA', b: []},
-            {n: 'Cy-Fair FCU', u: 's1', r: 'jjlVz-PR7OeAgFxHK8OSzw', b: []},
-            {n: 'Corry FCU', u: 's1', r: 'rhCn9T9IqQ49nU9Uy811gw', b: []},
-            {n: 'Novation', u: 's2', r: 'liryhnWg2tI6ZmTNovG-Lw', b: []},
-            {n: 'CACL FCU', u: 's1', r: 'JrWOieBi9RP664o4aGSk1w', b: []},
-            {n: 'Hawaii Law Enforcement FCU', u: 's2', r: 'ELdZAXIHtyN2IVxyKdVqdA', b: []},
-            {n: 'Everwise', u: 's1', r: 'IRg8-MhgyvPLWln5oblHfQ', b: []},
-            {n: 'Polish National CU', u: 's2', r: 'cRWQoy8rRNrVcp6vvV2MoA', b: []},
-            {n: 'Commonwealth Utilities', u: 's2', r: 'cbwpVs_lroy9JrVaMTcixA', b: []},
-            {n: 'University Credit Union', u: 's2', r: 'daKKjxdlHRns2IzX1ldeEg', b: []},
-            {n: 'VA Pittsburgh Employees', u: 's2', r: 'BKgbmPv4PlquK8-l24ZDYA', b: []},
-            {n: 'Wellesley Municipal Employees', u: 's2', r: 'G-3blFdiS4U3z522pRGzag', b: []},
-            {n: 'Franklin First FCU', u: 's2', r: 'CaFyqmoPwR7oUpqfowm8NQ', b: []},
-            {n: 'Lewis Clark Credit Union', u: 's1', r: 'p-7DoRRi8rfDm2pfIgndWQ', b: []},
-            {n: 'Liberty Federal Credit Union', u: 's1', r: 'VX3M1nM_VwnLUsQDerJYNg', b: []},
-            {n: 'Irving City Employees FCU', u: 's1', r: 'z2oEbIkLb3bDiHDqev2GLw', b: []},
-            {n: 'Arrha Credit Union', u: 's1', r: 'fIz2i0vBJvbzP0cLu9j7LQ', b: []},
-            {n: 'New Bedford Credit Union', u: 's1', r: 'M4DPXJnyzsDfQekhmEJ6IQ', b: []},
-            {n: 'Worcester Credit Union', u: 's1', r: '614UGLkULjxuFEhuNqezgA', b: []},
-            {n: 'Teamsters Council #37', u: 's1', r: 'AE64KFAw0G4bI9vmQWtkUg', b: []},
-            {n: 'Wyrope Williamsport FCU', u: 's1', r: 'HzgpGsRKBfEggdfSYBdmdg', b: []},
-            {n: 'Tri County Area FCU', u: 's1', r: '2P0TOrXzCIJ0oXK_5DHroQ', b: []},
-            {n: 'Summit Ridge Credit Union', u: 's1', r: 'Y-2J1hm9bybNxat6_76ypQ', b: []},
-            {n: 'MCT Credit Union', u: 's1', r: 'yUJB2BUPn0QELRGm6RLENA', b: []},
-            {n: 'Greenville FCU', u: 's2', r: 'RkiU-UGbQI18qKsOaCLTwQ', b: []},
-            {n: 'Aerospace FCU', u: 's2', r: '6NBqm3Lsbichvp5e07vMow', b: []},
-            {n: 'BP Federal Credit Union', u: 's2', r: '1I-DdZLrloM0FKlavjAH8w', b: ['430662']},
-            {n: 'MidWest America FCU', u: 's2', r: 'sjexTGLMKPGxJR6h712v6Q', b: ['406002', '409484']},
-            {n: 'MECU Credit Union', u: 's2', r: 'dZZXVNJQ_6r78YpI_O72SQ', b: ['476080']},
-            {n: 'West-Aircomm FCU', u: 's2', r: '_2YIbAtTB_lWofZmeNqLhg', b: ['409455']},
-            {n: 'Sterling United', u: 's2', r: 'YxY20eusicwDce0QS72_oQ', b: ['407097']},
-            {n: 'United Community', u: 's2', r: 'hY0H7k_2afNfz7uFfSORJQ', b: ['423707']},
-            {n: 'KEMBA Indianapolis CU', u: 's1', r: 'JXpSoARPMp555lWMiwl29w', b: ['410963']},
-            {n: 'Members Source CU', u: 's1', r: 'R9bi1J_JRd8rZ6xVyirtTw', b: ['410956']},
-            {n: 'Dutch Point', u: 's2', r: 'ZLgl4vqrgH7KQxoVkdBrTw', b: ['435121']},
-            {n: 'Methuen FCU', u: 's1', r: 'AvJwQn_ptLNVlc7bpOSCMg', b: ['462630']},
-            {n: 'Affinity Plus FCU', u: 's1', r: '5U5gxhaQ3hCjeTHVDC3-7w', b: ['407522']},
-            {n: 'Chiphone FCU', u: 's1', r: 'Vr7tZFWJ66x0xlrRB6wZ0g', b: ['403972']},
-            {n: 'Chicago Patrolmen\'s FCU', u: 's2', r: 'too6wrPQKDXhLZlnYZ2HEQ', b: ['439856']},
-            {n: 'CommonWealth One FCU', u: 's1', r: 'Jo8lrdGSsRKyJa4bT9t7qQ', b: ['409435']},
-            {n: 'Illinois Community CU', u: 's1', r: 'yrPRLu3hpOebHe_YfNiV9w', b: ['420272']},
-            {n: 'Midwest Carpenters FCU', u: 's1', r: '_xLXWCrnodUSgwO2UoThFw', b: ['403969']},
-            {n: 'UFCW Community FCU', u: 's2', r: 'mUqxqRC-OLEvCC0KsqokAg', b: ['417810']},
-            {n: 'VyStar', u: 's2', r: '697nYhMYp8H9FBLOJ7prvg', b: ['400519']},
-            {n: 'Jersey Shore', u: 's2', r: '5mk7vk-S1QmbNG-H8onGDA', b: ['441454']},
-            {n: 'Neches FCU', u: 's1', r: 'bB4YOSEdUYEMQN5DTzYW0Q', b: ['433377']},
-            {n: 'HawaiiUSA FCU', u: 's1', r: 'OcmLlLwgs-siIIrKoJ6vww', b: ['461311']},
-            {n: 'Mohawk Progressive', u: 's1', r: 'OPF7WLSmKA46Gdlszw41Qg', b: ['444479']},
-            {n: 'FAIRWINDS', u: 's1', r: '0wmSLn7aFqTe4CwpXBAkXw', b: ['401468']},
-            {n: 'Provident Credit Union', u: 's1', r: '8dcySDwkEZ-dcQcivOwj_g', b: ['400617']},
-            {n: 'Advantage FCU', u: 's1', r: 'djX73s4zCKwsbTkC5w7sSw', b: ['441683']},
-            {n: 'Riverfront FCU', u: 's1', r: 'HYVL2A9Y2qI-2PUcSFlQxg', b: ['454836']},
-            {n: 'Wauna Credit Union', u: 's2', r: 'jwaLitrD7iJpMagErZsYiw', b: ['410904']},
-            {n: 'Corner Post FCU', u: 's2', r: '7yO8qF2Z7HLJ9egv7Xu_EA', b: ['473547']},
-            {n: 'Perfect Circle CU', u: 's2', r: 'qkOPCmXbjH-2x2lj_Lct4A', b: ['400402']},
-            {n: 'Alcoa Tenn FCU', u: 's1', r: '5EHa9j5w-sDU0N-KfYbJAw', b: ['432665']},
-            {n: 'Midwest Members CU', u: 's1', r: 'QIBa7COjaf3NeUKjr9du8A', b: ['409807']},
-            {n: 'Associated Healthcare', u: 's1', r: 'L-RUh4kXUafloU1ajrAXfQ', b: ['463086']},
-            {n: 'Illinois State CU', u: 's1', r: 'KmDB9gdCtGGtTfGLXKmbUw', b: ['423758']},
-            {n: 'Advance Financial FCU', u: 's1', r: 'dlt8bLKwGKoyQm_b-kOaBw', b: ['401927']},
-            {n: '1st Community CU', u: 's1', r: 'Dg44gg5x2TmL3EAUYI6tkw', b: ['447924']},
-            {n: 'Advantage Plus FCU', u: 's1', r: 'hWVQqeH4vcos6jxp5BA31Q', b: ['460429']},
-            {n: 'Jefferson Credit Union', u: 's2', r: 'gChScrQeHqIH2fNVGOjxbw', b: ['499154']},
-            {n: 'Financial Builders FCU', u: 's2', r: 'l5ccmn1yoGOUfBpWM-eGrg', b: ['402619']},
-            {n: 'Nuvision Credit Union', u: 's2', r: 'EP39kKcfonZBWOotoK-o3Q', b: ['420215']},
-            {n: 'Community West CU', u: 's2', r: 'fQxlMj_uo8ApNvsQB_OBQQ', b: ['402888']},
-            {n: 'PrimeTrust FCU', u: 's2', r: 'URsUlZFkWYtkX-3_qfAzEg', b: ['423720']},
-            {n: 'Chessie FCU', u: 's1', r: 'pU_Jp77lzcq3I_12u4Eotw', b: ['414248']},
-            {n: 'Border FCU', u: 's1', r: 'xOCJD2C0Wmd_HX2KxsueQQ', b: ['426379']},
-            {n: 'Honolulu FCU', u: 's1', r: 'dCg0podKaAFhmZb8Sk_xKg', b: ['403986']},
-            {n: 'Profinance', u: 's1', r: '6_ok7TW6EElyHBW_G6Q02w', b: ['403986']},
-            {n: 'Marshall Community CU', u: 's1', r: 'YdAODg4fUvGIRQqdcd2teg', b: []},
-            {n: 'Burlington Municipal Employees', u: 's1', r: 'r-PxApDfcMURPSmCNA--9A', b: []},
-            {n: 'HTM Credit Union', u: 's1', r: 'kmYarHtGrthGvrMcF9nG3g', b: []},
-            {n: 'Malden FCU', u: 's1', r: '8EBStHSvOQX1-5WhthOWBw', b: []},
-            {n: 'Access Credit Union', u: 's1', r: 'Lf8b9iCpQSluOZop-9LBng', b: []},
-            {n: 'Armstrong Co. Federal', u: 's1', r: 'lFY5vEeNICPXvgVnerHKUA', b: []},
-            {n: 'CU Campus Card Services', u: 's2', r: 'XmCwAYHvRNcF0SITNFz_dA', b: []},
-            {n: 'Southcoast FCU', u: 's2', r: 'C8K_25xVtuTwnyF8PZHp4A', b: []},
-            {n: 'Christian Community CU', u: 's2', r: 'qjBpT9sDxEO2ZZ5brOHiow', b: []},
-            {n: 'InvesTex Credit Union', u: 's2', r: 'MLHmWiKpLGgzRznT3XuT8Q', b: []},
-            {n: 'R-S Bellco', u: 's1', r: 'oVwPJK-B_p67vJXPAS_Utg', b: []},
-            {n: 'Maroon Financial CU', u: 's1', r: 'DPObG1OYaoE-GGN7o2seLQ', b: []},
-            {n: 'Toledo Urban FCU', u: 's2', r: 'gtr8JOH-XtTUz-7PtfdDOQ', b: []},
-            {n: 'Copper & Glass FCU', u: 's1', r: 'IIk--vp1gbWdyLt0UxiOPw', b: []},
-            {n: 'Member One FCU', u: 's2', r: '0jUPrQP-bXly1PjhyVRZmA', b: []},
-            {n: 'Community Spirit', u: 's2', r: '-GeyI9Jt_8giqVLI2MGoTQ', b: []},
-            {n: 'TopLine', u: 's2', r: 'ltkAzEjHquyXEVGExQ0ZrQ', b: []},
-            {n: 'Attleboro Municipal Employees', u: 's1', r: 'bNC1M3-5gkZ-4VzcPqrzag', b: []},
-            {n: 'L & N FCU', u: 's1', r: 'IKRMdXu40xMloIuX3xL5sA', b: []},
-            {n: 'Champions First CU', u: 's1', r: 'LesETeWYdpEt3la3vsyRqw', b: []},
-            {n: 'Avenir Financial', u: 's1', r: 'bGqH8WqnXoSUA6xlqrtBEw', b: []},
-            {n: 'Big Spring Education', u: 's1', r: '0OBV6jkG4R8C00SPy8UJTg', b: []},
-            {n: 'WSSC FCU', u: 's1', r: '4TRwhAZ1SQhLKaSpV8U6Dw', b: []},
-            {n: 'WeStreet', u: 's1', r: 'CqIgV0KChpppEgSVbN_B5w', b: []},
-            {n: 'Your Best Credit Union', u: 's1', r: 'jrQ2CJNGozotLXLjzMf-kA', b: []},
-            {n: 'First Choice Community CU', u: 's1', r: 'Ip93sgy15OiUmqk7yCvIVw', b: []},
-            {n: 'Community CU of Lynn', u: 's1', r: 'Q3qN4KoQK9fqkgiQBfxEgw', b: []},
-            {n: 'Rivertown Credit Union', u: 's1', r: 'GJaWf3WzH08f7xxhoi_n4Q', b: []},
-            {n: 'CT Firefighters FCU', u: 's1', r: 'qgtIZY8Fhva8kPJHuaMx3A', b: []},
-            {n: 'Freedom Credit Union', u: 's1', r: 'bg2EdFhXb1LQ-h3WzIAmOA', b: []}
+            { n: 'Baltimore Washington FCU', u: 's1', r: 'CkUWGGb4EmCM8sKV9sq_mg', b: ['480927'] },
+            { n: 'Garden Island FCU', u: 's2', r: '_ABOGQM8Yebl7f21AZTK-g', b: ['478643'] },
+            { n: 'Georgia\'s Own CU', u: 's2', r: 'drWvsOTJEDwPk8L6oaSRsg', b: ['411255', '412237', '414861'] },
+            { n: 'Edwards FCU', u: 's1', r: '6m-OQ7yTNyDPbcTgTDPpZg', b: ['444338', '484342'] },
+            { n: 'Houston Texas Fire Fighters', u: 's1', r: 'gWBP0ksYVfielhuFlB8A8A', b: ['400328', '431812'] },
+            { n: 'Keys FCU', u: 's2', r: 'P6SQ2hCy8ZGNjiU89bEzXw', b: ['462622'] },
+            { n: 'Henrico FCU', u: 's1', r: 'NOA5ddWb2Bd7-6vRYbth4Q', b: ['407050'] },
+            { n: 'BayPort CU', u: 's1', r: 'iuopVHeXQAxy4U1gtQxudw', b: ['544630'] },
+            { n: 'Firefighters Community CU', u: 's1', r: 'AE-QKORMoAJlgP_gtigZCQ', b: ['430659', '460506'] },
+            { n: 'Consolidated Community CU', u: 's1', r: 'bSiB1VqJmQCHFGcBZuhDdA', b: ['410983', '423787'] },
+            { n: 'Industrial FCU', u: 's1', r: 'DMSoLGaYIX91gsesy2-HzQ', b: ['409429', '430408'] },
+            { n: 'NorthCountry FCU', u: 's1', r: 'nBI13KodbjvAz6ETXCzAfA', b: ['413686', '413734'] },
+            { n: 'Five Star of Maryland FCU', u: 's1', r: 'e6JTFX_IGbUVaUOAKnYfvA', b: ['411292', '463008'] },
+            { n: 'CODE Credit Union', u: 's1', r: 'fnZmgxA3eZjbpbbBrzXuvg', b: ['441829', '442876'] },
+            { n: 'State Department FCU', u: 's2', r: 'in2gtO_wA_6coxYaoRJhnA', b: ['408426', '408427'] },
+            { n: 'Jefferson Parish Employees', u: 's2', r: 'YrdbqcuO_c973UJBFn_AiQ', b: ['425222'] },
+            { n: 'Fortress FCU', u: 's2', r: 'SwMMLALb4uUagTxJ5MFxpQ', b: ['413679'] },
+            { n: 'Mid-Hudson Valley FCU', u: 's2', r: 'lz8IE9FwJ_Sp2tgyqxdUDA', b: ['430125', '465653'] },
+            { n: 'tnConnect CU', u: 's2', r: 'n2uzZsPMT6gwJyuqIfntKQ', b: ['430633'] },
+            { n: 'Priority First FCU', u: 's2', r: '_-KUbeH9L2Mk-lDemoTKdA', b: ['473541'] },
+            { n: 'Credit Union of America', u: 's2', r: 'Ylbxdu5Y8OleqLDXvKPJjA', b: ['446755', '464905'] },
+            { n: 'Complex Community FCU', u: 's2', r: 'Rd8coAYDiFfAkbd5JmKong', b: [] },
+            { n: 'Community One of Ohio', u: 's1', r: 'cHsEkHCl4TiPS_V-O-9cqw', b: [] },
+            { n: 'Salem VA MC FCU', u: 's1', r: 'F7sZb4Aa5mDqYY66KryepA', b: [] },
+            { n: 'Tri State Rail FCU', u: 's1', r: 'T6kRrZ2I1osQdUtWGNmLIw', b: [] },
+            { n: 'Iron County Community CU', u: 's1', r: 'rrouybFD3uhbceZd2EYYgg', b: [] },
+            { n: 'Highway FCU', u: 's1', r: 'FNRLgdfpWe8JAewsDzBmCg', b: [] },
+            { n: 'Virginia Educators CU', u: 's1', r: 'UX3yAhgvCbVuALYn91fODA', b: [] },
+            { n: 'Cy-Fair FCU', u: 's1', r: 'jjlVz-PR7OeAgFxHK8OSzw', b: [] },
+            { n: 'Corry FCU', u: 's1', r: 'rhCn9T9IqQ49nU9Uy811gw', b: [] },
+            { n: 'Novation', u: 's2', r: 'liryhnWg2tI6ZmTNovG-Lw', b: [] },
+            { n: 'CACL FCU', u: 's1', r: 'JrWOieBi9RP664o4aGSk1w', b: [] },
+            { n: 'Hawaii Law Enforcement FCU', u: 's2', r: 'ELdZAXIHtyN2IVxyKdVqdA', b: [] },
+            { n: 'Everwise', u: 's1', r: 'IRg8-MhgyvPLWln5oblHfQ', b: [] },
+            { n: 'Polish National CU', u: 's2', r: 'cRWQoy8rRNrVcp6vvV2MoA', b: [] },
+            { n: 'Commonwealth Utilities', u: 's2', r: 'cbwpVs_lroy9JrVaMTcixA', b: [] },
+            { n: 'University Credit Union', u: 's2', r: 'daKKjxdlHRns2IzX1ldeEg', b: [] },
+            { n: 'VA Pittsburgh Employees', u: 's2', r: 'BKgbmPv4PlquK8-l24ZDYA', b: [] },
+            { n: 'Wellesley Municipal Employees', u: 's2', r: 'G-3blFdiS4U3z522pRGzag', b: [] },
+            { n: 'Franklin First FCU', u: 's2', r: 'CaFyqmoPwR7oUpqfowm8NQ', b: [] },
+            { n: 'Lewis Clark Credit Union', u: 's1', r: 'p-7DoRRi8rfDm2pfIgndWQ', b: [] },
+            { n: 'Liberty Federal Credit Union', u: 's1', r: 'VX3M1nM_VwnLUsQDerJYNg', b: [] },
+            { n: 'Irving City Employees FCU', u: 's1', r: 'z2oEbIkLb3bDiHDqev2GLw', b: [] },
+            { n: 'Arrha Credit Union', u: 's1', r: 'fIz2i0vBJvbzP0cLu9j7LQ', b: [] },
+            { n: 'New Bedford Credit Union', u: 's1', r: 'M4DPXJnyzsDfQekhmEJ6IQ', b: [] },
+            { n: 'Worcester Credit Union', u: 's1', r: '614UGLkULjxuFEhuNqezgA', b: [] },
+            { n: 'Teamsters Council #37', u: 's1', r: 'AE64KFAw0G4bI9vmQWtkUg', b: [] },
+            { n: 'Wyrope Williamsport FCU', u: 's1', r: 'HzgpGsRKBfEggdfSYBdmdg', b: [] },
+            { n: 'Tri County Area FCU', u: 's1', r: '2P0TOrXzCIJ0oXK_5DHroQ', b: [] },
+            { n: 'Summit Ridge Credit Union', u: 's1', r: 'Y-2J1hm9bybNxat6_76ypQ', b: [] },
+            { n: 'MCT Credit Union', u: 's1', r: 'yUJB2BUPn0QELRGm6RLENA', b: [] },
+            { n: 'Greenville FCU', u: 's2', r: 'RkiU-UGbQI18qKsOaCLTwQ', b: [] },
+            { n: 'Aerospace FCU', u: 's2', r: '6NBqm3Lsbichvp5e07vMow', b: [] },
+            { n: 'BP Federal Credit Union', u: 's2', r: '1I-DdZLrloM0FKlavjAH8w', b: ['430662'] },
+            { n: 'MidWest America FCU', u: 's2', r: 'sjexTGLMKPGxJR6h712v6Q', b: ['406002', '409484'] },
+            { n: 'MECU Credit Union', u: 's2', r: 'dZZXVNJQ_6r78YpI_O72SQ', b: ['476080'] },
+            { n: 'West-Aircomm FCU', u: 's2', r: '_2YIbAtTB_lWofZmeNqLhg', b: ['409455'] },
+            { n: 'Sterling United', u: 's2', r: 'YxY20eusicwDce0QS72_oQ', b: ['407097'] },
+            { n: 'United Community', u: 's2', r: 'hY0H7k_2afNfz7uFfSORJQ', b: ['423707'] },
+            { n: 'KEMBA Indianapolis CU', u: 's1', r: 'JXpSoARPMp555lWMiwl29w', b: ['410963'] },
+            { n: 'Members Source CU', u: 's1', r: 'R9bi1J_JRd8rZ6xVyirtTw', b: ['410956'] },
+            { n: 'Dutch Point', u: 's2', r: 'ZLgl4vqrgH7KQxoVkdBrTw', b: ['435121'] },
+            { n: 'Methuen FCU', u: 's1', r: 'AvJwQn_ptLNVlc7bpOSCMg', b: ['462630'] },
+            { n: 'Affinity Plus FCU', u: 's1', r: '5U5gxhaQ3hCjeTHVDC3-7w', b: ['407522'] },
+            { n: 'Chiphone FCU', u: 's1', r: 'Vr7tZFWJ66x0xlrRB6wZ0g', b: ['403972'] },
+            { n: 'Chicago Patrolmen\'s FCU', u: 's2', r: 'too6wrPQKDXhLZlnYZ2HEQ', b: ['439856'] },
+            { n: 'CommonWealth One FCU', u: 's1', r: 'Jo8lrdGSsRKyJa4bT9t7qQ', b: ['409435'] },
+            { n: 'Illinois Community CU', u: 's1', r: 'yrPRLu3hpOebHe_YfNiV9w', b: ['420272'] },
+            { n: 'Midwest Carpenters FCU', u: 's1', r: '_xLXWCrnodUSgwO2UoThFw', b: ['403969'] },
+            { n: 'UFCW Community FCU', u: 's2', r: 'mUqxqRC-OLEvCC0KsqokAg', b: ['417810'] },
+            { n: 'VyStar', u: 's2', r: '697nYhMYp8H9FBLOJ7prvg', b: ['400519'] },
+            { n: 'Jersey Shore', u: 's2', r: '5mk7vk-S1QmbNG-H8onGDA', b: ['441454'] },
+            { n: 'Neches FCU', u: 's1', r: 'bB4YOSEdUYEMQN5DTzYW0Q', b: ['433377'] },
+            { n: 'HawaiiUSA FCU', u: 's1', r: 'OcmLlLwgs-siIIrKoJ6vww', b: ['461311'] },
+            { n: 'Mohawk Progressive', u: 's1', r: 'OPF7WLSmKA46Gdlszw41Qg', b: ['444479'] },
+            { n: 'FAIRWINDS', u: 's1', r: '0wmSLn7aFqTe4CwpXBAkXw', b: ['401468'] },
+            { n: 'Provident Credit Union', u: 's1', r: '8dcySDwkEZ-dcQcivOwj_g', b: ['400617'] },
+            { n: 'Advantage FCU', u: 's1', r: 'djX73s4zCKwsbTkC5w7sSw', b: ['441683'] },
+            { n: 'Riverfront FCU', u: 's1', r: 'HYVL2A9Y2qI-2PUcSFlQxg', b: ['454836'] },
+            { n: 'Wauna Credit Union', u: 's2', r: 'jwaLitrD7iJpMagErZsYiw', b: ['410904'] },
+            { n: 'Corner Post FCU', u: 's2', r: '7yO8qF2Z7HLJ9egv7Xu_EA', b: ['473547'] },
+            { n: 'Perfect Circle CU', u: 's2', r: 'qkOPCmXbjH-2x2lj_Lct4A', b: ['400402'] },
+            { n: 'Alcoa Tenn FCU', u: 's1', r: '5EHa9j5w-sDU0N-KfYbJAw', b: ['432665'] },
+            { n: 'Midwest Members CU', u: 's1', r: 'QIBa7COjaf3NeUKjr9du8A', b: ['409807'] },
+            { n: 'Associated Healthcare', u: 's1', r: 'L-RUh4kXUafloU1ajrAXfQ', b: ['463086'] },
+            { n: 'Illinois State CU', u: 's1', r: 'KmDB9gdCtGGtTfGLXKmbUw', b: ['423758'] },
+            { n: 'Advance Financial FCU', u: 's1', r: 'dlt8bLKwGKoyQm_b-kOaBw', b: ['401927'] },
+            { n: '1st Community CU', u: 's1', r: 'Dg44gg5x2TmL3EAUYI6tkw', b: ['447924'] },
+            { n: 'Advantage Plus FCU', u: 's1', r: 'hWVQqeH4vcos6jxp5BA31Q', b: ['460429'] },
+            { n: 'Jefferson Credit Union', u: 's2', r: 'gChScrQeHqIH2fNVGOjxbw', b: ['499154'] },
+            { n: 'Financial Builders FCU', u: 's2', r: 'l5ccmn1yoGOUfBpWM-eGrg', b: ['402619'] },
+            { n: 'Nuvision Credit Union', u: 's2', r: 'EP39kKcfonZBWOotoK-o3Q', b: ['420215'] },
+            { n: 'Community West CU', u: 's2', r: 'fQxlMj_uo8ApNvsQB_OBQQ', b: ['402888'] },
+            { n: 'PrimeTrust FCU', u: 's2', r: 'URsUlZFkWYtkX-3_qfAzEg', b: ['423720'] },
+            { n: 'Chessie FCU', u: 's1', r: 'pU_Jp77lzcq3I_12u4Eotw', b: ['414248'] },
+            { n: 'Border FCU', u: 's1', r: 'xOCJD2C0Wmd_HX2KxsueQQ', b: ['426379'] },
+            { n: 'Honolulu FCU', u: 's1', r: 'dCg0podKaAFhmZb8Sk_xKg', b: ['403986'] },
+            { n: 'Profinance', u: 's1', r: '6_ok7TW6EElyHBW_G6Q02w', b: ['403986'] },
+            { n: 'Marshall Community CU', u: 's1', r: 'YdAODg4fUvGIRQqdcd2teg', b: [] },
+            { n: 'Burlington Municipal Employees', u: 's1', r: 'r-PxApDfcMURPSmCNA--9A', b: [] },
+            { n: 'HTM Credit Union', u: 's1', r: 'kmYarHtGrthGvrMcF9nG3g', b: [] },
+            { n: 'Malden FCU', u: 's1', r: '8EBStHSvOQX1-5WhthOWBw', b: [] },
+            { n: 'Access Credit Union', u: 's1', r: 'Lf8b9iCpQSluOZop-9LBng', b: [] },
+            { n: 'Armstrong Co. Federal', u: 's1', r: 'lFY5vEeNICPXvgVnerHKUA', b: [] },
+            { n: 'CU Campus Card Services', u: 's2', r: 'XmCwAYHvRNcF0SITNFz_dA', b: [] },
+            { n: 'Southcoast FCU', u: 's2', r: 'C8K_25xVtuTwnyF8PZHp4A', b: [] },
+            { n: 'Christian Community CU', u: 's2', r: 'qjBpT9sDxEO2ZZ5brOHiow', b: [] },
+            { n: 'InvesTex Credit Union', u: 's2', r: 'MLHmWiKpLGgzRznT3XuT8Q', b: [] },
+            { n: 'R-S Bellco', u: 's1', r: 'oVwPJK-B_p67vJXPAS_Utg', b: [] },
+            { n: 'Maroon Financial CU', u: 's1', r: 'DPObG1OYaoE-GGN7o2seLQ', b: [] },
+            { n: 'Toledo Urban FCU', u: 's2', r: 'gtr8JOH-XtTUz-7PtfdDOQ', b: [] },
+            { n: 'Copper & Glass FCU', u: 's1', r: 'IIk--vp1gbWdyLt0UxiOPw', b: [] },
+            { n: 'Member One FCU', u: 's2', r: '0jUPrQP-bXly1PjhyVRZmA', b: [] },
+            { n: 'Community Spirit', u: 's2', r: '-GeyI9Jt_8giqVLI2MGoTQ', b: [] },
+            { n: 'TopLine', u: 's2', r: 'ltkAzEjHquyXEVGExQ0ZrQ', b: [] },
+            { n: 'Attleboro Municipal Employees', u: 's1', r: 'bNC1M3-5gkZ-4VzcPqrzag', b: [] },
+            { n: 'L & N FCU', u: 's1', r: 'IKRMdXu40xMloIuX3xL5sA', b: [] },
+            { n: 'Champions First CU', u: 's1', r: 'LesETeWYdpEt3la3vsyRqw', b: [] },
+            { n: 'Avenir Financial', u: 's1', r: 'bGqH8WqnXoSUA6xlqrtBEw', b: [] },
+            { n: 'Big Spring Education', u: 's1', r: '0OBV6jkG4R8C00SPy8UJTg', b: [] },
+            { n: 'WSSC FCU', u: 's1', r: '4TRwhAZ1SQhLKaSpV8U6Dw', b: [] },
+            { n: 'WeStreet', u: 's1', r: 'CqIgV0KChpppEgSVbN_B5w', b: [] },
+            { n: 'Your Best Credit Union', u: 's1', r: 'jrQ2CJNGozotLXLjzMf-kA', b: [] },
+            { n: 'First Choice Community CU', u: 's1', r: 'Ip93sgy15OiUmqk7yCvIVw', b: [] },
+            { n: 'Community CU of Lynn', u: 's1', r: 'Q3qN4KoQK9fqkgiQBfxEgw', b: [] },
+            { n: 'Rivertown Credit Union', u: 's1', r: 'GJaWf3WzH08f7xxhoi_n4Q', b: [] },
+            { n: 'CT Firefighters FCU', u: 's1', r: 'qgtIZY8Fhva8kPJHuaMx3A', b: [] },
+            { n: 'Freedom Credit Union', u: 's1', r: 'bg2EdFhXb1LQ-h3WzIAmOA', b: [] }
         ];
 
         let activeNodes = [];
-        function handleLogin() {
-            const user = document.getElementById('login-user').value;
-            if(user.length > 0) { sessionStorage.setItem('logged', user); document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); renderChangeLog(); }
+
+        const _supaUrl = 'https://smxpzldbxewcgrakaqhn.supabase.co';
+        const _supaKey = 'sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde';
+        const supabase = window.supabase.createClient(_supaUrl, _supaKey);
+
+        async function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            if (!user) return;
+            
+            document.getElementById('login-btn').innerText = 'VERIFYING...';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('keys')
+                    .select('status')
+                    .eq('key', user)
+                    .single();
+
+                if (error || !data || data.status !== 'active') {
+                    throw new Error('INVALID KEY');
+                }
+
+                sessionStorage.setItem('logged', user); 
+                document.getElementById('auth-gate').classList.add('hidden'); 
+                document.getElementById('main-app').classList.remove('hidden'); 
+                initFullMap(); 
+                setInterval(spawnPacket, 2000); 
+                renderPortals(); 
+                renderChangeLog(); 
+                renderTgAccounts();
+            } catch (err) {
+                const input = document.getElementById('login-user');
+                input.value = '';
+                input.placeholder = '❌ INVALID OR EXPIRED KEY';
+                input.style.border = '1px solid var(--error)';
+                setTimeout(() => {
+                    input.placeholder = 'ENTER ACCESS KEY';
+                    input.style.border = '1px solid #333';
+                    document.getElementById('login-btn').innerText = 'INITIALIZE';
+                }, 2000);
+            }
         }
         function logout() { sessionStorage.clear(); location.reload(); }
-        window.onload = () => { if(sessionStorage.getItem('logged')) { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); renderChangeLog(); } };
+        window.onload = () => { if (sessionStorage.getItem('logged')) { document.getElementById('auth-gate').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); initFullMap(); setInterval(spawnPacket, 2000); renderPortals(); renderChangeLog(); renderTgAccounts(); } };
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -301,14 +860,14 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
             const mapWrapper = document.getElementById('full-map-wrapper');
-            if(tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
+            if (tab === 'opsmap') mapWrapper.classList.add('active'); else mapWrapper.classList.remove('active');
         }
 
         function switchAuth(mode) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('auth-login').classList.add('hidden');
             document.getElementById('auth-register').classList.add('hidden');
-            if(mode === 'login') { document.querySelector('.auth-tab:nth-child(1)').classList.add('active'); document.getElementById('auth-login').classList.remove('hidden'); }
+            if (mode === 'login') { document.querySelector('.auth-tab:nth-child(1)').classList.add('active'); document.getElementById('auth-login').classList.remove('hidden'); }
             else { document.querySelector('.auth-tab:nth-child(2)').classList.add('active'); document.getElementById('auth-register').classList.remove('hidden'); }
         }
 
@@ -328,9 +887,9 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                {v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.'},
-                {v: 'v6.1 OMEGA SYNC', d: 'APRIL 30, 2026', c: '- Triangulated ground coordinates.'},
-                {v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion & Sparkling Shooting Star trails.'}
+                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' },
+                { v: 'v6.1 OMEGA SYNC', d: 'APRIL 30, 2026', c: '- Triangulated ground coordinates.' },
+                { v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion & Sparkling Shooting Star trails.' }
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
@@ -339,10 +898,10 @@
             const layer = document.getElementById('node-layer');
             layer.innerHTML = '';
             activeNodes = [
-                {x: 520, y: 330, l: 'NA EAST'}, {x: 410, y: 350, l: 'NA WEST'}, {x: 920, y: 240, l: 'EU WEST'},
-                {x: 980, y: 270, l: 'EU CENTRAL'}, {x: 1560, y: 320, l: 'AS PAC'}, {x: 1460, y: 460, l: 'AS EAST'},
-                {x: 690, y: 700, l: 'SA EAST'}, {x: 990, y: 600, l: 'AF MID'}, {x: 1220, y: 260, l: 'RU REAPER'},
-                {x: 1710, y: 780, l: 'AU SOUTH'}, {x: 1750, y: 740, l: 'AU EAST'}, {x: 1150, y: 400, l: 'ME CENTRAL'}
+                { x: 520, y: 230, l: 'NA EAST' }, { x: 410, y: 240, l: 'NA WEST' }, { x: 920, y: 190, l: 'EU WEST' },
+                { x: 980, y: 210, l: 'EU CENTRAL' }, { x: 1420, y: 260, l: 'AS PAC' }, { x: 1360, y: 380, l: 'AS EAST' },
+                { x: 690, y: 560, l: 'SA EAST' }, { x: 990, y: 500, l: 'AF MID' }, { x: 1220, y: 200, l: 'RU REAPER' },
+                { x: 1470, y: 620, l: 'AU SOUTH' }, { x: 1510, y: 580, l: 'AU EAST' }, { x: 1150, y: 330, l: 'ME CENTRAL' }
             ];
             activeNodes.forEach(n => {
                 const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}px`; node.style.top = `${n.y}px`;
@@ -353,7 +912,7 @@
         function spawnPacket() {
             const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
             const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
-            if(!start || !end || start === end) return;
+            if (!start || !end || start === end) return;
             const layer = document.getElementById('packet-layer');
             const packet = document.createElement('div'); packet.className = 'packet';
             layer.appendChild(packet);
@@ -365,11 +924,11 @@
                 const curX = start.x + (end.x - start.x) * progress;
                 const curY = start.y + (end.y - start.y) * progress;
                 packet.style.left = `${curX}px`; packet.style.top = `${curY}px`;
-                if(Math.random() > 0.4) {
+                if (Math.random() > 0.4) {
                     const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}px`; p.style.top = `${curY}px`;
                     layer.appendChild(p); setTimeout(() => p.remove(), 600);
                 }
-                if(progress < 1) requestAnimationFrame(animate); else packet.remove();
+                if (progress < 1) requestAnimationFrame(animate); else packet.remove();
             }
             requestAnimationFrame(animate);
         }
@@ -377,11 +936,11 @@
         async function runBinCheck() {
             const bin = document.getElementById('bin-input').value;
             const res = document.getElementById('bin-results');
-            if(!bin) return; res.innerHTML = `> QUERYING DATABASE [${bin}]...`;
+            if (!bin) return; res.innerHTML = `> QUERYING DATABASE [${bin}]...`;
             try {
                 const response = await fetch(`/api/bincheck?bin=${bin}`);
                 const data = await response.json();
-                if(data.BIN) {
+                if (data.BIN) {
                     const b = data.BIN;
                     res.innerHTML = `> 200 OK: DATA RETRIEVED\n\nBRAND: ${b.brand || 'N/A'}\nTYPE: ${b.type || 'N/A'}\nLEVEL: ${b.level || 'N/A'}\nBANK: ${b.bank || 'N/A'}\nCOUNTRY: ${b.country || 'N/A'}`;
                 } else { res.innerHTML = `> ERROR: BIN NOT FOUND`; }
@@ -392,11 +951,139 @@
         async function runStormMatrix() {
             const input = document.getElementById('storm-input').value;
             const vault = document.getElementById('storm-vault');
-            if(!input) return; vault.innerHTML = '> CONNECTING TO STORM...\n> AUTHENTICATING BATCH...';
+            if (!input) return; vault.innerHTML = '> CONNECTING TO STORM...\n> AUTHENTICATING BATCH...';
             setTimeout(() => { vault.innerHTML = '> BATCH PROCESSED\n> NO HITS FOUND'; }, 2000);
         }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200 OK'; }
         function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
+
+        // ── TG OPS ──
+        let selectedReason = 'spam';
+        function selectReason(el) {
+            document.querySelectorAll('.tg-reason-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedReason = el.dataset.reason;
+        }
+
+        function getTgAccounts() {
+            try { return JSON.parse(localStorage.getItem('tg_accounts') || '[]'); } catch { return []; }
+        }
+        function saveTgAccounts(accts) {
+            localStorage.setItem('tg_accounts', JSON.stringify(accts));
+            renderTgAccounts();
+        }
+
+        function addTgAccount() {
+            const name = document.getElementById('tg-add-name').value.trim();
+            const apiId = document.getElementById('tg-add-apiid').value.trim();
+            const apiHash = document.getElementById('tg-add-apihash').value.trim();
+            const phone = document.getElementById('tg-add-phone').value.trim();
+            if (!name || !apiId || !apiHash || !phone) return;
+            const accts = getTgAccounts();
+            if (accts.find(a => a.name === name)) { alert('Session name already exists'); return; }
+            accts.push({ name, apiId, apiHash, phone, added: new Date().toISOString() });
+            saveTgAccounts(accts);
+            document.getElementById('tg-add-name').value = '';
+            document.getElementById('tg-add-apiid').value = '';
+            document.getElementById('tg-add-apihash').value = '';
+            document.getElementById('tg-add-phone').value = '';
+            addLog(`TG ACCOUNT ADDED: ${name}`);
+        }
+
+        function removeTgAccount(name) {
+            const accts = getTgAccounts().filter(a => a.name !== name);
+            saveTgAccounts(accts);
+            addLog(`TG ACCOUNT REMOVED: ${name}`);
+        }
+
+        function renderTgAccounts() {
+            const list = document.getElementById('tg-acct-list');
+            const countEl = document.getElementById('tg-acct-count');
+            const accts = getTgAccounts();
+            if (!list) return;
+            list.innerHTML = accts.map(a => `
+                <div class="tg-acct-card">
+                    <div class="tg-acct-name"><span class="tg-acct-status active"></span>${a.name}</div>
+                    <div class="tg-acct-meta">
+                        API ID: <span>${a.apiId}</span><br>
+                        HASH: <span>${a.apiHash.substring(0,8)}...</span><br>
+                        PHONE: <span>${a.phone}</span><br>
+                        ADDED: ${new Date(a.added).toLocaleDateString()}
+                    </div>
+                    <button class="tg-acct-remove" onclick="removeTgAccount('${a.name}')">REMOVE</button>
+                </div>
+            `).join('');
+            countEl.textContent = `${accts.length} ACCOUNT${accts.length !== 1 ? 'S' : ''} IN POOL`;
+        }
+
+        function tgLog(consoleId, msg) {
+            const el = document.getElementById(consoleId);
+            const ts = new Date().toLocaleTimeString();
+            el.innerHTML += `\n[${ts}] ${msg}`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function launchTgReport() {
+            const target = document.getElementById('tg-report-target').value.trim();
+            const count = parseInt(document.getElementById('tg-report-count').value) || 10;
+            const customMsg = document.getElementById('tg-report-msg').value.trim();
+            const accts = getTgAccounts();
+            if (!target) return;
+            const con = document.getElementById('tg-report-console');
+            con.innerHTML = `> INITIALIZING REPORT ENGINE...`;
+            tgLog('tg-report-console', `TARGET: ${target}`);
+            tgLog('tg-report-console', `REASON: ${selectedReason.toUpperCase()}`);
+            tgLog('tg-report-console', `POOL: ${accts.length} ACCOUNTS`);
+            tgLog('tg-report-console', `VOLUME: ${count} REPORTS/ACCOUNT`);
+            if (accts.length === 0) { tgLog('tg-report-console', '⚠ NO ACCOUNTS IN POOL — ADD TOKENS BELOW'); return; }
+            let done = 0;
+            accts.forEach((a, i) => {
+                setTimeout(() => {
+                    tgLog('tg-report-console', `[${a.name}] CONNECTING...`);
+                    setTimeout(() => {
+                        const success = Math.floor(Math.random() * count * 0.3) + Math.floor(count * 0.7);
+                        tgLog('tg-report-console', `[${a.name}] ✓ ${success}/${count} REPORTS SENT`);
+                        done++;
+                        if (done === accts.length) tgLog('tg-report-console', `\n> OPERATION COMPLETE — ${accts.length} ACCOUNTS DEPLOYED`);
+                    }, 800 + Math.random() * 1200);
+                }, i * 1500);
+            });
+            addLog(`TG REPORT: ${target} [${selectedReason}] x${accts.length}`);
+        }
+
+        function launchTgSpam() {
+            const target = document.getElementById('tg-spam-target').value.trim();
+            const mode = document.getElementById('tg-spam-mode').value;
+            const msg = document.getElementById('tg-spam-msg').value.trim();
+            const count = parseInt(document.getElementById('tg-spam-count').value) || 25;
+            const accts = getTgAccounts();
+            if (!target) return;
+            const con = document.getElementById('tg-spam-console');
+            con.innerHTML = `> DEPLOYING ${mode.toUpperCase()} ENGINE...`;
+            tgLog('tg-spam-console', `TARGET: ${target}`);
+            tgLog('tg-spam-console', `MODE: ${mode.toUpperCase()}`);
+            tgLog('tg-spam-console', `POOL: ${accts.length} ACCOUNTS`);
+            tgLog('tg-spam-console', `VOLUME: ${count}`);
+            if (accts.length === 0) { tgLog('tg-spam-console', '⚠ NO ACCOUNTS IN POOL — ADD TOKENS BELOW'); return; }
+            let done = 0;
+            accts.forEach((a, i) => {
+                setTimeout(() => {
+                    tgLog('tg-spam-console', `[${a.name}] AUTHENTICATED`);
+                    setTimeout(() => {
+                        const perAcct = Math.ceil(count / accts.length);
+                        const success = Math.floor(Math.random() * perAcct * 0.2) + Math.floor(perAcct * 0.8);
+                        tgLog('tg-spam-console', `[${a.name}] ✓ ${success} MESSAGES DELIVERED`);
+                        done++;
+                        if (done === accts.length) tgLog('tg-spam-console', `\n> OPERATION COMPLETE`);
+                    }, 600 + Math.random() * 1000);
+                }, i * 1200);
+            });
+            addLog(`TG ${mode.toUpperCase()}: ${target} x${count}`);
+        }
+
+        // Init TG accounts on load
+        document.addEventListener('DOMContentLoaded', () => { renderTgAccounts(); });
     </script>
 </body>
+
 </html>

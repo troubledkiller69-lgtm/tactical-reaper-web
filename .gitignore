@@ -1,0 +1,28 @@
+# Secrets
+.env
+
+# Session files (contain auth tokens)
+*.session
+*.session-journal
+sessions/
+
+# Database
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# History
+history.json
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
