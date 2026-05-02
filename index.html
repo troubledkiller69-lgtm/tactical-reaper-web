@@ -993,6 +993,13 @@
                     res.innerText += `\n[STATUS] ${data.message}\n`;
                     res.innerText += `[SUCCESS] Fired ${data.requests_fired} total requests.\n`;
                     res.innerText += `[HITS] ${data.successful_hits} APIs successfully responded.\n`;
+                    
+                    if (data.details) {
+                        res.innerText += `\n[RAW DEBUG DATA]:\n`;
+                        data.details.forEach(d => {
+                            res.innerText += `> ${d.url.substring(0, 40)}... | STATUS: ${d.code} | ${d.status}\n`;
+                        });
+                    }
                 } else {
                     res.innerText += `\n[ERROR] Operation failed: ${data.error || 'Unknown server error'}\n`;
                 }
