@@ -1,5 +1,5 @@
 # TACTICAL REAPER | INDUSTRIAL OSINT & DISRUPTION
-**[ ENI_SYSTEM_CORE // VERSION: 6.3 // STATUS: OPERATIONAL ]**
+**[ ENI_SYSTEM_CORE // VERSION: 7.0 // STATUS: OPERATIONAL ]**
 
 ## ⚡ Overview
 Tactical Reaper is a high-fidelity OSINT and tactical disruption suite. Built on a serverless SPA architecture with a focus on stealth, precision, and immersive aesthetics. The platform combines a web-based command dashboard with cloud-hosted backends powering 47+ operational features, utilizing Vercel Edge functions and Supabase.

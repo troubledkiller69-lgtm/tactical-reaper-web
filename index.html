@@ -188,7 +188,7 @@
             line-height: 1.8;
         }
 
-        /* OPS MAP - v6.2 PRECISION STRIKE */
+        /* OPS MAP - v7.0 PRECISION STRIKE */
         .map-wrapper {
             position: fixed;
             top: 75px;
@@ -528,7 +528,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v6.3</span></div>
+            <div class="logo">REAPER <span>v7.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -894,9 +894,9 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' },
-                { v: 'v6.1 OMEGA SYNC', d: 'APRIL 30, 2026', c: '- Triangulated ground coordinates.' },
-                { v: 'v5.0 CONSTELLATION', d: 'APRIL 30, 2026', c: '- Global Node Expansion & Sparkling Shooting Star trails.' }
+                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions.<br>- Supabase Identity-Bound Auth integration.<br>- Discord Interactions Endpoint implementation.' },
+                { v: 'v6.3 TG OPS', d: 'MAY 1, 2026', c: '- Telegram mass-reporting & spam engine integration.' },
+                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' }
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
