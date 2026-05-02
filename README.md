@@ -36,13 +36,35 @@ Hosted entirely as a Vercel Serverless Function serving Discord Interactions.
 - **Keys Table**: Stores `key`, `operator_id`, `status` (active/revoked), and `duration_hours`.
 - Handled via Row Level Security (RLS) configured to allow seamless client-side verification and secure server-side mutation.
 
-## 🚧 In Development: DX Dumper (dx_dumper.py)
-The Tactical Reaper Arsenal is expanding with a dedicated DXOnline infrastructure dumper.
-**Planned Features:**
-- **Multi-Threaded Architecture**: High-speed concurrent scraping of DXOnline portals.
-- **Proxy Rotation**: Native SOCKS5/HTTP proxy integration to prevent IP bans during mass data acquisition.
-- **Automated Captcha Resolution**: Integration with third-party solvers (or headless bypass techniques) to seamlessly slip through hCaptcha/reCAPTCHA gates on s1/s2 portals.
-- **Data Extraction**: Automated harvesting of BINs, routing numbers, and institutional metadata directly into the tactical suite.
+## 🚧 Roadmap & Architecture Plan
+
+The Tactical Reaper Arsenal is expanding into a comprehensive, multi-layered disruption and OSINT suite. 
+
+### 📡 The Signal: SMTP & SMS Expansion
+- **SMS Spamming**: Sourcing high-throughput, low-filter international gateways (TBomb multi-nodes) to bypass aggressive US WAFs.
+- **SMTP Relay**: Deploying iron-clad email infrastructure (SendGrid/Mailgun) for high-volume delivery.
+
+### 🎯 The Sniper: High-Fidelity Acquisition
+- **Multi-Threaded Monitor**: Sniping site updates and securing targets instantly using stored credentials.
+- **Captcha Bypass**: Deep integration with solver APIs (CapSolver) for zero-friction automation.
+
+### 🕵️ The Dumpers: Infrastructure Reversal
+- **DXO Dumper**: A specialized multi-threaded crawler designed to enumerate and dump all DXOnline portals (`dxonline-apps-*-cloud.pscu.com`) with proxy rotation and captcha solvers.
+- **CardValet Dumper**: Reversing the Fiserv/CardValet ecosystem to build a searchable database of the PSCU/Fiserv landscape.
+- **Cross-Referencing**: Automated mapping of BINs directly to their respective DXO portals.
+
+### 🛰️ Signal Intel & Tracking
+- **Link Tracer**: Custom tracking link generation to capture IP, User-Agent, and metadata.
+- **Geo Locator**: Instant IP-to-Geolocation reversal (city, country, ISP, physical coordinates).
+
+### 💰 Monetization: The Gatekeeper
+- **License Key System**: Multi-tier licensing gate (Daily/Weekly/Monthly/Lifetime) with crypto-only payment integration.
+- **Telegram Licensing Bot**: Automated purchasing, redeeming, and managing of operator licenses.
+
+### 🛡️ Hardening: DDoS Protection & Stealth
+- **Mitigation Layer**: Integrating specialized protection (Cloudflare, DDoS-Guard) to absorb malicious traffic.
+- **Reverse Proxy**: Multi-layered architecture to keep the backend infrastructure entirely hidden.
+- **Rate Limiting**: Real-time traffic scrubbing on all API endpoints.
 
 ## 📡 Deployment
 
