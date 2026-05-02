@@ -528,7 +528,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v6.2</span></div>
+            <div class="logo">REAPER <span>v6.3</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -979,7 +979,7 @@
             res.innerText = 'INITIALIZING ASYNC OTP FLOOD...\nRESOLVING VULNERABLE ENDPOINTS...\n[+] FIRING BATCH 1...\n';
             
             try {
-                const response = await fetch('/api/sms_bomber', {
+                const response = await fetch(`/api/sms_bomber?t=${Date.now()}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
