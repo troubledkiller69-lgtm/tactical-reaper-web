@@ -551,6 +551,7 @@
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
                 <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
+                <a onclick="switchTab('ipops')" id="nav-ipops">IP OPS</a>
                 <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('logs')" id="nav-logs">LOGS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
@@ -716,6 +717,28 @@
                     </div>
                     <div class="tg-acct-grid" id="tg-acct-list"></div>
                     <p id="tg-acct-count" style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#444; margin-top:1rem;"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-ipops" class="tab-content">
+            <div style="margin-top:4rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">SIGNAL INTEL</h2>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+                    <div class="card">
+                        <h3>📍 GEO LOCATOR</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">IP-to-Geolocation reverse mapping.</p>
+                        <input type="text" id="geo-ip" placeholder="TARGET IP (e.g., 8.8.8.8)">
+                        <button class="btn" onclick="runGeoLocator()">LOCATE</button>
+                        <div id="geo-results" class="results">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>🔗 LINK TRACER</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Generate tracking links to capture IP, User-Agent, and metadata.</p>
+                        <input type="text" id="tracer-dest" placeholder="DESTINATION URL">
+                        <button class="btn" onclick="generateTracer()">GENERATE TRACKER</button>
+                        <div id="tracer-results" class="results">...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1259,6 +1282,57 @@
                 }, i * 1200);
             });
             addLog(`TG ${mode.toUpperCase()}: ${target} x${count}`);
+        }
+
+        // ── IP OPS ──
+        async function runGeoLocator() {
+            const ip = document.getElementById('geo-ip').value.trim();
+            const res = document.getElementById('geo-results');
+            if (!ip) { res.innerText = 'ERROR: IP REQUIRED'; return; }
+            res.innerText = '> LOCATING IP...';
+            try {
+                // Using a public IP API for demonstration purposes in the UI
+                const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,zip,lat,lon,timezone,isp,org,as,query`);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    let out = `> GEO DATA ACQUIRED\n\n`;
+                    out += `IP:       ${data.query}\n`;
+                    out += `ISP:      ${data.isp}\n`;
+                    out += `ORG:      ${data.org}\n`;
+                    out += `ASN:      ${data.as}\n\n`;
+                    out += `LOCATION: ${data.city}, ${data.regionName}, ${data.country}\n`;
+                    out += `ZIP:      ${data.zip}\n`;
+                    out += `COORDS:   ${data.lat}, ${data.lon}\n`;
+                    out += `TZ:       ${data.timezone}\n`;
+                    res.innerText = out;
+                    addLog(`GEO RECON: ${ip} -> ${data.city}, ${data.country}`);
+                } else {
+                    res.innerText = `> ERROR: ${data.message || 'LOOKUP FAILED'}`;
+                }
+            } catch (err) {
+                res.innerText = '> ERROR: LOOKUP TIMEOUT OR NETWORK ERROR';
+                console.error(err);
+            }
+        }
+
+        function generateTracer() {
+            const dest = document.getElementById('tracer-dest').value.trim();
+            const res = document.getElementById('tracer-results');
+            if (!dest) { res.innerText = 'ERROR: DESTINATION URL REQUIRED'; return; }
+            res.innerText = '> GENERATING TRACKING PAYLOAD...';
+            
+            setTimeout(() => {
+                const token = Math.random().toString(36).substring(2, 10);
+                const trackingLink = `https://${window.location.host}/t/${token}`;
+                let out = `> PAYLOAD GENERATED\n\n`;
+                out += `DEST:     ${dest}\n`;
+                out += `TOKEN:    ${token}\n\n`;
+                out += `TRACKER URL (DISTRIBUTE TO TARGET):\n`;
+                out += `${trackingLink}\n\n`;
+                out += `> AWAITING CONNECTION EVENT...`;
+                res.innerText = out;
+                addLog(`LINK TRACER DEPLOYED: ${token} -> ${dest}`);
+            }, 800);
         }
 
         // Init TG accounts on load
