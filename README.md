@@ -1,28 +1,37 @@
-# TACTICAL REAPER | INDUSTRIAL OSINT & DISRUPTION
+# BIFROST | INDUSTRIAL OSINT & DISRUPTION
 **[ ENI_SYSTEM_CORE // VERSION: 10.0 // STATUS: BLACK ICE ULTIMATE ]**
 
-## Overview
-Tactical Reaper is a high-fidelity OSINT and tactical disruption suite. Built on a serverless SPA architecture with a focus on stealth, precision, and immersive aesthetics. The platform combines a web-based command dashboard with cloud-hosted backends powering 47+ operational features, utilizing Vercel Edge functions and Supabase.
+## 🧊 Overview
+BIFROST (formerly Tactical Reaper) is a high-performance, industrial-grade OSINT and tactical disruption suite. Built on a serverless architecture, the platform focuses on surgical precision, automated acquisition, and a premium "Black Ice" aesthetic.
 
-## BIFROST: BLACK ICE (v10.0)
-The platform has undergone a massive tactical overhaul to align with the iconic Black Ice aesthetic.
-* Liquid Glass UI: High-gloss, shimmering crystalline buttons with dynamic light-sweep animations.
-* * Sub-Zero Palette: Precision-tuned gradient (Frost White to Electric Cyan to Deep Navy) sampled from the Mx4 Storm reference.
-  * * Crystalline Depth: Enhanced shattered ice textures and backdrop blurs for a premium, cold interface.
-   
-    * ## Web Dashboard (index.html)
-   
-    * ### Tabs
-    * * DASHBOARD - BIN Intel lookup, Email Flood dispatch, Ghost SMS broadcast
-      * * OPS MAP - Real-time global node monitoring
-        * * PORTAL RECON - 120+ institutional DXOnline portal index
-          * * STORM MATRIX - Bulk authorization charge engine
-            * * TG OPS - Telegram mass-reporting and spam engine
-              * * CHANGE LOG - Version history stream
-                * * LOGS - Real-time operation log feed
-                 
-                  * ### Auth (Identity-Bound Login)
-                  * * Strict Operator ID + Access Key model via Supabase.
-                   
-                    * ## Serverless Infrastructure
-                    * * Discord Bot: Hosted as Vercel Serverless Function.
+## 🌈 BIFROST: BLACK ICE ULTIMATE (v10.0)
+The platform has been meticulously refined to match the sub-zero aesthetic of the iconic "Black Ice" tactical gear.
+- **Liquid Glass UI**: High-gloss, shimmering crystalline buttons featuring dynamic light-sweep animations on hover.
+- **Sub-Zero Palette**: A precision-tuned horizontal gradient (Frost White → Electric Cyan → Deep Navy) sampled directly from tactical reference imagery.
+- **Crystalline Depth**: Advanced shattered-ice texture overlays and `backdrop-filter` blurs for a cold, high-fidelity command experience.
+
+## 🌐 Web Dashboard
+### Operational Modules
+- **DASHBOARD**: Core KPIs and quick-strike tools (BIN Intel, Email Flooder).
+- **SNIPER**: Authenticated high-speed acquisition engine with TLS fingerprint spoofing (Chrome 120) and automated login for premium targets like UltimateShop.
+- **OPS MAP**: Global node surveillance with real-time packet visualization and topographical mapping.
+- **PORTAL RECON**: Automated index of 120+ institutional portals with BIN mapping and infrastructure categorization.
+- **STORM MATRIX**: Bulk authorization processing and data verification vault.
+- **TG OPS**: Multi-account Telegram management, mass-reporting, and automated spam engines.
+
+### 🔐 Secure Authentication
+- **Identity-Bound Gate**: Strict Operator ID + Access Key validation.
+- **Backend**: Powered by Supabase for real-time authentication and identity persistence.
+
+## 🤖 Infrastructure
+- **Serverless Core**: 24/7 autonomous execution via Vercel Edge Functions.
+- **TLS Spoofing**: Custom `curl_cffi` implementation to bypass Cloudflare and anti-bot protections.
+- **Identity Bot**: Integrated Discord bot for license generation and operator management.
+
+## 📡 Deployment
+- **Main Terminal**: [https://b1frost.vercel.app/](https://b1frost.vercel.app/)
+- **Legacy Endpoint**: [https://tactical-reaper-web.vercel.app/](https://tactical-reaper-web.vercel.app/)
+
+---
+**[ ACCESS RESTRICTED // OPERATOR ID REQUIRED ]**
+❄️
