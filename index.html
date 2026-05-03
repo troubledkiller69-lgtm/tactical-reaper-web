@@ -986,7 +986,7 @@
                 <div class="continent-label" style="top: 35%; left: 80%;">ASIA</div>
                 <div class="continent-label" style="top: 75%; left: 90%;">OCEANIA</div>
 
-                <!-- BIFROST TACTICAL NODES - PURE MATH v13.1 -->
+                <!-- BIFROST TACTICAL NODES - PURE MATH v13.3 -->
                 <div class="node" style="top: 35%; left: 31%;" data-city="NEW YORK">
                     <div class="node-info"><h4>NEW YORK</h4><p>STATUS: ACTIVE</p></div>
                 </div>
@@ -1419,8 +1419,7 @@
                 sessionStorage.setItem('logged', user); 
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
-                initFullMap(); 
-                setInterval(spawnPacket, 2000); 
+                setTimeout(initTacticalMap, 500);
                 renderPortals(); 
                 renderChangeLog(); 
                 renderTgAccounts();
@@ -1532,32 +1531,16 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                { v: 'v7.1 SMS GATEWAY', d: 'MAY 2, 2026', c: '- Email-to-SMS gateway bomber (20 US carriers).<br>- Shotgun mode: fires all gateways simultaneously.<br>- Carrier Recon: reverse phone-to-carrier lookup.<br>- phonenumbers lib integration for MSISDN intelligence.' },
-                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions.<br>- Supabase Identity-Bound Auth integration.<br>- Discord Interactions Endpoint implementation.' },
-                { v: 'v6.3 TG OPS', d: 'MAY 1, 2026', c: '- Telegram mass-reporting & spam engine integration.' },
-                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' }
+                { v: 'v13.3 RADIANCE PURGE', d: 'MAY 3, 2026', c: '- Removed logo drop-shadow and scanline glow for Clean Room aesthetic.<br>- Fixed version parity across all modules.' },
+                { v: 'v13.1 HUD HARDENING', d: 'MAY 3, 2026', c: '- Eastward node recalibration for 1:1 landmass alignment.<br>- Removed background HUD textures and graticule outlines.' },
+                { v: 'v12.0 COMMAND CENTER', d: 'MAY 3, 2026', c: '- Implemented 3D Tactical HUD with global signal mesh.<br>- Repositioned nodes to global data hubs.' },
+                { v: 'v10.0 BLACK ICE', d: 'MAY 3, 2026', c: '- Total visual transformation to Black Ice theme.<br>- Liquid Glass button textures with dynamic shimmer.' },
+                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions and Supabase Auth.' }
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
 
-        function initFullMap() {
-            const layer = document.getElementById('node-layer');
-            layer.innerHTML = '';
-            activeNodes = [
-                { x: 520, y: 230, l: 'NA EAST' }, { x: 410, y: 240, l: 'NA WEST' }, { x: 920, y: 190, l: 'EU WEST' },
-                { x: 980, y: 210, l: 'EU CENTRAL' }, { x: 1420, y: 260, l: 'AS PAC' }, { x: 1360, y: 380, l: 'AS EAST' },
-                { x: 690, y: 560, l: 'SA EAST' }, { x: 990, y: 500, l: 'AF MID' }, { x: 1220, y: 200, l: 'RU REAPER' },
-                { x: 1470, y: 620, l: 'AU SOUTH' }, { x: 1510, y: 580, l: 'AU EAST' }, { x: 1150, y: 330, l: 'ME CENTRAL' }
-            ];
-            activeNodes.forEach(n => {
-                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}px`; node.style.top = `${n.y}px`;
-                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
-            });
-        }
 
-        function spawnPacket() {
-            const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
-            const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
             if (!start || !end || start === end) return;
             const layer = document.getElementById('packet-layer');
             const packet = document.createElement('div'); packet.className = 'packet';
