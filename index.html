@@ -501,6 +501,22 @@
         .tg-reason-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
         .tg-reason-btn { background: #0a0a0a; border: 1px solid var(--border); color: #888; padding: 0.6rem; font-family: 'JetBrains Mono'; font-size: 0.55rem; cursor: pointer; text-align: center; transition: 0.3s; text-transform: uppercase; }
         .tg-reason-btn:hover, .tg-reason-btn.selected { border-color: #fff; color: #fff; background: #111; }
+
+        /* SMS MODE TOGGLES */
+        .sms-modes { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+        .sms-mode-btn { background: #0a0a0a; border: 1px solid var(--border); color: #666; padding: 0.5rem 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.55rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; flex: 1; text-align: center; }
+        .sms-mode-btn:hover { border-color: #555; color: #aaa; }
+        .sms-mode-btn.active { border-color: #fff; color: #fff; background: #111; box-shadow: 0 0 8px rgba(255,255,255,0.1); }
+        .sms-email-opts select { background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; width: 100%; font-family: 'JetBrains Mono'; font-size: 0.75rem; margin-bottom: 1rem; appearance: none; cursor: pointer; }
+        .sms-email-opts select option { background: #0a0a0a; }
+        .sms-count-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .sms-count-row input { margin-bottom: 1rem; }
+        .carrier-tag { display: inline-block; background: #111; border: 1px solid #333; color: var(--success); font-family: 'JetBrains Mono'; font-size: 0.6rem; padding: 2px 8px; margin: 2px; border-radius: 2px; }
+        .carrier-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.8rem; }
+        .carrier-result-item { background: #050505; border: 1px solid var(--border); padding: 0.6rem; }
+        .carrier-result-label { font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        .carrier-result-value { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--success); word-break: break-all; }
+
         @media (max-width: 900px) { .tg-layout { grid-template-columns: 1fr; } .tg-add-row { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
@@ -528,7 +544,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v7.0</span></div>
+            <div class="logo">REAPER <span>v7.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -554,9 +570,53 @@
                     <div id="flood-results" class="results">...</div>
                 </div>
                 <div class="card">
-                    <h3>📱 OTP SMS BOMBER</h3><input type="text" id="sms-target" placeholder="MSISDN (e.g. +1234567890)"><button class="btn" id="sms-btn"
-                        onclick="runSmsBomber()">BLAST OTP</button>
+                    <h3>📱 SMS BOMBER</h3>
+                    <div class="sms-modes">
+                        <div class="sms-mode-btn active" id="sms-mode-otp" onclick="setSmsMode('otp')">OTP FLOOD</div>
+                        <div class="sms-mode-btn" id="sms-mode-email" onclick="setSmsMode('email')">EMAIL GW</div>
+                        <div class="sms-mode-btn" id="sms-mode-shotgun" onclick="setSmsMode('shotgun')">SHOTGUN</div>
+                    </div>
+                    <input type="text" id="sms-target" placeholder="TARGET (e.g. 2025551234)">
+                    <div id="sms-email-opts" class="sms-email-opts hidden">
+                        <select id="sms-carrier">
+                            <option value="att">AT&amp;T</option>
+                            <option value="tmobile">T-Mobile</option>
+                            <option value="verizon">Verizon</option>
+                            <option value="sprint">Sprint</option>
+                            <option value="uscellular">US Cellular</option>
+                            <option value="boost">Boost Mobile</option>
+                            <option value="cricket">Cricket</option>
+                            <option value="metro">Metro PCS</option>
+                            <option value="googlefi">Google Fi</option>
+                            <option value="consumer">Consumer Cellular</option>
+                            <option value="virgin">Virgin Mobile</option>
+                            <option value="republic">Republic Wireless</option>
+                            <option value="xfinity">Xfinity Mobile</option>
+                            <option value="mint">Mint Mobile</option>
+                            <option value="visible">Visible</option>
+                            <option value="straighttalk">Straight Talk</option>
+                            <option value="tracfone">TracFone</option>
+                            <option value="ting">Ting</option>
+                            <option value="cspire">C Spire</option>
+                            <option value="spectrum">Spectrum Mobile</option>
+                        </select>
+                        <div class="sms-count-row">
+                            <input type="number" id="sms-count" value="25" min="1" max="100" placeholder="MSG COUNT">
+                        </div>
+                    </div>
+                    <div id="sms-shotgun-info" class="hidden" style="font-family:'JetBrains Mono';font-size:0.55rem;color:#555;margin-bottom:1rem;border:1px solid var(--border);padding:0.6rem;background:#050505;">⚡ SHOTGUN: Fires to ALL 20 carrier gateways simultaneously. No carrier detection needed — at least one will land.
+                        <div class="sms-count-row" style="margin-top:0.5rem;">
+                            <input type="number" id="sms-shotgun-count" value="5" min="1" max="20" placeholder="PER CARRIER">
+                        </div>
+                    </div>
+                    <button class="btn" id="sms-btn" onclick="runSmsBomber()">EXECUTE</button>
                     <div id="sms-results" class="results">...</div>
+                </div>
+                <div class="card">
+                    <h3>🔍 CARRIER RECON</h3>
+                    <input type="text" id="carrier-phone" placeholder="PHONE (+1XXXXXXXXXX)">
+                    <button class="btn" onclick="runCarrierLookup()">IDENTIFY CARRIER</button>
+                    <div id="carrier-results" class="results">...</div>
                 </div>
             </div>
         </div>
@@ -894,6 +954,7 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
+                { v: 'v7.1 SMS GATEWAY', d: 'MAY 2, 2026', c: '- Email-to-SMS gateway bomber (20 US carriers).<br>- Shotgun mode: fires all gateways simultaneously.<br>- Carrier Recon: reverse phone-to-carrier lookup.<br>- phonenumbers lib integration for MSISDN intelligence.' },
                 { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions.<br>- Supabase Identity-Bound Auth integration.<br>- Discord Interactions Endpoint implementation.' },
                 { v: 'v6.3 TG OPS', d: 'MAY 1, 2026', c: '- Telegram mass-reporting & spam engine integration.' },
                 { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' }
@@ -964,51 +1025,112 @@
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200 OK'; }
         function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
 
+        // ── SMS BOMBER (multi-mode) ──
+        let smsMode = 'otp';
+        function setSmsMode(mode) {
+            smsMode = mode;
+            document.querySelectorAll('.sms-mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`sms-mode-${mode}`).classList.add('active');
+            document.getElementById('sms-email-opts').classList.toggle('hidden', mode !== 'email');
+            document.getElementById('sms-shotgun-info').classList.toggle('hidden', mode !== 'shotgun');
+            const ph = mode === 'otp' ? 'TARGET (e.g. +12025551234)' : 'TARGET DIGITS (e.g. 2025551234)';
+            document.getElementById('sms-target').placeholder = ph;
+        }
+
         async function runSmsBomber() {
             const target = document.getElementById('sms-target').value.trim();
             const res = document.getElementById('sms-results');
             const btn = document.getElementById('sms-btn');
-            
-            if (!target) {
-                res.innerText = 'ERROR: MSISDN REQUIRED';
-                return;
-            }
-            
+            if (!target) { res.innerText = 'ERROR: TARGET REQUIRED'; return; }
+
             btn.innerText = 'BOMBING...';
             btn.disabled = true;
-            res.innerText = 'INITIALIZING ASYNC OTP FLOOD...\nRESOLVING VULNERABLE ENDPOINTS...\n[+] FIRING BATCH 1...\n';
-            
+
+            const payload = { target: target, mode: smsMode };
+
+            if (smsMode === 'email') {
+                payload.carrier = document.getElementById('sms-carrier').value;
+                payload.count = parseInt(document.getElementById('sms-count').value) || 25;
+                res.innerText = `INITIALIZING EMAIL GATEWAY FLOOD...\nCARRIER: ${payload.carrier.toUpperCase()}\nCOUNT: ${payload.count}\n`;
+            } else if (smsMode === 'shotgun') {
+                payload.mode = 'shotgun';
+                payload.count = parseInt(document.getElementById('sms-shotgun-count').value) || 5;
+                res.innerText = `INITIALIZING SHOTGUN MODE...\nFIRING TO ALL 20 CARRIER GATEWAYS...\nCOUNT PER CARRIER: ${payload.count}\n`;
+            } else {
+                res.innerText = 'INITIALIZING ASYNC OTP FLOOD...\nRESOLVING VULNERABLE ENDPOINTS...\n[+] FIRING BATCH 1...\n';
+            }
+
             try {
                 const response = await fetch(`/api/sms_bomber?t=${Date.now()}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ target: target })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-                
                 const data = await response.json();
-                
+
                 if (response.ok) {
-                    res.innerText += `\n[STATUS] ${data.message}\n`;
-                    res.innerText += `[SUCCESS] Fired ${data.requests_fired} total requests.\n`;
-                    res.innerText += `[HITS] ${data.successful_hits} APIs successfully responded.\n`;
-                    
-                    if (data.details) {
-                        res.innerText += `\n[RAW DEBUG DATA]:\n`;
-                        data.details.forEach(d => {
-                            res.innerText += `> ${d.url.substring(0, 40)}... | STATUS: ${d.code} | ${d.status}\n`;
-                        });
+                    if (data.mode === 'otp') {
+                        res.innerText += `\n[STATUS] ${data.message}\n`;
+                        res.innerText += `[FIRED] ${data.requests_fired} total requests\n`;
+                        res.innerText += `[HITS] ${data.successful_hits} APIs responded\n`;
+                        if (data.details) {
+                            res.innerText += `\n[RAW]:\n`;
+                            data.details.forEach(d => {
+                                res.innerText += `> ${(d.url||'').substring(0, 40)}... | ${d.code} | ${d.status}\n`;
+                            });
+                        }
+                    } else {
+                        res.innerText += `\n[STATUS] ${data.status.toUpperCase()}\n`;
+                        res.innerText += `[SENT] ${data.messages_sent}/${data.messages_total} messages delivered\n`;
+                        if (data.targets_hit) {
+                            res.innerText += `[TARGETS]\n`;
+                            data.targets_hit.forEach(t => { res.innerText += `  → ${t}\n`; });
+                        }
+                        if (data.error) res.innerText += `[WARN] ${data.error}\n`;
                     }
                 } else {
-                    res.innerText += `\n[ERROR] Operation failed: ${data.error || 'Unknown server error'}\n`;
+                    res.innerText += `\n[ERROR] ${data.error || 'Server error'}\n`;
                 }
             } catch (err) {
-                res.innerText += `\n[ERROR] Connection to OTP Engine failed.\n`;
+                res.innerText += `\n[ERROR] Connection failed\n`;
                 console.error(err);
             } finally {
-                btn.innerText = 'BLAST OTP';
+                btn.innerText = 'EXECUTE';
                 btn.disabled = false;
+            }
+        }
+
+        // ── CARRIER RECON ──
+        async function runCarrierLookup() {
+            const phone = document.getElementById('carrier-phone').value.trim();
+            const res = document.getElementById('carrier-results');
+            if (!phone) { res.innerText = 'ERROR: PHONE NUMBER REQUIRED'; return; }
+            res.innerText = '> QUERYING CARRIER DATABASE...';
+            try {
+                const response = await fetch(`/api/carrier_lookup?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+                if (response.ok) {
+                    let out = `> CARRIER IDENTIFIED\n\n`;
+                    out += `PHONE:    ${data.national || data.phone}\n`;
+                    out += `DIGITS:   ${data.digits}\n`;
+                    out += `CARRIER:  ${data.carrier}\n`;
+                    out += `RAW:      ${data.carrier_raw}\n`;
+                    out += `RESOLVED: ${data.resolved ? 'YES' : 'NO'}\n`;
+                    if (data.sms_gateway) {
+                        out += `\nSMS GW:   ${data.sms_gateway}\n`;
+                        out += `MMS GW:   ${data.mms_gateway}\n`;
+                        out += `DOMAIN:   ${data.sms_domain}\n`;
+                    } else {
+                        out += `\n⚠ NO GATEWAY MATCH — Use SHOTGUN mode or manual carrier selection\n`;
+                    }
+                    res.innerText = out;
+                    addLog(`CARRIER RECON: ${data.carrier} [${data.digits}]`);
+                } else {
+                    res.innerText = `> ERROR: ${data.error}`;
+                }
+            } catch (err) {
+                res.innerText = '> ERROR: LOOKUP FAILED';
+                console.error(err);
             }
         }
 
