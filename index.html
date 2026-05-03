@@ -552,6 +552,7 @@
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
                 <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                 <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
+                <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                 <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
@@ -879,6 +880,68 @@
 
         <div id="tab-changelog" class="tab-content">
             <div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div>
+        </div>
+        
+        <div id="tab-sniper" class="tab-content">
+            <div style="margin-top:2rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem;">SNIPER ENGINE</h2>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Configuration Deck -->
+                    <div class="card" style="border: 1px solid #333; background: #111;">
+                        <h3 style="color: var(--primary); margin-bottom: 1.5rem;">CONFIGURATION DECK</h3>
+                        
+                        <label style="font-size: 0.7rem; color: #777;">TARGET PLATFORM</label>
+                        <select id="sniper-target-preset" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';" onchange="updateSniperTarget()">
+                            <option value="custom">Custom Endpoint URL</option>
+                            <option value="pscu_dxo">PSCU DXOnline API</option>
+                            <option value="briansclub">BriansClub Drops (Demo)</option>
+                            <option value="jokers_stash">Jokers Stash Archive (Demo)</option>
+                        </select>
+                        
+                        <input type="text" id="sniper-target" placeholder="TARGET ENDPOINT URL" style="margin-bottom: 1.5rem;">
+                        
+                        <label style="font-size: 0.7rem; color: #777;">BIN / KEYWORD FILTER</label>
+                        <input type="text" id="sniper-filter" placeholder="e.g., 414720, PLATINUM, NAVY FEDERAL" style="margin-bottom: 1.5rem;">
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.7rem; color: #777;">PULSE RATE (SEC)</label>
+                                <input type="number" id="sniper-pulse" value="10" min="1" max="60" style="width: 100%;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.7rem; color: #777;">MAX ASSET PRICE ($)</label>
+                                <input type="number" id="sniper-max-price" value="50" min="0" style="width: 100%;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 2rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="sniper-auto-acquire" checked> AUTO-ACQUIRE TRIGGER
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="sniper-jitter" checked> ENABLE REQUEST JITTER (+/- 2s)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa;">
+                                <input type="checkbox" id="sniper-capsolver"> CAPSOLVER BYPASS
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn" id="btn-engage-sniper" onclick="engageSniper()" style="flex: 2; background: var(--success); color: #000; font-weight: bold;">ENGAGE SNIPER</button>
+                            <button class="btn" id="btn-abort-sniper" onclick="abortSniper()" style="flex: 1; background: var(--error); color: #fff; font-weight: bold;" disabled>ABORT</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Matrix Feed -->
+                    <div class="card" style="border: 1px solid var(--primary); background: #050505; position: relative;">
+                        <h3 style="color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1rem;">MATRIX FEED <span id="sniper-status" style="float: right; color: #555; font-size: 0.7rem; animation: pulse 2s infinite;">OFFLINE</span></h3>
+                        <div id="sniper-log-stream" style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #aaa; height: 400px; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 6px;">
+                            <div>> SYSTEM READY. AWAITING ENGAGEMENT.</div>
+                        </div>
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(transparent, #050505); pointer-events: none;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         </div>
@@ -1773,6 +1836,118 @@
                 res.innerText = out;
                 addLog(`LINK TRACER DEPLOYED: ${token} -> ${dest}`);
             }, 800);
+        }
+
+        // --- SNIPER LOGIC ---
+        let sniperInterval = null;
+        let sniperPingCount = 0;
+
+        function updateSniperTarget() {
+            const preset = document.getElementById('sniper-target-preset').value;
+            const targetInput = document.getElementById('sniper-target');
+            if (preset === 'custom') {
+                targetInput.value = '';
+                targetInput.disabled = false;
+            } else if (preset === 'pscu_dxo') {
+                targetInput.value = 'https://dxonline-apps.pscu.com/api/v1/dump';
+                targetInput.disabled = true;
+            } else if (preset === 'briansclub') {
+                targetInput.value = 'https://briansclub.cm/api/inventory';
+                targetInput.disabled = true;
+            } else if (preset === 'jokers_stash') {
+                targetInput.value = 'https://jokersstash.net/api/dumps';
+                targetInput.disabled = true;
+            }
+        }
+
+        function sniperLog(msg, type="info") {
+            const stream = document.getElementById('sniper-log-stream');
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const div = document.createElement('div');
+            
+            let color = "#aaa";
+            if(type === "hit") color = "var(--success)";
+            if(type === "error") color = "var(--error)";
+            if(type === "warn") color = "#f39c12";
+
+            div.style.color = color;
+            div.innerHTML = `<span style="color:#555">[${timeStr}]</span> ${msg}`;
+            stream.appendChild(div);
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        function engageSniper() {
+            const target = document.getElementById('sniper-target').value.trim();
+            const filter = document.getElementById('sniper-filter').value.trim();
+            let pulse = parseInt(document.getElementById('sniper-pulse').value) || 10;
+            const jitter = document.getElementById('sniper-jitter').checked;
+
+            if (!target) {
+                sniperLog("ERROR: Target Endpoint URL required to engage.", "error");
+                return;
+            }
+
+            document.getElementById('btn-engage-sniper').disabled = true;
+            document.getElementById('btn-engage-sniper').innerText = "ENGAGED";
+            document.getElementById('btn-engage-sniper').style.opacity = '0.5';
+            document.getElementById('btn-abort-sniper').disabled = false;
+            
+            const statusEl = document.getElementById('sniper-status');
+            statusEl.innerText = "LIVE";
+            statusEl.style.color = "var(--success)";
+
+            sniperLog(`> ENGAGING SNIPER PROTOCOL`, "warn");
+            sniperLog(`> TARGET: ${target}`, "info");
+            sniperLog(`> FILTER: ${filter || 'NONE (CATCH-ALL)'}`, "info");
+            sniperPingCount = 0;
+
+            const executePing = () => {
+                sniperPingCount++;
+                let actualDelay = pulse * 1000;
+                if (jitter) {
+                    actualDelay += (Math.random() * 4000 - 2000); // +/- 2 seconds
+                }
+
+                sniperLog(`PING [REQ-${sniperPingCount}] -> ${target} -> 200 OK | NO ASSETS MATCHING FILTER`, "info");
+
+                // Simulate a hit after 5 pings
+                if (sniperPingCount === 5) {
+                    setTimeout(() => {
+                        sniperLog(`⚠️ HIT DETECTED: HIGH-VALUE ASSET MATCHES FILTER!`, "warn");
+                        if(document.getElementById('sniper-auto-acquire').checked) {
+                            sniperLog(`> INITIATING AUTO-ACQUIRE SEQUENCE...`, "info");
+                            setTimeout(() => {
+                                sniperLog(`✅ ASSET SECURED. LOGGED TO DATABASE.`, "hit");
+                                addLog(`SNIPER ACQUISITION: Asset secured from ${target}`);
+                            }, 800);
+                        } else {
+                            sniperLog(`> AUTO-ACQUIRE DISABLED. MANUAL INTERVENTION REQUIRED.`, "warn");
+                        }
+                    }, 500);
+                }
+
+                sniperInterval = setTimeout(executePing, actualDelay);
+            };
+
+            // Start the first ping loop
+            executePing();
+        }
+
+        function abortSniper() {
+            if (sniperInterval) clearTimeout(sniperInterval);
+            sniperInterval = null;
+
+            document.getElementById('btn-engage-sniper').disabled = false;
+            document.getElementById('btn-engage-sniper').innerText = "ENGAGE SNIPER";
+            document.getElementById('btn-engage-sniper').style.opacity = '1';
+            document.getElementById('btn-abort-sniper').disabled = true;
+
+            const statusEl = document.getElementById('sniper-status');
+            statusEl.innerText = "OFFLINE";
+            statusEl.style.color = "#555";
+
+            sniperLog(`> SNIPER ABORTED.`, "error");
         }
 
         // Init TG accounts on load
