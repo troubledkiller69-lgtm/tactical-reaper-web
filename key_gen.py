@@ -1,39 +1,55 @@
 import os
 import uuid
 import argparse
-from datetime import datetime, timedelta
-from supabase import create_client, Client
+import sys
 
-SUPABASE_URL = "https://smxpzldbxewcgrakaqhn.supabase.co"
-SUPABASE_KEY = "sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde"
+VAULT_PATH = "api/auth_vault.py"
 
-try:
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-except Exception as e:
-    print(f"Error initializing Supabase client: {e}")
-    exit(1)
-
-def generate_key(hours=24):
-    """Generates a new Retri key and inserts it into Supabase."""
+def generate_key(operator_id="Clean"):
+    """Generates a new Retri key and adds it to the local Identity Vault."""
     new_key = f"Retri-{uuid.uuid4().hex[:8].upper()}-{uuid.uuid4().hex[:8].upper()}"
     
-    data = {
-        "key": new_key,
-        "duration_hours": hours,
-        "status": "active"
-    }
-    
+    if not os.path.exists(VAULT_PATH):
+        print(f"[-] Error: {VAULT_PATH} not found. Ensure you are in the repository root.")
+        return
+
     try:
-        response = supabase.table("keys").insert(data).execute()
-        print(f"\n[+] Key Generated Successfully!")
-        print(f"    KEY: {new_key}")
-        print(f"    DURATION: {hours} hours\n")
+        with open(VAULT_PATH, "r") as f:
+            lines = f.readlines()
+
+        # Find the VALID_KEYS dictionary and insert the new key
+        new_lines = []
+        found_dict = False
+        inserted = False
+        
+        for line in lines:
+            new_lines.append(line)
+            if "VALID_KEYS = {" in line:
+                found_dict = True
+            if found_dict and not inserted and "}" in line:
+                # Insert before the closing brace
+                new_lines.insert(-1, f'    "{new_key}": {{"operator_id": "{operator_id}", "status": "active"}},\n')
+                inserted = True
+
+        if not inserted:
+            print("[-] Error: Could not find VALID_KEYS dictionary in vault file.")
+            return
+
+        with open(VAULT_PATH, "w") as f:
+            f.writelines(new_lines)
+
+        print(f"\n[+] BIFROST IDENTITY VAULT UPDATED!")
+        print(f"    OPERATOR: {operator_id}")
+        print(f"    NEW KEY:  {new_key}")
+        print(f"    STATUS:   ACTIVE\n")
+        print(f"    [!] Commit and Push to activate this key on the server.\n")
+
     except Exception as e:
-        print(f"[-] Failed to insert key to Supabase: {e}")
+        print(f"[-] Failed to update vault: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Tactical Reaper Key Generator (Cloud)")
-    parser.add_argument("-d", "--duration", type=int, default=24, help="Duration of the key in hours (default: 24)")
+    parser = argparse.ArgumentParser(description="BIFROST Identity Vault Key Generator")
+    parser.add_argument("-o", "--operator", type=str, default="Clean", help="Operator ID for the key")
     args = parser.parse_args()
     
-    generate_key(args.duration)
+    generate_key(args.operator)

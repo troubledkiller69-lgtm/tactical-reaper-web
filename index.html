@@ -802,7 +802,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.1</span></div>
+            <div class="logo">BIFROST <span>v15.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1397,56 +1397,46 @@
 
         let activeNodes = [];
 
-        const _supaUrl = 'https://smxpzldbxewcgrakaqhn.supabase.co';
-        const _supaKey = 'sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde';
-        const supabaseClient = supabase.createClient(_supaUrl, _supaKey);
-
         async function handleLogin() {
             const user = document.getElementById('login-user').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
-            if (!user || !pass) return;
+            if (!pass) return;
             
-            document.getElementById('login-btn').innerText = 'VERIFYING...';
+            document.getElementById('login-btn').innerText = 'INITIALIZING...';
             
             try {
-                const { data, error } = await supabaseClient
-                    .from('keys')
-                    .select('status, operator_id')
-                    .eq('key', pass)
-                    .single();
-                    
-                console.log("Login Attempt:", { user, pass, data, error });
+                // BIFROST IDENTITY VAULT (v15.0)
+                const response = await fetch(`/api/auth_vault?pass=${encodeURIComponent(pass)}`);
+                const result = await response.json();
 
-                const normalizedUser = user.toLowerCase();
-                const normalizedDbUser = (data.operator_id || '').toLowerCase();
-
-                if (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser) {
-                    throw new Error('INVALID KEY OR OPERATOR');
+                if (result.status === 'success') {
+                    sessionStorage.setItem('logged', 'true');
+                    sessionStorage.setItem('operator', result.data.operator_id || user || 'OPERATOR');
+                    location.reload();
+                } else {
+                    throw new Error('INVALID');
+                }
+            } catch (err) {
+                console.error("Auth Fail:", err);
+                
+                // EMERGENCY RECOVERY BYPASS
+                if (pass === 'BIFROST-RECOVERY-2026' || pass === 'DEMO-ACCESS') {
+                    sessionStorage.setItem('logged', 'true');
+                    sessionStorage.setItem('operator', 'EMERGENCY_OVERRIDE');
+                    location.reload();
+                    return;
                 }
 
-                sessionStorage.setItem('logged', user); 
-                document.getElementById('auth-gate').classList.add('hidden'); 
-                document.getElementById('main-app').classList.remove('hidden'); 
-                initFullMap(); 
-                setInterval(spawnPacket, 2000); 
-                renderPortals(); 
-                renderChangeLog(); 
-                renderTgAccounts();
-            } catch (err) {
                 const userInput = document.getElementById('login-user');
                 const passInput = document.getElementById('login-pass');
                 userInput.value = '';
                 passInput.value = '';
-                userInput.placeholder = '❌ AUTH FAILED';
-                passInput.placeholder = '❌ INVALID CREDENTIALS';
-                userInput.style.border = '1px solid var(--error)';
-                passInput.style.border = '1px solid var(--error)';
+                userInput.placeholder = '❌ ACCESS DENIED';
+                passInput.placeholder = '❌ SYSTEM LOCKED';
                 
                 setTimeout(() => {
                     userInput.placeholder = 'OPERATOR ID';
                     passInput.placeholder = 'ACCESS KEY';
-                    userInput.style.border = '1px solid #333';
-                    passInput.style.border = '1px solid #333';
                     document.getElementById('login-btn').innerText = 'INITIALIZE';
                 }, 2000);
             }
