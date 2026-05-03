@@ -31,6 +31,13 @@
             --map-node: #00d2ff;
         }
 
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100%);
             }
         }
 
@@ -93,14 +100,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 75px;
-            border: none;
-            padding: 0 2rem;
-            position: fixed;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.9);
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
             backdrop-filter: blur(10px);
         }
 
@@ -112,6 +117,7 @@
             background: var(--black-ice);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px var(--neon-glow));
             background-size: 200% 100%;
             animation: ice-shimmer 10s linear infinite;
         }
@@ -615,7 +621,7 @@
 
         .auth-card {
             background: #050505;
-            border: none;
+            border: 1px solid #222;
             padding: 0;
             width: 100%;
             max-width: 450px;
@@ -624,7 +630,7 @@
             overflow: hidden;
             margin: 1rem;
             position: relative;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .auth-card::before {
@@ -773,6 +779,7 @@
 </head>
 
 <body>
+    <div class="scanline"></div>
 
     <div id="auth-gate">
         <div class="auth-card">
@@ -786,6 +793,7 @@
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
                     <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
+                    <button class="btn" style="margin-top: 1rem; background: rgba(0,210,255,0.05); border: 1px solid var(--border);" onclick="demoLogin()">DEMO ACCESS</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
             </div>
@@ -794,7 +802,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v14.5</span></div>
+            <div class="logo">BIFROST <span>v13.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -986,7 +994,7 @@
                 <div class="continent-label" style="top: 35%; left: 80%;">ASIA</div>
                 <div class="continent-label" style="top: 75%; left: 90%;">OCEANIA</div>
 
-                <!-- BIFROST TACTICAL NODES - PURE MATH v13.3 -->
+                <!-- BIFROST TACTICAL NODES - PURE MATH v13.1 -->
                 <div class="node" style="top: 35%; left: 31%;" data-city="NEW YORK">
                     <div class="node-info"><h4>NEW YORK</h4><p>STATUS: ACTIVE</p></div>
                 </div>
@@ -1123,20 +1131,17 @@
                 <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">OPEN SOURCE INTELLIGENCE SUITE</p>
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
                     <div class="card">
-                        <h3>USERNAME RECON (MAIGRET)</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 50+ platforms via Maigret engine.</p>
+                        <h3>USERNAME RECON</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 30+ platforms for username presence.</p>
                         <input type="text" id="osint-username" placeholder="TARGET USERNAME">
-                        <button class="btn" onclick="runMaigretScan()">ENGAGE MAIGRET</button>
+                        <button class="btn" onclick="runUsernameScan()">SCAN</button>
                         <div id="username-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
                     </div>
                     <div class="card">
-                        <h3>EMAIL INTEL (GHUNT)</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Deep Google Account profiling via GHunt.</p>
-                        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
-                            <input type="text" id="osint-email" placeholder="TARGET EMAIL" style="flex:1;">
-                            <button class="btn" style="width:auto; padding:0 1rem;" onclick="configGhunt()">⚙️</button>
-                        </div>
-                        <button class="btn" onclick="runGhuntOsint()">INVESTIGATE</button>
+                        <h3>EMAIL INTEL</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Validate email and check breach exposure.</p>
+                        <input type="text" id="osint-email" placeholder="TARGET EMAIL">
+                        <button class="btn" onclick="runEmailOsint()">INVESTIGATE</button>
                         <div id="email-osint-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
                     </div>
                     <div class="card">
@@ -1406,23 +1411,28 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('keys')
-                    .select('*')
-                    .eq('key', pass);
+                    .select('status, operator_id')
+                    .eq('key', pass)
+                    .single();
                     
-                console.log("Auth Response:", { data, error });
+                console.log("Login Attempt:", { user, pass, data, error });
 
-                if (error) throw error;
-                const keyData = data && data.length > 0 ? data[0] : null;
+                const normalizedUser = user.toLowerCase();
+                const normalizedDbUser = (data.operator_id || '').toLowerCase();
 
-                if (!keyData || keyData.status !== 'active') {
-                    throw new Error('INVALID');
+                if (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser) {
+                    throw new Error('INVALID KEY OR OPERATOR');
                 }
 
-                sessionStorage.setItem('logged', 'true'); 
-                sessionStorage.setItem('operator', user || 'OPERATOR');
-                location.reload(); 
+                sessionStorage.setItem('logged', user); 
+                document.getElementById('auth-gate').classList.add('hidden'); 
+                document.getElementById('main-app').classList.remove('hidden'); 
+                initFullMap(); 
+                setInterval(spawnPacket, 2000); 
+                renderPortals(); 
+                renderChangeLog(); 
+                renderTgAccounts();
             } catch (err) {
-                console.error("Auth Fail:", err);
                 const userInput = document.getElementById('login-user');
                 const passInput = document.getElementById('login-pass');
                 userInput.value = '';
@@ -1446,12 +1456,18 @@
             if (sessionStorage.getItem('logged')) { 
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
-                setTimeout(initTacticalMap, 500);
+                initTacticalMap();
                 renderPortals(); 
                 renderChangeLog(); 
                 renderTgAccounts(); 
             } 
         };
+
+        function demoLogin() {
+            sessionStorage.setItem('logged', 'true');
+            sessionStorage.setItem('operator', 'DEMO_UNITS');
+            location.reload();
+        }
 
         function switchTab(tab) {
             console.log('Switching to tab:', tab);
@@ -1530,16 +1546,32 @@
         function renderChangeLog() {
             const container = document.getElementById('changelog-stream');
             const logs = [
-                { v: 'v13.3 RADIANCE PURGE', d: 'MAY 3, 2026', c: '- Removed logo drop-shadow and scanline glow for Clean Room aesthetic.<br>- Fixed version parity across all modules.' },
-                { v: 'v13.1 HUD HARDENING', d: 'MAY 3, 2026', c: '- Eastward node recalibration for 1:1 landmass alignment.<br>- Removed background HUD textures and graticule outlines.' },
-                { v: 'v12.0 COMMAND CENTER', d: 'MAY 3, 2026', c: '- Implemented 3D Tactical HUD with global signal mesh.<br>- Repositioned nodes to global data hubs.' },
-                { v: 'v10.0 BLACK ICE', d: 'MAY 3, 2026', c: '- Total visual transformation to Black Ice theme.<br>- Liquid Glass button textures with dynamic shimmer.' },
-                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions and Supabase Auth.' }
+                { v: 'v7.1 SMS GATEWAY', d: 'MAY 2, 2026', c: '- Email-to-SMS gateway bomber (20 US carriers).<br>- Shotgun mode: fires all gateways simultaneously.<br>- Carrier Recon: reverse phone-to-carrier lookup.<br>- phonenumbers lib integration for MSISDN intelligence.' },
+                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions.<br>- Supabase Identity-Bound Auth integration.<br>- Discord Interactions Endpoint implementation.' },
+                { v: 'v6.3 TG OPS', d: 'MAY 1, 2026', c: '- Telegram mass-reporting & spam engine integration.' },
+                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' }
             ];
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
 
+        function initFullMap() {
+            const layer = document.getElementById('node-layer');
+            layer.innerHTML = '';
+            activeNodes = [
+                { x: 520, y: 230, l: 'NA EAST' }, { x: 410, y: 240, l: 'NA WEST' }, { x: 920, y: 190, l: 'EU WEST' },
+                { x: 980, y: 210, l: 'EU CENTRAL' }, { x: 1420, y: 260, l: 'AS PAC' }, { x: 1360, y: 380, l: 'AS EAST' },
+                { x: 690, y: 560, l: 'SA EAST' }, { x: 990, y: 500, l: 'AF MID' }, { x: 1220, y: 200, l: 'RU REAPER' },
+                { x: 1470, y: 620, l: 'AU SOUTH' }, { x: 1510, y: 580, l: 'AU EAST' }, { x: 1150, y: 330, l: 'ME CENTRAL' }
+            ];
+            activeNodes.forEach(n => {
+                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}px`; node.style.top = `${n.y}px`;
+                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
+            });
+        }
 
+        function spawnPacket() {
+            const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
             if (!start || !end || start === end) return;
             const layer = document.getElementById('packet-layer');
             const packet = document.createElement('div'); packet.className = 'packet';
@@ -1967,45 +1999,6 @@
             } catch(e) { out += `GRAVATAR: CHECK FAILED\n`; }
             res.innerText = out;
             addLog(`EMAIL OSINT: ${email}`);
-        }
-
-        function configGhunt() {
-            const cookies = prompt("PASTE GHUNT BASE64 COOKIES:");
-            if (cookies) {
-                localStorage.setItem('ghunt_cookies', cookies);
-                alert("GHUNT AUTHENTICATION STORED.");
-            }
-        }
-
-        async function runGhuntOsint() {
-            const email = document.getElementById('osint-email').value.trim();
-            const cookies = localStorage.getItem('ghunt_cookies');
-            if (!email) return;
-            if (!cookies) { alert("GHUNT COOKIES NOT CONFIGURED. CLICK THE GEAR ICON."); return; }
-            
-            const resBox = document.getElementById('email-osint-results');
-            resBox.innerHTML = '<div class="loader"></div> INITIALIZING GHUNT SHIELD...';
-            
-            try {
-                const r = await fetch('/api/ghunt', {
-                    method: 'POST',
-                    body: JSON.stringify({ email, cookies_b64: cookies })
-                });
-                const data = await r.json();
-                if (data.status === 'success') {
-                    resBox.innerHTML = `
-                        <div style="color:var(--primary);margin-bottom:0.5rem;">[+] GOOGLE ACCOUNT IDENTIFIED</div>
-                        <div>NAME: ${data.profile.name}</div>
-                        <div>GAIA ID: ${data.profile.gaia_id}</div>
-                        <div>LAST ACTIVE: ${data.profile.last_updated}</div>
-                        <div style="margin-top:0.4rem;color:#555;">SERVICES: ${data.profile.services.join(', ')}</div>
-                    `;
-                } else {
-                    resBox.innerHTML = `ERROR: ${data.error}`;
-                }
-            } catch (e) {
-                resBox.innerHTML = 'ERROR EXECUTING GHUNT SHIELD.';
-            }
         }
 
         async function runPhoneOsint() {
