@@ -794,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.4</span></div>
+            <div class="logo">BIFROST <span>v13.5</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1409,14 +1409,8 @@
                     
                 console.log("Login Attempt:", { user, pass, data, error });
 
-                const normalizedUser = user.toLowerCase();
-                const normalizedDbUser = (data && data.operator_id ? data.operator_id : '').toLowerCase();
-
-                // Emergency Fallback for provided credentials
-                const isEmergency = (user === 'Clean' && pass === 'Retri-9798B3D2-0B248109');
-
-                if (!isEmergency && (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser)) {
-                    throw new Error('INVALID KEY OR OPERATOR');
+                if (error || !data || data.status !== 'active') {
+                    throw new Error('INVALID KEY');
                 }
 
                 sessionStorage.setItem('logged', user); 
