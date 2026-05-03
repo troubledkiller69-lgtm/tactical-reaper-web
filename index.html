@@ -1036,7 +1036,18 @@
                 const data = await response.json();
                 if (data.BIN) {
                     const b = data.BIN;
-                    res.innerHTML = `> 200 OK: DATA RETRIEVED\n\nBRAND: ${b.brand || 'N/A'}\nTYPE: ${b.type || 'N/A'}\nLEVEL: ${b.level || 'N/A'}\nBANK: ${b.bank || 'N/A'}\nCOUNTRY: ${b.country || 'N/A'}`;
+                    let out = `> 200 OK: DATA RETRIEVED\n\n`;
+                    out += `BRAND:    ${b.brand || b.scheme || 'N/A'}\n`;
+                    out += `TYPE:     ${b.type || 'N/A'}\n`;
+                    out += `LEVEL:    ${b.level || 'N/A'}\n`;
+                    out += `PREPAID:  ${b.is_prepaid === 'true' ? 'YES' : 'NO'}\n`;
+                    out += `COMM:     ${b.is_commercial === 'true' ? 'YES' : 'NO'}\n`;
+                    out += `CURRENCY: ${b.currency || 'N/A'}\n\n`;
+                    out += `ISSUER:   ${b.issuer?.name || b.bank || 'N/A'}\n`;
+                    if (b.issuer?.website) out += `WEBSITE:  ${b.issuer.website}\n`;
+                    if (b.issuer?.phone) out += `PHONE:    ${b.issuer.phone}\n`;
+                    out += `\nCOUNTRY:  ${b.country?.name || 'N/A'} ${b.country?.flag || ''}\n`;
+                    res.innerHTML = out;
                 } else { res.innerHTML = `> ERROR: BIN NOT FOUND`; }
             } catch (e) { res.innerHTML = `> EXCEPTION: TIMEOUT`; }
         }
