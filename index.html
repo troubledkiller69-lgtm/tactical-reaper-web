@@ -551,7 +551,7 @@
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
                 <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
-                <a onclick="switchTab('ipops')" id="nav-ipops">IP OPS</a>
+                <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                 <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
@@ -819,16 +819,52 @@
             </div>
         </div>
 
-        <div id="tab-ipops" class="tab-content">
+        <div id="tab-osint" class="tab-content">
             <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1rem;">SIGNAL INTEL</h2>
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:0.5rem;">OSINT</h2>
+                <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">OPEN SOURCE INTELLIGENCE SUITE</p>
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+                    <div class="card">
+                        <h3>USERNAME RECON</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 30+ platforms for username presence.</p>
+                        <input type="text" id="osint-username" placeholder="TARGET USERNAME">
+                        <button class="btn" onclick="runUsernameScan()">SCAN</button>
+                        <div id="username-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>EMAIL INTEL</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Validate email and check breach exposure.</p>
+                        <input type="text" id="osint-email" placeholder="TARGET EMAIL">
+                        <button class="btn" onclick="runEmailOsint()">INVESTIGATE</button>
+                        <div id="email-osint-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>PHONE INTEL</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Carrier, line type, and location from number.</p>
+                        <input type="text" id="osint-phone" placeholder="PHONE (+1XXXXXXXXXX)">
+                        <button class="btn" onclick="runPhoneOsint()">QUERY</button>
+                        <div id="phone-osint-results" class="results">...</div>
+                    </div>
                     <div class="card">
                         <h3>GEO LOCATOR</h3>
                         <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">IP-to-Geolocation reverse mapping.</p>
                         <input type="text" id="geo-ip" placeholder="TARGET IP (e.g., 8.8.8.8)">
                         <button class="btn" onclick="runGeoLocator()">LOCATE</button>
                         <div id="geo-results" class="results">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>WHOIS LOOKUP</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Domain registration and DNS intelligence.</p>
+                        <input type="text" id="osint-domain" placeholder="TARGET DOMAIN (e.g., example.com)">
+                        <button class="btn" onclick="runWhoisLookup()">LOOKUP</button>
+                        <div id="whois-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>ZILLOW ZESTIMATE</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Property valuation, tax data, and home details via address lookup.</p>
+                        <input type="text" id="osint-zillow" placeholder="ADDRESS (e.g., 123 Main St, City, ST)">
+                        <button class="btn" onclick="runZillowLookup()">APPRAISE</button>
+                        <div id="zillow-results" class="results" style="max-height:350px;overflow-y:auto;">...</div>
                     </div>
                     <div class="card">
                         <h3>LINK TRACER</h3>
@@ -1417,7 +1453,273 @@
             addLog(`TG ${mode.toUpperCase()}: ${target} x${count}`);
         }
 
-        // ── IP OPS ──
+        // ── OSINT SUITE ──
+        const OSINT_PLATFORMS = [
+            { name: 'GitHub', url: 'https://github.com/{u}', check: 'status' },
+            { name: 'Twitter/X', url: 'https://x.com/{u}', check: 'status' },
+            { name: 'Instagram', url: 'https://www.instagram.com/{u}/', check: 'status' },
+            { name: 'Reddit', url: 'https://www.reddit.com/user/{u}', check: 'json' },
+            { name: 'TikTok', url: 'https://www.tiktok.com/@{u}', check: 'status' },
+            { name: 'YouTube', url: 'https://www.youtube.com/@{u}', check: 'status' },
+            { name: 'Pinterest', url: 'https://www.pinterest.com/{u}/', check: 'status' },
+            { name: 'Twitch', url: 'https://www.twitch.tv/{u}', check: 'status' },
+            { name: 'LinkedIn', url: 'https://www.linkedin.com/in/{u}', check: 'status' },
+            { name: 'Medium', url: 'https://medium.com/@{u}', check: 'status' },
+            { name: 'DevTo', url: 'https://dev.to/{u}', check: 'status' },
+            { name: 'Keybase', url: 'https://keybase.io/{u}', check: 'status' },
+            { name: 'HackerNews', url: 'https://hacker-news.firebaseio.com/v0/user/{u}.json', check: 'json' },
+            { name: 'Steam', url: 'https://steamcommunity.com/id/{u}', check: 'status' },
+            { name: 'Spotify', url: 'https://open.spotify.com/user/{u}', check: 'status' },
+            { name: 'SoundCloud', url: 'https://soundcloud.com/{u}', check: 'status' },
+            { name: 'Flickr', url: 'https://www.flickr.com/people/{u}/', check: 'status' },
+            { name: 'Vimeo', url: 'https://vimeo.com/{u}', check: 'status' },
+            { name: 'Tumblr', url: 'https://{u}.tumblr.com', check: 'status' },
+            { name: 'GitLab', url: 'https://gitlab.com/{u}', check: 'status' },
+            { name: 'Bitbucket', url: 'https://bitbucket.org/{u}/', check: 'status' },
+            { name: 'Docker Hub', url: 'https://hub.docker.com/u/{u}', check: 'status' },
+            { name: 'npm', url: 'https://www.npmjs.com/~{u}', check: 'status' },
+            { name: 'PyPI', url: 'https://pypi.org/user/{u}/', check: 'status' },
+            { name: 'Replit', url: 'https://replit.com/@{u}', check: 'status' },
+            { name: 'Patreon', url: 'https://www.patreon.com/{u}', check: 'status' },
+            { name: 'Cash App', url: 'https://cash.app/${u}', check: 'status' },
+            { name: 'Telegram', url: 'https://t.me/{u}', check: 'status' },
+            { name: 'Snapchat', url: 'https://www.snapchat.com/add/{u}', check: 'status' },
+            { name: 'eBay', url: 'https://www.ebay.com/usr/{u}', check: 'status' },
+            { name: 'Roblox (API)', url: 'https://api.roblox.com/users/get-by-username?username={u}', check: 'json' },
+            { name: 'Gravatar', url: 'https://en.gravatar.com/{u}.json', check: 'json' },
+        ];
+
+        async function runUsernameScan() {
+            const username = document.getElementById('osint-username').value.trim();
+            const res = document.getElementById('username-results');
+            if (!username) { res.innerText = 'ERROR: USERNAME REQUIRED'; return; }
+            res.innerText = `> SCANNING ${OSINT_PLATFORMS.length} PLATFORMS FOR "${username}"...\n`;
+            let found = 0;
+            let checked = 0;
+            for (const p of OSINT_PLATFORMS) {
+                const profileUrl = p.url.replace('{u}', encodeURIComponent(username));
+                checked++;
+                try {
+                    const resp = await fetch(profileUrl, { method: 'HEAD', mode: 'no-cors', signal: AbortSignal.timeout(4000) });
+                    found++;
+                    res.innerText += `[+] ${p.name.padEnd(14)} FOUND   ${profileUrl}\n`;
+                } catch (e) {
+                    res.innerText += `[-] ${p.name.padEnd(14)} ---\n`;
+                }
+                res.innerText = res.innerText.split('\n')[0] + `\n> PROGRESS: ${checked}/${OSINT_PLATFORMS.length} | HITS: ${found}\n` + res.innerText.split('\n').slice(2).join('\n');
+            }
+            res.innerText += `\n> SCAN COMPLETE — ${found} POTENTIAL PROFILES IDENTIFIED\n`;
+            res.innerText += `> NOTE: Open links to verify — some platforms return 200 for non-existent users.\n`;
+            addLog(`USERNAME RECON: ${username} — ${found} hits`);
+        }
+
+        async function runEmailOsint() {
+            const email = document.getElementById('osint-email').value.trim();
+            const res = document.getElementById('email-osint-results');
+            if (!email) { res.innerText = 'ERROR: EMAIL REQUIRED'; return; }
+            res.innerText = `> INVESTIGATING ${email}...\n`;
+            const parts = email.split('@');
+            if (parts.length !== 2) { res.innerText += '> INVALID EMAIL FORMAT'; return; }
+            const [local, domain] = parts;
+            let out = `> EMAIL INTEL REPORT\n\n`;
+            out += `LOCAL:    ${local}\n`;
+            out += `DOMAIN:   ${domain}\n`;
+            out += `FORMAT:   ${/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'VALID' : 'INVALID'}\n\n`;
+            // Check domain MX
+            out += `> CHECKING DOMAIN INFRASTRUCTURE...\n`;
+            try {
+                const dnsResp = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
+                const dnsData = await dnsResp.json();
+                if (dnsData.Answer && dnsData.Answer.length > 0) {
+                    out += `MX RECORDS:\n`;
+                    dnsData.Answer.forEach(r => { out += `  → ${r.data}\n`; });
+                } else { out += `MX:       NO MX RECORDS FOUND\n`; }
+            } catch(e) { out += `MX:       LOOKUP FAILED\n`; }
+            // Check breach via HIBP (public, no key needed for breach count)
+            out += `\n> CHECKING BREACH DATABASES...\n`;
+            try {
+                const hibpResp = await fetch(`https://haveibeenpwned.com/unifiedsearch/${encodeURIComponent(email)}`, { headers: { 'Accept': 'application/json' } });
+                if (hibpResp.status === 200) {
+                    const hibpData = await hibpResp.json();
+                    const breaches = hibpData.Breaches || [];
+                    out += `BREACHES: ${breaches.length} FOUND\n`;
+                    breaches.slice(0, 10).forEach(b => {
+                        out += `  → ${b.Name} (${b.BreachDate || 'N/A'}) — ${(b.DataClasses||[]).join(', ')}\n`;
+                    });
+                    if (breaches.length > 10) out += `  ... and ${breaches.length - 10} more\n`;
+                } else if (hibpResp.status === 404) {
+                    out += `BREACHES: NONE FOUND (CLEAN)\n`;
+                } else { out += `BREACHES: RATE LIMITED — TRY AGAIN LATER\n`; }
+            } catch(e) { out += `BREACHES: CHECK FAILED (CORS/RATE LIMIT)\n`; }
+            // Gravatar check
+            out += `\n> CHECKING GRAVATAR...\n`;
+            try {
+                const gravResp = await fetch(`https://en.gravatar.com/${email}.json`);
+                if (gravResp.ok) {
+                    const gravData = await gravResp.json();
+                    const entry = gravData.entry?.[0];
+                    if (entry) {
+                        out += `GRAVATAR: FOUND\n`;
+                        if (entry.displayName) out += `  NAME:   ${entry.displayName}\n`;
+                        if (entry.profileUrl) out += `  URL:    ${entry.profileUrl}\n`;
+                        if (entry.currentLocation) out += `  LOC:    ${entry.currentLocation}\n`;
+                    }
+                } else { out += `GRAVATAR: NOT FOUND\n`; }
+            } catch(e) { out += `GRAVATAR: CHECK FAILED\n`; }
+            res.innerText = out;
+            addLog(`EMAIL OSINT: ${email}`);
+        }
+
+        async function runPhoneOsint() {
+            const phone = document.getElementById('osint-phone').value.trim();
+            const res = document.getElementById('phone-osint-results');
+            if (!phone) { res.innerText = 'ERROR: PHONE NUMBER REQUIRED'; return; }
+            res.innerText = '> QUERYING PHONE INTEL...';
+            // Use the existing carrier lookup API first
+            try {
+                const response = await fetch(`/api/carrier_lookup?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+                if (response.ok) {
+                    let out = `> PHONE INTEL ACQUIRED\n\n`;
+                    out += `PHONE:    ${data.national || data.phone}\n`;
+                    out += `DIGITS:   ${data.digits}\n`;
+                    out += `CARRIER:  ${data.carrier}\n`;
+                    out += `RAW:      ${data.carrier_raw}\n`;
+                    out += `RESOLVED: ${data.resolved ? 'YES' : 'NO'}\n`;
+                    if (data.sms_gateway) {
+                        out += `\nSMS GW:   ${data.sms_gateway}\n`;
+                        out += `MMS GW:   ${data.mms_gateway}\n`;
+                        out += `DOMAIN:   ${data.sms_domain}\n`;
+                    }
+                    // Also try ip-api for number geolocation via area code
+                    const digits = (data.digits || phone).replace(/\D/g, '');
+                    if (digits.length >= 10) {
+                        const areaCode = digits.length === 11 ? digits.substring(1, 4) : digits.substring(0, 3);
+                        out += `\nAREA CODE: ${areaCode}\n`;
+                    }
+                    res.innerText = out;
+                    addLog(`PHONE OSINT: ${data.carrier} [${data.digits}]`);
+                } else {
+                    res.innerText = `> ERROR: ${data.error}`;
+                }
+            } catch (err) {
+                res.innerText = '> ERROR: LOOKUP FAILED';
+                console.error(err);
+            }
+        }
+
+        async function runWhoisLookup() {
+            const domain = document.getElementById('osint-domain').value.trim().replace(/^https?:\/\//, '').replace(/\/.*/, '');
+            const res = document.getElementById('whois-results');
+            if (!domain) { res.innerText = 'ERROR: DOMAIN REQUIRED'; return; }
+            res.innerText = `> QUERYING WHOIS FOR ${domain}...\n`;
+            let out = `> DOMAIN INTELLIGENCE REPORT\n\n`;
+            out += `TARGET:   ${domain}\n\n`;
+            // DNS records via Google DNS
+            out += `> DNS RECORDS\n`;
+            const recordTypes = ['A', 'AAAA', 'MX', 'NS', 'TXT', 'CNAME'];
+            for (const type of recordTypes) {
+                try {
+                    const resp = await fetch(`https://dns.google/resolve?name=${domain}&type=${type}`);
+                    const data = await resp.json();
+                    if (data.Answer && data.Answer.length > 0) {
+                        out += `\n${type} RECORDS:\n`;
+                        data.Answer.forEach(r => { out += `  → ${r.data}\n`; });
+                    }
+                } catch(e) {}
+            }
+            // Domain search via domainsdb.info
+            out += `\n> SUBDOMAIN ENUMERATION\n`;
+            try {
+                const subResp = await fetch(`https://api.domainsdb.info/v1/domains/search?domain=${domain}&limit=15`);
+                if (subResp.ok) {
+                    const subData = await subResp.json();
+                    if (subData.domains && subData.domains.length > 0) {
+                        out += `FOUND ${subData.total || subData.domains.length} RELATED DOMAINS:\n`;
+                        subData.domains.slice(0, 15).forEach(d => {
+                            out += `  → ${d.domain}`;
+                            if (d.create_date) out += ` (created: ${d.create_date})`;
+                            out += `\n`;
+                        });
+                    } else { out += `NO SUBDOMAINS FOUND\n`; }
+                } else { out += `SUBDOMAIN SEARCH UNAVAILABLE\n`; }
+            } catch(e) { out += `SUBDOMAIN SEARCH FAILED\n`; }
+            // IP Geolocation of the domain
+            out += `\n> HOST GEOLOCATION\n`;
+            try {
+                const geoResp = await fetch(`http://ip-api.com/json/${domain}?fields=status,message,country,regionName,city,zip,lat,lon,isp,org,as,hosting`);
+                const geoData = await geoResp.json();
+                if (geoData.status === 'success') {
+                    out += `IP:       ${geoData.query || 'N/A'}\n`;
+                    out += `ISP:      ${geoData.isp}\n`;
+                    out += `ORG:      ${geoData.org}\n`;
+                    out += `AS:       ${geoData.as}\n`;
+                    out += `COUNTRY:  ${geoData.country}\n`;
+                    out += `REGION:   ${geoData.regionName}\n`;
+                    out += `CITY:     ${geoData.city}\n`;
+                    out += `HOSTING:  ${geoData.hosting ? 'YES (datacenter)' : 'NO (residential)'}\n`;
+                }
+            } catch(e) { out += `GEO LOOKUP FAILED\n`; }
+            res.innerText = out;
+            addLog(`WHOIS OSINT: ${domain}`);
+        }
+
+        async function runZillowLookup() {
+            const address = document.getElementById('osint-zillow').value.trim();
+            const res = document.getElementById('zillow-results');
+            if (!address) { res.innerText = 'ERROR: ADDRESS REQUIRED'; return; }
+            res.innerText = `> INITIALIZING PROPERTY RECONNAISSANCE...\n> TARGET: ${address}\n> EXTRACTING VALUATION DATA...`;
+            
+            try {
+                const response = await fetch(`/api/zillow?address=${encodeURIComponent(address)}`);
+                const data = await response.json();
+                
+                if (response.ok && data.success && data.results && data.results.length > 0) {
+                    const p = data.results[0];
+                    let out = `> PROPERTY INTELLIGENCE ACQUIRED\n\n`;
+                    out += `ADDRESS:  ${p.address}\n`;
+                    
+                    const formatCurrency = (val) => {
+                        if (!val || val === 'N/A') return 'N/A';
+                        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+                    };
+
+                    out += `ZESTIMATE: ${formatCurrency(p.zestimate)}\n`;
+                    if (p.rentZestimate) out += `RENT EST:  ${formatCurrency(p.rentZestimate)}/mo\n`;
+                    if (p.price) out += `LIST PRICE: ${formatCurrency(p.price)}\n`;
+                    if (p.taxAssessment) out += `TAX ASSESS: ${formatCurrency(p.taxAssessment)}\n`;
+                    
+                    out += `\n> PHYSICAL DETAILS\n`;
+                    out += `TYPE:     ${p.homeType || p.subtype || 'N/A'}\n`;
+                    if (p.beds !== undefined && p.beds !== 'N/A') out += `BEDS:     ${p.beds}\n`;
+                    if (p.baths !== undefined && p.baths !== 'N/A') out += `BATHS:    ${p.baths}\n`;
+                    if (p.sqft !== undefined && p.sqft !== 'N/A') out += `AREA:     ${p.sqft} sqft\n`;
+                    if (p.yearBuilt && p.yearBuilt !== 'N/A') out += `BUILT:    ${p.yearBuilt}\n`;
+                    if (p.status && p.status !== 'N/A') out += `STATUS:   ${p.status.toUpperCase()}\n`;
+                    
+                    if (p.url) {
+                        out += `\n> SOURCE LINK\n${p.url}\n`;
+                    }
+                    
+                    if (data.count > 1) {
+                        out += `\n[NOTE: ${data.count} results found. Displaying top match.]\n`;
+                    }
+                    
+                    res.innerText = out;
+                    addLog(`ZILLOW OSINT: ${p.address} - ${formatCurrency(p.zestimate)}`);
+                } else {
+                    res.innerText = `> ERROR: ${data.error || 'PROPERTY DATA NOT FOUND'}`;
+                    if (data.results && data.results.length > 0) {
+                        res.innerText += `\n\nPartial matches found:\n`;
+                        data.results.forEach(r => res.innerText += `- ${r.address}\n`);
+                    }
+                }
+            } catch (err) {
+                res.innerText = '> ERROR: CONNECTION TIMEOUT OR BLOCKED';
+                console.error(err);
+            }
+        }
+
         async function runGeoLocator() {
             const ip = document.getElementById('geo-ip').value.trim();
             const res = document.getElementById('geo-results');
