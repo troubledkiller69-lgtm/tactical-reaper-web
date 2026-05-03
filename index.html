@@ -235,7 +235,7 @@
             width: 100%;
             height: 100%;
             background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_Map_Blank.svg') center/100% 100% no-repeat;
-            filter: invert(1) brightness(0.6) contrast(1.5);
+            filter: invert(1) brightness(0.6) contrast(1.2);
             opacity: 0.4;
         }
 
@@ -253,13 +253,7 @@
         }
 
         .hex-grid {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/hexellence.png');
-            background-size: 100px 100px;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 5;
+            display: none;
         }
 
         .sonar-scan {
@@ -808,7 +802,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.0</span></div>
+            <div class="logo">BIFROST <span>v13.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -992,49 +986,49 @@
             <svg class="signal-mesh" id="map-mesh"></svg>
             <div class="map-container"></div>
             <div class="node-layer" id="map-nodes">
-                <!-- CONTINENTAL LABELS -->
-                <div class="continent-label" style="top: 30%; left: 15%;">NORTH AMERICA</div>
-                <div class="continent-label" style="top: 65%; left: 30%;">SOUTH AMERICA</div>
-                <div class="continent-label" style="top: 25%; left: 50%;">EUROPE</div>
-                <div class="continent-label" style="top: 55%; left: 53%;">AFRICA</div>
-                <div class="continent-label" style="top: 35%; left: 75%;">ASIA</div>
-                <div class="continent-label" style="top: 75%; left: 88%;">OCEANIA</div>
+                <!-- CONTINENTAL LABELS - RECALIBRATED -->
+                <div class="continent-label" style="top: 30%; left: 25%;">NORTH AMERICA</div>
+                <div class="continent-label" style="top: 65%; left: 38%;">SOUTH AMERICA</div>
+                <div class="continent-label" style="top: 25%; left: 54%;">EUROPE</div>
+                <div class="continent-label" style="top: 55%; left: 58%;">AFRICA</div>
+                <div class="continent-label" style="top: 35%; left: 80%;">ASIA</div>
+                <div class="continent-label" style="top: 75%; left: 90%;">OCEANIA</div>
 
-                <!-- BIFROST TACTICAL NODES - RE-ENGINEERED v13.0 -->
-                <div class="node" style="top: 35%; left: 24.5%;" data-city="NEW YORK">
+                <!-- BIFROST TACTICAL NODES - PURE MATH v13.1 -->
+                <div class="node" style="top: 35%; left: 31%;" data-city="NEW YORK">
                     <div class="node-info"><h4>NEW YORK</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 38%; left: 16%;" data-city="SAN FRANCISCO">
+                <div class="node" style="top: 38%; left: 22%;" data-city="SAN FRANCISCO">
                     <div class="node-info"><h4>SAN FRANCISCO</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 26%; left: 47.5%;" data-city="LONDON">
+                <div class="node" style="top: 26%; left: 52%;" data-city="LONDON">
                     <div class="node-info"><h4>LONDON</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 28%; left: 51%;" data-city="FRANKFURT">
+                <div class="node" style="top: 28%; left: 55%;" data-city="FRANKFURT">
                     <div class="node-info"><h4>FRANKFURT</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 36%; left: 81%;" data-city="TOKYO">
+                <div class="node" style="top: 36%; left: 85%;" data-city="TOKYO">
                     <div class="node-info"><h4>TOKYO</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 57%; left: 74%;" data-city="SINGAPORE">
+                <div class="node" style="top: 57%; left: 78%;" data-city="SINGAPORE">
                     <div class="node-info"><h4>SINGAPORE</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 78%; left: 85%;" data-city="SYDNEY">
+                <div class="node" style="top: 78%; left: 89%;" data-city="SYDNEY">
                     <div class="node-info"><h4>SYDNEY</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 70%; left: 34%;" data-city="SAO PAULO">
+                <div class="node" style="top: 70%; left: 38%;" data-city="SAO PAULO">
                     <div class="node-info"><h4>SAO PAULO</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 76%; left: 54%;" data-city="JOHANNESBURG">
+                <div class="node" style="top: 76%; left: 58%;" data-city="JOHANNESBURG">
                     <div class="node-info"><h4>JOHANNESBURG</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 48%; left: 61%;" data-city="DUBAI">
+                <div class="node" style="top: 48%; left: 65%;" data-city="DUBAI">
                     <div class="node-info"><h4>DUBAI</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 52%; left: 68%;" data-city="MUMBAI">
+                <div class="node" style="top: 52%; left: 72%;" data-city="MUMBAI">
                     <div class="node-info"><h4>MUMBAI</h4><p>STATUS: ACTIVE</p></div>
                 </div>
-                <div class="node" style="top: 22%; left: 45%;" data-city="REYKJAVIK">
+                <div class="node" style="top: 22%; left: 49%;" data-city="REYKJAVIK">
                     <div class="node-info"><h4>REYKJAVIK</h4><p>STATUS: PRIMARY</p></div>
                 </div>
             </div>
