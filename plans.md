@@ -28,6 +28,15 @@ A new, elite module for instantaneous asset acquisition.
 - **Execution**: Using stored operator credentials to automatically log in and secure targets before the public even sees them.
 - **Captcha Bypass**: Integrating specialized solver APIs (CapSolver primary) to ensure zero-friction.
 
+### 💎 PREMIUM ARSENAL: THE UPGRADE PATH
+The next evolution of the dashboard will integrate elite, operator-tier modules.
+- **AIO Panel**: A unified command center aggregating all active feeds and disruptions.
+- **Press-1 Autodial BOT**: Automated OTP capture engine via programmable voice.
+- **Bank Panels**: Automated deployment and management of high-fidelity phishing domains.
+- **SIP / CID SPOOFING**: WebRTC-based softphone integration for browser-based caller ID spoofing.
+- **Mailer**: High-volume, inbox-optimized phishing and spam engine.
+- **Card Snipers / DX tools**: Real-time acquisition feeds for high-value targets.
+
 ### 🕵️ THE DUMPERS: INFRASTRUCTURE REVERSAL
 Total mapping of the credit union digital card management ecosystems.
 - **[DXO DUMPER]**: A specialized crawler designed to enumerate and dump all DXOnline portals (`dxonline-apps-*-cloud.pscu.com`).
