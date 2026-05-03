@@ -13,16 +13,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary: #ffffff;
-            --neon-gray: #e0e0e0;
-            --neon-glow: rgba(255, 255, 255, 0.4);
+            --primary: #00d2ff;
+            --secondary: #9d50bb;
+            --bifrost: linear-gradient(90deg, #ff0000, #ff7b00, #ffea00, #00ff00, #00d2ff, #7000ff, #ff00ea);
+            --neon-glow: rgba(0, 210, 255, 0.3);
             --bg: #000000;
-            --card-bg: #0a0a0a;
+            --card-bg: #050505;
             --text: #ffffff;
-            --text-dim: #888888;
-            --border: #1a1a1a;
-            --error: #ff4444;
-            --success: #44ff44;
+            --text-dim: #666666;
+            --border: #151515;
+            --error: #ff3366;
+            --success: #00ffcc;
         }
 
         @keyframes scanline {
@@ -106,10 +107,18 @@
         .logo {
             font-size: 1.2rem;
             font-weight: 900;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
             text-transform: uppercase;
-            color: var(--neon-gray);
-            text-shadow: 0 0 10px var(--neon-glow);
+            background: var(--bifrost);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px var(--neon-glow));
+            background-size: 200% auto;
+            animation: bifrost-shimmer 5s linear infinite;
+        }
+
+        @keyframes bifrost-shimmer {
+            to { background-position: 200% center; }
         }
 
         .nav-links {
@@ -131,7 +140,7 @@
         .nav-links a.active {
             color: var(--primary);
             border-bottom: 2px solid var(--primary);
-            text-shadow: 0 0 10px var(--neon-glow);
+            filter: drop-shadow(0 0 5px var(--neon-glow));
         }
 
         .tab-content {
@@ -589,7 +598,7 @@
             </div>
             <div class="auth-body">
                 <div id="auth-login">
-                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">ARCHON LOGIN
+                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem; background: var(--bifrost); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: bifrost-shimmer 5s linear infinite;">BIFROST LOGIN
                     </h2>
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
@@ -602,7 +611,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">ARCHON <span>v7.2</span></div>
+            <div class="logo">BIFROST <span>v8.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -620,7 +629,7 @@
         
         <div id="tab-dashboard" class="tab-content active">
             <div style="margin-top:2rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem;">OPERATIONAL OVERVIEW</h2>
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--primary);">OPERATIONAL OVERVIEW</h2>
                 
                 <!-- KPI Tier -->
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-bottom: 2rem;">
