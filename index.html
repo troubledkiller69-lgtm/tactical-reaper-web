@@ -794,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.5</span></div>
+            <div class="logo">BIFROST <span>v14.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1123,17 +1123,20 @@
                 <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">OPEN SOURCE INTELLIGENCE SUITE</p>
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
                     <div class="card">
-                        <h3>USERNAME RECON</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 30+ platforms for username presence.</p>
+                        <h3>USERNAME RECON (MAIGRET)</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 50+ platforms via Maigret engine.</p>
                         <input type="text" id="osint-username" placeholder="TARGET USERNAME">
-                        <button class="btn" onclick="runUsernameScan()">SCAN</button>
+                        <button class="btn" onclick="runMaigretScan()">ENGAGE MAIGRET</button>
                         <div id="username-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
                     </div>
                     <div class="card">
-                        <h3>EMAIL INTEL</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Validate email and check breach exposure.</p>
-                        <input type="text" id="osint-email" placeholder="TARGET EMAIL">
-                        <button class="btn" onclick="runEmailOsint()">INVESTIGATE</button>
+                        <h3>EMAIL INTEL (GHUNT)</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Deep Google Account profiling via GHunt.</p>
+                        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                            <input type="text" id="osint-email" placeholder="TARGET EMAIL" style="flex:1;">
+                            <button class="btn" style="width:auto; padding:0 1rem;" onclick="configGhunt()">⚙️</button>
+                        </div>
+                        <button class="btn" onclick="runGhuntOsint()">INVESTIGATE</button>
                         <div id="email-osint-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
                     </div>
                     <div class="card">
@@ -1966,6 +1969,45 @@
             } catch(e) { out += `GRAVATAR: CHECK FAILED\n`; }
             res.innerText = out;
             addLog(`EMAIL OSINT: ${email}`);
+        }
+
+        function configGhunt() {
+            const cookies = prompt("PASTE GHUNT BASE64 COOKIES:");
+            if (cookies) {
+                localStorage.setItem('ghunt_cookies', cookies);
+                alert("GHUNT AUTHENTICATION STORED.");
+            }
+        }
+
+        async function runGhuntOsint() {
+            const email = document.getElementById('osint-email').value.trim();
+            const cookies = localStorage.getItem('ghunt_cookies');
+            if (!email) return;
+            if (!cookies) { alert("GHUNT COOKIES NOT CONFIGURED. CLICK THE GEAR ICON."); return; }
+            
+            const resBox = document.getElementById('email-osint-results');
+            resBox.innerHTML = '<div class="loader"></div> INITIALIZING GHUNT SHIELD...';
+            
+            try {
+                const r = await fetch('/api/ghunt', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, cookies_b64: cookies })
+                });
+                const data = await r.json();
+                if (data.status === 'success') {
+                    resBox.innerHTML = `
+                        <div style="color:var(--primary);margin-bottom:0.5rem;">[+] GOOGLE ACCOUNT IDENTIFIED</div>
+                        <div>NAME: ${data.profile.name}</div>
+                        <div>GAIA ID: ${data.profile.gaia_id}</div>
+                        <div>LAST ACTIVE: ${data.profile.last_updated}</div>
+                        <div style="margin-top:0.4rem;color:#555;">SERVICES: ${data.profile.services.join(', ')}</div>
+                    `;
+                } else {
+                    resBox.innerHTML = `ERROR: ${data.error}`;
+                }
+            } catch (e) {
+                resBox.innerHTML = 'ERROR EXECUTING GHUNT SHIELD.';
+            }
         }
 
         async function runPhoneOsint() {
