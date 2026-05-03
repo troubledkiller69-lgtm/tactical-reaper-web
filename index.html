@@ -31,13 +31,6 @@
             --map-node: #00d2ff;
         }
 
-        @keyframes scanline {
-            0% {
-                transform: translateY(-100%);
-            }
-
-            100% {
-                transform: translateY(100%);
             }
         }
 
@@ -119,7 +112,6 @@
             background: var(--black-ice);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px var(--neon-glow));
             background-size: 200% 100%;
             animation: ice-shimmer 10s linear infinite;
         }
@@ -781,7 +773,6 @@
 </head>
 
 <body>
-    <div class="scanline"></div>
 
     <div id="auth-gate">
         <div class="auth-card">
@@ -803,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.1</span></div>
+            <div class="logo">BIFROST <span>v13.3</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
