@@ -117,26 +117,51 @@ class handler(BaseHTTPRequestHandler):
 
     def _lookup(self, phone):
         try:
+            # Parse to ensure it's E.164 formatted for Twilio
             number = phonenumbers.parse(phone, 'US')
+            if not phonenumbers.is_valid_number(number):
+                self._json(400, {'error': 'Invalid phone number format'})
+                return
+            national = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)
+            digits = ''.join(filter(str.isdigit, national))
+            e164_phone = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
         except Exception:
             self._json(400, {'error': 'Cannot parse phone number'})
             return
 
-        if not phonenumbers.is_valid_number(number):
-            self._json(400, {'error': 'Invalid phone number'})
-            return
+        # Twilio Lookup API v2 (Credentials loaded from Vercel ENV)
+        import os
+        TWILIO_SID = os.environ.get('TWILIO_SID')
+        TWILIO_AUTH = os.environ.get('TWILIO_AUTH')
+        
+        raw_carrier = "Unknown"
+        
+        if TWILIO_SID and TWILIO_AUTH:
+            import urllib.request
+            import base64
 
-        raw_carrier = pn_carrier.name_for_number(number, 'en')
+            req = urllib.request.Request(f"https://lookups.twilio.com/v2/PhoneNumbers/{e164_phone}?Fields=line_type_intelligence")
+            auth_string = f"{TWILIO_SID}:{TWILIO_AUTH}"
+            base64_auth = base64.b64encode(auth_string.encode('ascii')).decode('ascii')
+            req.add_header('Authorization', f'Basic {base64_auth}')
+
+            try:
+                with urllib.request.urlopen(req) as response:
+                    data = json.loads(response.read().decode())
+                    if data.get('line_type_intelligence') and data['line_type_intelligence'].get('carrier_name'):
+                        raw_carrier = data['line_type_intelligence']['carrier_name']
+            except Exception as e:
+                print("Twilio Lookup Error:", e)
+                pass
+
         canonical = resolve_carrier(raw_carrier)
-        national = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)
-        digits = ''.join(filter(str.isdigit, national))
 
         result = {
             'phone': phone,
             'national': national,
             'digits': digits,
-            'carrier_raw': raw_carrier or 'Unknown',
-            'carrier': canonical or raw_carrier or 'Unknown',
+            'carrier_raw': raw_carrier,
+            'carrier': canonical or raw_carrier,
             'resolved': canonical is not None and canonical in CARRIER_GATEWAYS,
         }
 
