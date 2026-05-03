@@ -794,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v14.1</span></div>
+            <div class="logo">BIFROST <span>v14.5</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1404,30 +1404,25 @@
             document.getElementById('login-btn').innerText = 'VERIFYING...';
             
             try {
-                const { data: keys, error } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('keys')
-                    .select('status, operator_id')
+                    .select('*')
                     .eq('key', pass);
                     
-                console.log("Supabase Response:", { keys, error });
+                console.log("Auth Response:", { data, error });
 
                 if (error) throw error;
-                const data = keys && keys.length > 0 ? keys[0] : null;
+                const keyData = data && data.length > 0 ? data[0] : null;
 
-                if (!data || data.status !== 'active') {
-                    console.error("Auth Failure:", !data ? "Key not found" : "Key inactive");
-                    throw new Error('INVALID KEY');
+                if (!keyData || keyData.status !== 'active') {
+                    throw new Error('INVALID');
                 }
 
-                sessionStorage.setItem('logged', user); 
-                sessionStorage.setItem('operator', user);
-                document.getElementById('auth-gate').classList.add('hidden'); 
-                document.getElementById('main-app').classList.remove('hidden'); 
-                setTimeout(initTacticalMap, 800);
-                renderPortals(); 
-                renderChangeLog(); 
-                renderTgAccounts();
+                sessionStorage.setItem('logged', 'true'); 
+                sessionStorage.setItem('operator', user || 'OPERATOR');
+                location.reload(); 
             } catch (err) {
+                console.error("Auth Fail:", err);
                 const userInput = document.getElementById('login-user');
                 const passInput = document.getElementById('login-pass');
                 userInput.value = '';
