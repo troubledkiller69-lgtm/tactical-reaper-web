@@ -215,6 +215,7 @@
             overflow: hidden;
             display: none;
             perspective: 1200px;
+            z-index: 1000;
         }
 
         .map-wrapper.active {
@@ -801,6 +802,7 @@
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
                     <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
+                    <button class="btn" style="margin-top: 1rem; background: rgba(0,210,255,0.05); border: 1px solid var(--border);" onclick="demoLogin()">DEMO ACCESS</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
             </div>
@@ -1462,17 +1464,32 @@
             } 
         };
 
+        function demoLogin() {
+            sessionStorage.setItem('logged', 'true');
+            sessionStorage.setItem('operator', 'DEMO_UNITS');
+            location.reload();
+        }
+
         function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            console.log('Switching to tab:', tab);
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             
             const targetTab = document.getElementById(tab) || document.getElementById(`tab-${tab}`);
-            if (targetTab) targetTab.classList.add('active');
+            if (targetTab) {
+                targetTab.classList.add('active');
+                targetTab.style.display = 'block';
+            }
             
             const navEl = document.getElementById(`nav-${tab}`);
             if (navEl) navEl.classList.add('active');
             
-            if (tab === 'opsmap') initTacticalMap();
+            if (tab === 'opsmap') {
+                setTimeout(initTacticalMap, 100);
+            }
             if (tab === 'dashboard' && typeof fetchDashboardStats === 'function') fetchDashboardStats();
         }
 
