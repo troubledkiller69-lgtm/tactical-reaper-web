@@ -1052,7 +1052,30 @@
             } catch (e) { res.innerHTML = `> EXCEPTION: TIMEOUT`; }
         }
 
-        function runFlooder() { document.getElementById('flood-results').innerText = '> DISPATCH OK'; addLog('EMAIL FLOOD INITIATED'); }
+        async function runFlooder() {
+            const target = document.getElementById('flood-target').value.trim();
+            const res = document.getElementById('flood-results');
+            if (!target) { res.innerText = '> ERROR: TARGET REQUIRED'; return; }
+            res.innerText = `> INITIALIZING EMAIL FLOOD...\n> TARGET: ${target}\n> CONNECTING TO SMTP RELAY...`;
+            addLog(`EMAIL FLOOD INITIATED: ${target}`);
+            try {
+                const response = await fetch(`/api/email_bomber?t=${Date.now()}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target: target, count: 25 })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    res.innerText += `\n> STATUS: ${data.status.toUpperCase()}`;
+                    res.innerText += `\n> DELIVERED: ${data.messages_sent} / ${data.messages_total}`;
+                    if (data.error) res.innerText += `\n> WARN: ${data.error}`;
+                } else {
+                    res.innerText += `\n> ERROR: ${data.error || 'SERVER EXCEPTION'}`;
+                }
+            } catch (err) {
+                res.innerText += `\n> ERROR: CONNECTION TIMEOUT`;
+            }
+        }
         async function runStormMatrix() {
             const input = document.getElementById('storm-input').value;
             const vault = document.getElementById('storm-vault');
