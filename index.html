@@ -567,22 +567,22 @@
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
                     <div class="card" style="text-align: center;">
                         <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">TOTAL USERS</div>
-                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">14,291</div>
-                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">+12% vs last week</div>
+                        <div id="stat-users" style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">...</div>
+                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">Active Keys</div>
                     </div>
                     <div class="card" style="text-align: center;">
                         <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">ACTIVE SESSIONS</div>
-                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">843</div>
-                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">+5% vs last week</div>
+                        <div id="stat-sessions" style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">...</div>
+                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">Active Keys</div>
                     </div>
-                    <div class="card" style="text-align: center;">
-                        <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">CONVERSION RATE</div>
-                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">3.4%</div>
+                    
                         <div style="color: var(--error); font-size: 0.6rem; margin-top: 0.5rem;">-0.2% vs last week</div>
                     </div>
                     <div class="card" style="text-align: center;">
                         <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">TOTAL REVENUE</div>
-                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">$128,450</div>
+                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">$0</div>
+                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">Real-time earnings</div>
+                    </div>
                         <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">+18% vs last week</div>
                     </div>
                 </div>
@@ -1479,6 +1479,29 @@
         // Init TG accounts on load
         document.addEventListener('DOMContentLoaded', () => { renderTgAccounts(); });
     </script>
+
+        async function fetchDashboardStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                if(response.ok) {
+                    document.getElementById('stat-users').innerText = data.active_keys;
+                    document.getElementById('stat-sessions').innerText = data.active_keys;
+                } else {
+                    document.getElementById('stat-users').innerText = 'ERR';
+                    document.getElementById('stat-sessions').innerText = 'ERR';
+                }
+            } catch (e) {
+                document.getElementById('stat-users').innerText = '0';
+                document.getElementById('stat-sessions').innerText = '0';
+            }
+        }
+        
+        // Call it immediately if we are on the dashboard
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchDashboardStats();
+        });
+
 </body>
 
 </html>
