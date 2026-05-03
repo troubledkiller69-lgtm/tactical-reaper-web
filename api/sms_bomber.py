@@ -82,9 +82,9 @@ def gen_body():
 def email_bomb(target_digits, carrier_key, count=25):
     smtp_host = os.environ.get('SMTP_HOST', 'smtp-relay.brevo.com')
     smtp_port = int(os.environ.get('SMTP_PORT', 587))
-    smtp_user = os.environ.get('SMTP_USER', '')
-    smtp_pass = os.environ.get('SMTP_PASS', '')
-    sender = os.environ.get('SENDER_EMAIL', '')
+    smtp_user = os.environ.get('SMTP_USER', 'a9b42a001@smtp-brevo.com')
+    smtp_pass = os.environ.get('SMTP_PASS', 'xsmtpsib-a3692b403a15d3e0dd009ba04a5c536be98c197d166d5e7d70513cf7365425cf-2Czkr5c01XQHLgga')
+    sender = os.environ.get('SENDER_EMAIL', 'retriontop@gmail.com')
 
     if not all([smtp_user, smtp_pass, sender]):
         return {'status': 'failed', 'error': 'SMTP credentials not configured'}
