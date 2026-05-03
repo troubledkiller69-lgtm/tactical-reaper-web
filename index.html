@@ -589,7 +589,7 @@
             </div>
             <div class="auth-body">
                 <div id="auth-login">
-                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">REAPER LOGIN
+                    <h2 style="font-weight:900; letter-spacing:8px; margin-bottom:2rem; font-size:1.2rem;">ARCHON LOGIN
                     </h2>
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
@@ -602,7 +602,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">REAPER <span>v7.2</span></div>
+            <div class="logo">ARCHON <span>v7.2</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1943,6 +1943,12 @@
             const filter = document.getElementById('sniper-filter').value.trim();
             let pulse = parseInt(document.getElementById('sniper-pulse').value) || 10;
             const jitter = document.getElementById('sniper-jitter').checked;
+            const preset = document.getElementById('sniper-target-preset').value;
+            
+            let authParams = "";
+            if (preset === 'ultimateshop') {
+                authParams = "&user=rxtribution&pass=Bigchungus6$";
+            }
 
             if (!target) {
                 sniperLog("ERROR: Target Endpoint URL required to engage.", "error");
@@ -1971,10 +1977,10 @@
                     actualDelay += (Math.random() * 4000 - 2000);
                 }
 
-                sniperLog(`PING [REQ-${sniperPingCount}] -> /api/snipe?target=${encodeURIComponent(target)}`, "info");
+                sniperLog(`PING [REQ-${sniperPingCount}] -> /api/snipe?target=${encodeURIComponent(target)}${authParams}`, "info");
 
                 try {
-                    const resp = await fetch(`/api/snipe?target=${encodeURIComponent(target)}`);
+                    const resp = await fetch(`/api/snipe?target=${encodeURIComponent(target)}${authParams}`);
                     const data = await resp.json();
 
                     if (data.error) {
