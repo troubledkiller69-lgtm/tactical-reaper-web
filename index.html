@@ -1218,7 +1218,7 @@
             setTimeout(() => { vault.innerHTML = '> BATCH PROCESSED\n> NO HITS FOUND'; }, 2000);
         }
         function runSim(type) { document.getElementById(`${type}-results`).innerText = '> STATUS: 200 OK'; }
-        function addLog(msg) { const stream = document.getElementById('log-stream'); stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; }
+        function addLog(msg) { const stream = document.getElementById('log-stream'); if (stream) { stream.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + stream.innerHTML; } console.log(`[LOG] ${msg}`); }
 
         // ── SMS BOMBER (multi-mode) ──
         let smsMode = 'otp';
