@@ -794,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v14.0</span></div>
+            <div class="logo">BIFROST <span>v14.1</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1404,15 +1404,18 @@
             document.getElementById('login-btn').innerText = 'VERIFYING...';
             
             try {
-                const { data, error } = await supabaseClient
+                const { data: keys, error } = await supabaseClient
                     .from('keys')
                     .select('status, operator_id')
-                    .eq('key', pass)
-                    .single();
+                    .eq('key', pass);
                     
-                console.log("Login Attempt:", { user, pass, data, error });
+                console.log("Supabase Response:", { keys, error });
 
-                if (error || !data || data.status !== 'active') {
+                if (error) throw error;
+                const data = keys && keys.length > 0 ? keys[0] : null;
+
+                if (!data || data.status !== 'active') {
+                    console.error("Auth Failure:", !data ? "Key not found" : "Key inactive");
                     throw new Error('INVALID KEY');
                 }
 
