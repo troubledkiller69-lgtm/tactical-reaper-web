@@ -100,12 +100,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.9);
-            position: sticky;
+            height: 75px;
+            border: none;
+            padding: 0 2rem;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
         }
 
@@ -621,7 +623,7 @@
 
         .auth-card {
             background: #050505;
-            border: 1px solid #222;
+            border: none;
             padding: 0;
             width: 100%;
             max-width: 450px;
@@ -630,7 +632,7 @@
             overflow: hidden;
             margin: 1rem;
             position: relative;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
         }
 
         .auth-card::before {
@@ -793,7 +795,6 @@
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
                     <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
-                    <button class="btn" style="margin-top: 1rem; background: rgba(0,210,255,0.05); border: 1px solid var(--border);" onclick="demoLogin()">DEMO ACCESS</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
             </div>
@@ -1456,18 +1457,12 @@
             if (sessionStorage.getItem('logged')) { 
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
-                initTacticalMap();
+                setTimeout(initTacticalMap, 500);
                 renderPortals(); 
                 renderChangeLog(); 
                 renderTgAccounts(); 
             } 
         };
-
-        function demoLogin() {
-            sessionStorage.setItem('logged', 'true');
-            sessionStorage.setItem('operator', 'DEMO_UNITS');
-            location.reload();
-        }
 
         function switchTab(tab) {
             console.log('Switching to tab:', tab);
