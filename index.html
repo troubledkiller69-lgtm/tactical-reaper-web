@@ -1291,7 +1291,7 @@
             if (!ip) { res.innerText = 'ERROR: IP REQUIRED'; return; }
             res.innerText = '> LOCATING IP...';
             try {
-                const response = await fetch(`https://ipwho.is/${ip}`);
+                const response = await fetch(`/api/geo?ip=${encodeURIComponent(ip)}`);
                 const data = await response.json();
                 if (data.success) {
                     let out = `> GEO DATA ACQUIRED\n\n`;
