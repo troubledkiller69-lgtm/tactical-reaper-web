@@ -884,62 +884,67 @@
         
         <div id="tab-sniper" class="tab-content">
             <div style="margin-top:2rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem;">SNIPER ENGINE</h2>
-                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <!-- Configuration Deck -->
-                    <div class="card" style="border: 1px solid #333; background: #111;">
-                        <h3 style="color: var(--primary); margin-bottom: 1.5rem;">CONFIGURATION DECK</h3>
-                        
-                        <label style="font-size: 0.7rem; color: #777;">TARGET PLATFORM</label>
-                        <select id="sniper-target-preset" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';" onchange="updateSniperTarget()">
-                            <option value="custom">Custom Endpoint URL</option>
-                            <option value="pscu_dxo">PSCU DXOnline API</option>
-                            <option value="briansclub">BriansClub Drops (Demo)</option>
-                            <option value="jokers_stash">Jokers Stash Archive (Demo)</option>
-                        </select>
-                        
-                        <input type="text" id="sniper-target" placeholder="TARGET ENDPOINT URL" style="margin-bottom: 1.5rem;">
-                        
-                        <label style="font-size: 0.7rem; color: #777;">BIN / KEYWORD FILTER</label>
-                        <input type="text" id="sniper-filter" placeholder="e.g., 414720, PLATINUM, NAVY FEDERAL" style="margin-bottom: 1.5rem;">
-                        
-                        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div style="flex: 1;">
-                                <label style="font-size: 0.7rem; color: #777;">PULSE RATE (SEC)</label>
-                                <input type="number" id="sniper-pulse" value="10" min="1" max="60" style="width: 100%;">
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="font-size: 0.7rem; color: #777;">MAX ASSET PRICE ($)</label>
-                                <input type="number" id="sniper-max-price" value="50" min="0" style="width: 100%;">
-                            </div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;">
+                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0;">SNIPER PROTOCOL</h2>
+                    <span id="sniper-status" style="color: #555; font-size: 0.8rem; font-family: 'JetBrains Mono'; letter-spacing: 2px;">STATUS: OFFLINE</span>
+                </div>
+                
+                <!-- Streamlined Configuration Bar -->
+                <div class="card" style="border: 1px solid #222; background: #0a0a0a; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">PLATFORM TARGET</label>
+                            <select id="sniper-target-preset" style="width: 100%; padding: 0.6rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';" onchange="updateSniperTarget()">
+                                <option value="custom">CUSTOM ENDPOINT</option>
+                                <option value="pscu_dxo">PSCU DXONLINE</option>
+                            </select>
                         </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa; margin-bottom: 0.5rem;">
-                                <input type="checkbox" id="sniper-auto-acquire" checked> AUTO-ACQUIRE TRIGGER
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa; margin-bottom: 0.5rem;">
-                                <input type="checkbox" id="sniper-jitter" checked> ENABLE REQUEST JITTER (+/- 2s)
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #aaa;">
-                                <input type="checkbox" id="sniper-capsolver"> CAPSOLVER BYPASS
-                            </label>
-                        </div>
-                        
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="btn" id="btn-engage-sniper" onclick="engageSniper()" style="flex: 2; background: var(--success); color: #000; font-weight: bold;">ENGAGE SNIPER</button>
-                            <button class="btn" id="btn-abort-sniper" onclick="abortSniper()" style="flex: 1; background: var(--error); color: #fff; font-weight: bold;" disabled>ABORT</button>
+                        <div style="flex: 2;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">ENDPOINT URL</label>
+                            <input type="text" id="sniper-target" placeholder="https://api.target.com/..." style="padding: 0.6rem;">
                         </div>
                     </div>
                     
-                    <!-- Matrix Feed -->
-                    <div class="card" style="border: 1px solid var(--primary); background: #050505; position: relative;">
-                        <h3 style="color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1rem;">MATRIX FEED <span id="sniper-status" style="float: right; color: #555; font-size: 0.7rem; animation: pulse 2s infinite;">OFFLINE</span></h3>
-                        <div id="sniper-log-stream" style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #aaa; height: 400px; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 6px;">
-                            <div>> SYSTEM READY. AWAITING ENGAGEMENT.</div>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="flex: 2;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">BIN / KEYWORD FILTER</label>
+                            <input type="text" id="sniper-filter" placeholder="e.g., 414720, PLATINUM" style="padding: 0.6rem;">
                         </div>
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(transparent, #050505); pointer-events: none;"></div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">PULSE (SEC)</label>
+                            <input type="number" id="sniper-pulse" value="10" min="1" max="60" style="padding: 0.6rem;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">MAX PRICE</label>
+                            <input type="number" id="sniper-max-price" value="50" min="0" style="padding: 0.6rem;">
+                        </div>
                     </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid #222;">
+                        <div style="display: flex; gap: 1.5rem;">
+                            <label style="font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 0.4rem;">
+                                <input type="checkbox" id="sniper-auto-acquire" checked> AUTO-ACQUIRE
+                            </label>
+                            <label style="font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 0.4rem;">
+                                <input type="checkbox" id="sniper-jitter" checked> REQUEST JITTER
+                            </label>
+                            <label style="font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 0.4rem;">
+                                <input type="checkbox" id="sniper-capsolver"> CAPSOLVER
+                            </label>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn" id="btn-abort-sniper" onclick="abortSniper()" style="background: transparent; color: var(--error); border: 1px solid var(--error); font-weight: bold; width: 100px;" disabled>ABORT</button>
+                            <button class="btn" id="btn-engage-sniper" onclick="engageSniper()" style="background: var(--success); color: #000; font-weight: bold; width: 150px; letter-spacing: 1px;">ENGAGE</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Full Width Matrix Feed -->
+                <div class="card" style="border: 1px solid #333; background: #020202; position: relative;">
+                    <div id="sniper-log-stream" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #aaa; height: 500px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="color: #555;">> SYSTEM INITIALIZED. AWAITING PARAMETERS.</div>
+                    </div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(transparent, #020202); pointer-events: none;"></div>
                 </div>
             </div>
         </div>
@@ -1850,12 +1855,6 @@
                 targetInput.disabled = false;
             } else if (preset === 'pscu_dxo') {
                 targetInput.value = 'https://dxonline-apps.pscu.com/api/v1/dump';
-                targetInput.disabled = true;
-            } else if (preset === 'briansclub') {
-                targetInput.value = 'https://briansclub.cm/api/inventory';
-                targetInput.disabled = true;
-            } else if (preset === 'jokers_stash') {
-                targetInput.value = 'https://jokersstash.net/api/dumps';
                 targetInput.disabled = true;
             }
         }
