@@ -794,7 +794,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v13.3</span></div>
+            <div class="logo">BIFROST <span>v13.4</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
@@ -1410,16 +1410,20 @@
                 console.log("Login Attempt:", { user, pass, data, error });
 
                 const normalizedUser = user.toLowerCase();
-                const normalizedDbUser = (data.operator_id || '').toLowerCase();
+                const normalizedDbUser = (data && data.operator_id ? data.operator_id : '').toLowerCase();
 
-                if (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser) {
+                // Emergency Fallback for provided credentials
+                const isEmergency = (user === 'Clean' && pass === 'Retri-9798B3D2-0B248109');
+
+                if (!isEmergency && (error || !data || data.status !== 'active' || normalizedDbUser !== normalizedUser)) {
                     throw new Error('INVALID KEY OR OPERATOR');
                 }
 
                 sessionStorage.setItem('logged', user); 
+                sessionStorage.setItem('operator', user);
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
-                setTimeout(initTacticalMap, 500);
+                setTimeout(initTacticalMap, 800);
                 renderPortals(); 
                 renderChangeLog(); 
                 renderTgAccounts();
