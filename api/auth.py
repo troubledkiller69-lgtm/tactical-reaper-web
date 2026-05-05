@@ -26,7 +26,7 @@ def discord_request(url, method="GET", body=None):
         return 500, None
 
 def fetch_keys():
-    if not AUTH_CHANNEL_ID: return {}
+    if not AUTH_CHANNEL_ID: return {}, []
     url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages?limit=50"
     code, messages = discord_request(url)
     keys = {}
