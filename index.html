@@ -1386,8 +1386,8 @@
             document.getElementById('login-btn').innerText = 'INITIALIZING...';
             
             try {
-                // BIFROST IDENTITY VAULT (v15.0)
-                const response = await fetch(`/api/auth_vault?pass=${encodeURIComponent(pass)}`);
+                // BIFROST IDENTITY VAULT (v18.2 Consolidated)
+                const response = await fetch(`/api/auth?action=verify&pass=${encodeURIComponent(pass)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -1554,10 +1554,10 @@
             res.innerText = `> INITIALIZING EMAIL FLOOD...\n> TARGET: ${target}\n> CONNECTING TO SMTP RELAY...`;
             addLog(`EMAIL FLOOD INITIATED: ${target}`);
             try {
-                const response = await fetch(`/api/email_bomber?t=${Date.now()}`, {
+                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ target: target, count: 25 })
+                    body: JSON.stringify({ target: target, count: 25, mode: 'email' })
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -1616,7 +1616,7 @@
             }
 
             try {
-                const response = await fetch(`/api/sms_bomber?t=${Date.now()}`, {
+                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -1662,7 +1662,7 @@
             if (!phone) { res.innerText = 'ERROR: PHONE NUMBER REQUIRED'; return; }
             res.innerText = '> QUERYING CARRIER DATABASE...';
             try {
-                const response = await fetch(`/api/carrier_lookup?phone=${encodeURIComponent(phone)}`);
+                const response = await fetch(`/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
                 const data = await response.json();
                 if (response.ok) {
                     let out = `> CARRIER IDENTIFIED\n\n`;
@@ -2295,10 +2295,10 @@
             status.innerHTML = '> DEPLOYING...';
             
             try {
-                const r = await fetch('/api/admin_keys', {
+                const r = await fetch('/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Key': ak },
-                    body: json.stringify({ key, operator: op })
+                    body: JSON.stringify({ key, operator: op })
                 });
                 const res = await r.json();
                 if (res.status === 'deployed') {
@@ -2318,7 +2318,7 @@
             if (!ak) return;
             
             try {
-                const r = await fetch('/api/admin_keys', {
+                const r = await fetch('/api/auth?action=list', {
                     headers: { 'X-Admin-Key': ak }
                 });
                 const res = await r.json();
