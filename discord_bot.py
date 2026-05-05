@@ -2,25 +2,21 @@ import discord
 from discord import app_commands
 import os
 import uuid
-from supabase import create_client, Client
 
-# --- CONFIG ---
+# BIFROST DISCORD MASTER (v16.0)
+# Integrated with Discord-Sync Auth Bridge.
+
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_ID = None 
+AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID")
+GUILD_ID = None # Set to your server ID for instant command sync
 
-# --- SUPABASE CONFIG ---
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://smxpzldbxewcgrakaqhn.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_QviDYLWIVjVJl4N01Bqaug_ZgkNHcde")
+# Operator ID of the primary controller
+AUTHORIZED_USERS = [] 
 
-# --- AUTHORIZATION ---
-# Replace with the Discord User ID of the bot admin (or leave blank to allow anyone to generate keys initially)
-AUTHORIZED_USERS = []
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-class EniDiscordBot(discord.Client):
+class BifrostBot(discord.Client):
     def __init__(self):
         intents = discord.Intents.default()
+        intents.message_content = True
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
 
@@ -32,58 +28,61 @@ class EniDiscordBot(discord.Client):
         else:
             await self.tree.sync()
 
-client = EniDiscordBot()
+client = BifrostBot()
 
 @client.event
 async def on_ready():
-    print(f"[!] Discord Master is online as {client.user}")
+    print(f"\n[!] BIFROST DISCORD MASTER ONLINE: {client.user}")
+    print(f"[!] SYNCED TO AUTH CHANNEL: {AUTH_CHANNEL_ID}")
 
-@client.tree.command(name="genkey", description="Generate a new Tactical Reaper cloud access key")
-@app_commands.describe(hours="Duration in hours (default 24)")
-async def genkey(interaction: discord.Interaction, hours: int = 24):
+@client.tree.command(name="gen", description="Generate a new BIFROST license key")
+@app_commands.describe(operator="Operator Name/ID")
+async def gen(interaction: discord.Interaction, operator: str = "Clean"):
     if AUTHORIZED_USERS and interaction.user.id not in AUTHORIZED_USERS:
-        await interaction.response.send_message("❌ Unauthorized to generate keys.", ephemeral=True)
+        await interaction.response.send_message("❌ ACCESS DENIED", ephemeral=True)
         return
 
-    new_key = f"Retri-{uuid.uuid4().hex[:8].upper()}-{uuid.uuid4().hex[:8].upper()}"
-    data = {
-        "key": new_key,
-        "duration_hours": hours,
-        "status": "active"
-    }
-    
-    try:
-        supabase.table("keys").insert(data).execute()
-        
-        embed = discord.Embed(title="🚀 New Cloud License Generated", color=discord.Color.magenta())
-        embed.add_field(name="Key", value=f"`{new_key}`", inline=False)
-        embed.add_field(name="Duration", value=f"{hours} hours", inline=True)
-        embed.set_footer(text="Tactical Reaper Cloud Engine")
-        
-        await interaction.response.send_message(embed=embed)
-    except Exception as e:
-        await interaction.response.send_message(f"❌ Database Error: {e}", ephemeral=True)
+    if not AUTH_CHANNEL_ID:
+        await interaction.response.send_message("❌ ERROR: AUTH_CHANNEL_ID NOT CONFIGURED", ephemeral=True)
+        return
 
-@client.tree.command(name="stats", description="View cloud licensing statistics")
-async def stats(interaction: discord.Interaction):
-    try:
-        response = supabase.table("keys").select("*", count="exact").execute()
-        total_keys = response.count if response.count is not None else 0
-        
-        active_response = supabase.table("keys").select("*", count="exact").eq("status", "active").execute()
-        active_keys = active_response.count if active_response.count is not None else 0
-        
-        embed = discord.Embed(title="📊 Cloud System Statistics", color=discord.Color.cyan())
-        embed.add_field(name="Total Keys Created", value=str(total_keys), inline=True)
-        embed.add_field(name="Active Keys", value=str(active_keys), inline=True)
-        embed.set_footer(text="Tactical Reaper Cloud Engine")
-        
-        await interaction.response.send_message(embed=embed)
-    except Exception as e:
-        await interaction.response.send_message(f"❌ Database Error: {e}", ephemeral=True)
+    # Generate Secure Key
+    new_key = f"Retri-{uuid.uuid4().hex[:8].upper()}-{uuid.uuid4().hex[:8].upper()}"
+    
+    # Format for API Parsing
+    auth_channel = client.get_channel(int(AUTH_CHANNEL_ID))
+    if not auth_channel:
+        await interaction.response.send_message("❌ ERROR: COULD NOT LOCATE AUTH CHANNEL", ephemeral=True)
+        return
+
+    # Post to Vault Channel
+    await auth_channel.send(f"KEY: {new_key} | OP: {operator}")
+
+    # Success Response
+    embed = discord.Embed(title="⚡ BIFROST LICENSE ACTIVATED", color=0x00d2ff)
+    embed.add_field(name="LICENSE KEY", value=f"`{new_key}`", inline=False)
+    embed.add_field(name="OPERATOR ID", value=operator, inline=True)
+    embed.add_field(name="STATUS", value="ACTIVE", inline=True)
+    embed.set_footer(text="BIFROST INDUSTRIAL OSINT & DISRUPTION")
+    
+    await interaction.response.send_message(embed=embed)
+
+@client.tree.command(name="purge", description="Purge all active keys in the auth channel")
+async def purge(interaction: discord.Interaction):
+    if AUTHORIZED_USERS and interaction.user.id not in AUTHORIZED_USERS:
+        await interaction.response.send_message("❌ UNAUTHORIZED", ephemeral=True)
+        return
+
+    auth_channel = client.get_channel(int(AUTH_CHANNEL_ID))
+    if auth_channel:
+        await interaction.response.defer()
+        deleted = await auth_channel.purge(limit=100)
+        await interaction.followup.send(f"✅ PURGE COMPLETE: {len(deleted)} LICENSES REVOKED")
+    else:
+        await interaction.response.send_message("❌ CHANNEL NOT FOUND")
 
 if __name__ == "__main__":
     if not DISCORD_TOKEN:
-        print("[!] Error: DISCORD_TOKEN environment variable not set.")
+        print("[!] ERROR: DISCORD_TOKEN NOT FOUND IN ENVIRONMENT")
     else:
         client.run(DISCORD_TOKEN)
