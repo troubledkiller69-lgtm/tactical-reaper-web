@@ -15,7 +15,6 @@ class handler(BaseHTTPRequestHandler):
         data = {
             "active_keys": active_keys,
             "status": "OPERATIONAL",
-            "nodes": 12,
             "latency_ms": random.randint(15, 45)
         }
         

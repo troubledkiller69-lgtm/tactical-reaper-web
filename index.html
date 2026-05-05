@@ -805,12 +805,12 @@
             <div class="logo">BIFROST <span>v16.0</span></div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
-                <a onclick="switchTab('opsmap')" id="nav-opsmap">OPS MAP</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
                 <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
                 <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                 <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                 <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
+                <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
                 <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
                 <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
@@ -979,61 +979,42 @@
             </div>
         </div>
 
-        <div id="opsmap" class="tab-content map-wrapper">
-        <div class="map-3d-container">
-            <div class="hex-grid"></div>
-            <div class="sonar-scan"></div>
-            <svg class="signal-mesh" id="map-mesh"></svg>
-            <div class="map-container"></div>
-            <div class="node-layer" id="map-nodes">
-                <!-- CONTINENTAL LABELS - RECALIBRATED -->
-                <div class="continent-label" style="top: 30%; left: 25%;">NORTH AMERICA</div>
-                <div class="continent-label" style="top: 65%; left: 38%;">SOUTH AMERICA</div>
-                <div class="continent-label" style="top: 25%; left: 54%;">EUROPE</div>
-                <div class="continent-label" style="top: 55%; left: 58%;">AFRICA</div>
-                <div class="continent-label" style="top: 35%; left: 80%;">ASIA</div>
-                <div class="continent-label" style="top: 75%; left: 90%;">OCEANIA</div>
+        <div id="tab-admin" class="tab-content">
+            <div style="margin-top:2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; border-bottom: 2px solid var(--success); padding-bottom: 1rem;">
+                    <h2 style="font-weight:900; letter-spacing:8px; margin: 0; color: var(--success);">COMMANDER CONSOLE</h2>
+                    <span style="color: var(--success); font-size: 0.8rem; font-family: 'JetBrains Mono'; letter-spacing: 2px;">LVL 4 ACCESS GRANTED</span>
+                </div>
 
-                <!-- BIFROST TACTICAL NODES - PURE MATH v13.1 -->
-                <div class="node" style="top: 35%; left: 31%;" data-city="NEW YORK">
-                    <div class="node-info"><h4>NEW YORK</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 38%; left: 22%;" data-city="SAN FRANCISCO">
-                    <div class="node-info"><h4>SAN FRANCISCO</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 26%; left: 52%;" data-city="LONDON">
-                    <div class="node-info"><h4>LONDON</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 28%; left: 55%;" data-city="FRANKFURT">
-                    <div class="node-info"><h4>FRANKFURT</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 36%; left: 85%;" data-city="TOKYO">
-                    <div class="node-info"><h4>TOKYO</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 57%; left: 78%;" data-city="SINGAPORE">
-                    <div class="node-info"><h4>SINGAPORE</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 78%; left: 89%;" data-city="SYDNEY">
-                    <div class="node-info"><h4>SYDNEY</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 70%; left: 38%;" data-city="SAO PAULO">
-                    <div class="node-info"><h4>SAO PAULO</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 76%; left: 58%;" data-city="JOHANNESBURG">
-                    <div class="node-info"><h4>JOHANNESBURG</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 48%; left: 65%;" data-city="DUBAI">
-                    <div class="node-info"><h4>DUBAI</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 52%; left: 72%;" data-city="MUMBAI">
-                    <div class="node-info"><h4>MUMBAI</h4><p>STATUS: ACTIVE</p></div>
-                </div>
-                <div class="node" style="top: 22%; left: 49%;" data-city="REYKJAVIK">
-                    <div class="node-info"><h4>REYKJAVIK</h4><p>STATUS: PRIMARY</p></div>
+                <div class="grid" style="grid-template-columns: 1fr 2fr; gap: 2rem;">
+                    <!-- Key Generator -->
+                    <div class="card" style="border: 1px solid var(--success); background: rgba(0, 255, 204, 0.02);">
+                        <h3 style="color: var(--success);">DEPLOY NEW LICENSE</h3>
+                        <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">OPERATOR NAME</label>
+                        <input type="text" id="admin-new-op" placeholder="e.g. Ghost_Unit">
+                        
+                        <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">GENERATE KEY</label>
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                            <input type="text" id="admin-new-key" placeholder="BIFROST-XXXX-XXXX" style="margin-bottom: 0;">
+                            <button class="btn" style="width: 80px; padding: 0;" onclick="rollKey()">ROLL</button>
+                        </div>
+                        
+                        <button class="btn" id="btn-deploy-key" onclick="deployKey()" style="background: var(--success); color: #000; font-weight: 900;">DEPLOY TO VAULT</button>
+                        <div id="admin-deploy-status" style="margin-top: 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
+                    </div>
+
+                    <!-- Key List -->
+                    <div class="card">
+                        <h3>ACTIVE LICENSES (DISCORD VAULT)</h3>
+                        <div id="admin-key-list" style="height: 400px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa;">
+                            > LOADING VAULT...
+                        </div>
+                        <button class="btn" style="margin-top: 1rem; background: transparent; border: 1px solid #333; font-size: 0.6rem;" onclick="loadVault()">REFRESH VAULT</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
 
         <div id="tab-recon" class="tab-content">
             <div style="margin-top:4rem;">
@@ -1412,6 +1393,8 @@
                 if (result.status === 'success') {
                     sessionStorage.setItem('logged', 'true');
                     sessionStorage.setItem('operator', result.data.operator_id || user || 'OPERATOR');
+                    if (result.data.role) sessionStorage.setItem('role', result.data.role);
+                    if (result.data.role === 'commander') sessionStorage.setItem('ak', pass); // Store admin key for this session
                     location.reload();
                 } else {
                     throw new Error('INVALID');
@@ -1441,15 +1424,24 @@
                 }, 2000);
             }
         }
-        function logout() { sessionStorage.clear(); location.reload(); }
+        function logout() { sessionStorage.clear(); window.location.href = '/'; }
         window.onload = () => { 
             if (sessionStorage.getItem('logged')) { 
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
-                initTacticalMap();
                 renderPortals(); 
                 renderChangeLog(); 
                 renderTgAccounts(); 
+                
+                // Commander Access
+                if (sessionStorage.getItem('role') === 'commander') {
+                    document.getElementById('nav-admin').classList.remove('hidden');
+                    loadVault();
+                }
+
+                // Route handling (v17.2)
+                const path = window.location.pathname.replace('/', '') || 'dashboard';
+                switchTab(path, false);
             } 
         };
 
@@ -1459,58 +1451,42 @@
             location.reload();
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, updateHistory = true) {
             console.log('Switching to tab:', tab);
+            
+            // Clean tab ID
+            const tabId = tab.startsWith('tab-') ? tab : `tab-${tab}`;
+            const cleanName = tab.replace('tab-', '');
+
+            const targetTab = document.getElementById(tabId);
+            if (!targetTab) return; // Silent fail if tab doesn't exist
+
             document.querySelectorAll('.tab-content').forEach(c => {
                 c.classList.remove('active');
                 c.style.display = 'none';
             });
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
             
-            const targetTab = document.getElementById(tab) || document.getElementById(`tab-${tab}`);
-            if (targetTab) {
-                targetTab.classList.add('active');
-                targetTab.style.display = 'block';
-            }
+            targetTab.classList.add('active');
+            targetTab.style.display = 'block';
             
-            const navEl = document.getElementById(`nav-${tab}`);
+            const navEl = document.getElementById(`nav-${cleanName}`);
             if (navEl) navEl.classList.add('active');
             
-            if (tab === 'opsmap') {
-                setTimeout(initTacticalMap, 100);
+            if (updateHistory) {
+                const path = cleanName === 'dashboard' ? '/' : `/${cleanName}`;
+                history.pushState({ tab: cleanName }, '', path);
             }
-            if (tab === 'dashboard' && typeof fetchDashboardStats === 'function') fetchDashboardStats();
+
+            if (cleanName === 'dashboard' && typeof fetchDashboardStats === 'function') fetchDashboardStats();
         }
 
-        function initTacticalMap() {
-            const mesh = document.getElementById('map-mesh');
-            if (!mesh) return;
-            mesh.innerHTML = '';
-            const nodes = Array.from(document.querySelectorAll('.node'));
-            
-            // Connect nodes to BIFROST (Reykjavik) and nearest neighbors
-            const primary = nodes.find(n => n.dataset.city === 'REYKJAVIK');
-            if (!primary) return;
+        window.onpopstate = (event) => {
+            if (event.state && event.state.tab) {
+                switchTab(event.state.tab, false);
+            }
+        };
 
-            nodes.forEach(n => {
-                if (n === primary) return;
-                // Line to primary
-                createSignalLine(primary, n, mesh);
-                // Line to a random other node to create a mesh
-                const other = nodes[Math.floor(Math.random() * nodes.length)];
-                if (other !== n && other !== primary) createSignalLine(n, other, mesh);
-            });
-        }
-
-        function createSignalLine(n1, n2, mesh) {
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", n1.style.left);
-            line.setAttribute("y1", n1.style.top);
-            line.setAttribute("x2", n2.style.left);
-            line.setAttribute("y2", n2.style.top);
-            line.classList.add("signal-line");
-            mesh.appendChild(line);
-        }
 
         function switchAuth(mode) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -1544,44 +1520,7 @@
             container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
         }
 
-        function initFullMap() {
-            const layer = document.getElementById('node-layer');
-            layer.innerHTML = '';
-            activeNodes = [
-                { x: 520, y: 230, l: 'NA EAST' }, { x: 410, y: 240, l: 'NA WEST' }, { x: 920, y: 190, l: 'EU WEST' },
-                { x: 980, y: 210, l: 'EU CENTRAL' }, { x: 1420, y: 260, l: 'AS PAC' }, { x: 1360, y: 380, l: 'AS EAST' },
-                { x: 690, y: 560, l: 'SA EAST' }, { x: 990, y: 500, l: 'AF MID' }, { x: 1220, y: 200, l: 'RU REAPER' },
-                { x: 1470, y: 620, l: 'AU SOUTH' }, { x: 1510, y: 580, l: 'AU EAST' }, { x: 1150, y: 330, l: 'ME CENTRAL' }
-            ];
-            activeNodes.forEach(n => {
-                const node = document.createElement('div'); node.className = 'node'; node.style.left = `${n.x}px`; node.style.top = `${n.y}px`;
-                node.innerHTML = `<div class="node-info">${n.l}</div>`; layer.appendChild(node);
-            });
-        }
 
-        function spawnPacket() {
-            const start = activeNodes[Math.floor(Math.random() * activeNodes.length)];
-            const end = activeNodes[Math.floor(Math.random() * activeNodes.length)];
-            if (!start || !end || start === end) return;
-            const layer = document.getElementById('packet-layer');
-            const packet = document.createElement('div'); packet.className = 'packet';
-            layer.appendChild(packet);
-            const duration = 1500;
-            const startTime = performance.now();
-            function animate() {
-                const now = performance.now();
-                const progress = Math.min((now - startTime) / duration, 1);
-                const curX = start.x + (end.x - start.x) * progress;
-                const curY = start.y + (end.y - start.y) * progress;
-                packet.style.left = `${curX}px`; packet.style.top = `${curY}px`;
-                if (Math.random() > 0.4) {
-                    const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${curX}px`; p.style.top = `${curY}px`;
-                    layer.appendChild(p); setTimeout(() => p.remove(), 600);
-                }
-                if (progress < 1) requestAnimationFrame(animate); else packet.remove();
-            }
-            requestAnimationFrame(animate);
-        }
 
         async function runBinCheck() {
             const bin = document.getElementById('bin-input').value;
@@ -2336,6 +2275,67 @@
         document.addEventListener("DOMContentLoaded", () => {
             fetchDashboardStats();
         });
+        // COMMANDER FUNCTIONS
+        function rollKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let k = 'BIFROST-';
+            for(let i=0; i<4; i++) k += chars.charAt(Math.floor(Math.random() * chars.length));
+            k += '-';
+            for(let i=0; i<4; i++) k += chars.charAt(Math.floor(Math.random() * chars.length));
+            document.getElementById('admin-new-key').value = k;
+        }
+
+        async function deployKey() {
+            const key = document.getElementById('admin-new-key').value;
+            const op = document.getElementById('admin-new-op').value || 'OPERATOR';
+            const ak = sessionStorage.getItem('ak');
+            const status = document.getElementById('admin-deploy-status');
+            
+            if (!key) return;
+            status.innerHTML = '> DEPLOYING...';
+            
+            try {
+                const r = await fetch('/api/admin_keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Key': ak },
+                    body: json.stringify({ key, operator: op })
+                });
+                const res = await r.json();
+                if (res.status === 'deployed') {
+                    status.innerHTML = '<span style="color:var(--success)">> DEPLOYED TO VAULT</span>';
+                    loadVault();
+                } else {
+                    status.innerHTML = '<span style="color:var(--error)">> FAILED: ' + (res.error || 'UNKNOWN') + '</span>';
+                }
+            } catch (e) {
+                status.innerHTML = '<span style="color:var(--error)">> ERROR: ' + e.message + '</span>';
+            }
+        }
+
+        async function loadVault() {
+            const ak = sessionStorage.getItem('ak');
+            const list = document.getElementById('admin-key-list');
+            if (!ak) return;
+            
+            try {
+                const r = await fetch('/api/admin_keys', {
+                    headers: { 'X-Admin-Key': ak }
+                });
+                const res = await r.json();
+                if (res.keys) {
+                    list.innerHTML = res.keys.map(k => `
+                        <div style="padding: 0.5rem; border-bottom: 1px solid #111; display: flex; justify-content: space-between;">
+                            <span>${k.content}</span>
+                            <span style="color: #444; font-size: 0.5rem;">${new Date(k.timestamp).toLocaleDateString()}</span>
+                        </div>
+                    `).join('') || '> NO ACTIVE KEYS IN VAULT';
+                } else {
+                    list.innerHTML = '> VAULT LOCKED OR EMPTY';
+                }
+            } catch (e) {
+                list.innerHTML = '> VAULT CONNECTION ERROR';
+            }
+        }
     </script>
 </body>
 </html>

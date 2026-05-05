@@ -10,11 +10,8 @@ from urllib.parse import urlparse, parse_qs
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID")
-
-# Emergency Fallback Key
-LOCAL_KEYS = {
-    "BIFROST-RECOVERY-2026": {"operator_id": "MASTER_ADMIN", "status": "active"}
-}
+ADMIN_KEY = os.getenv("ADMIN_KEY")
+ADMIN_OPERATOR = os.getenv("ADMIN_OPERATOR", "ADMIN")
 
 def fetch_discord_keys():
     """Fetches parseable keys from the designated Discord channel."""
@@ -50,24 +47,24 @@ class handler(BaseHTTPRequestHandler):
         query = parse_qs(urlparse(self.path).query)
         key_input = query.get('pass', [None])[0]
         
-        # Merge Discord keys with Local fallback
-        discord_keys = fetch_discord_keys()
-        all_keys = {**LOCAL_KEYS, **discord_keys}
-        
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        
-        if key_input and key_input in all_keys:
+        # 1. Check Admin Master Key
+        if ADMIN_KEY and key_input == ADMIN_KEY:
             result = {
                 "status": "success",
-                "data": all_keys[key_input]
+                "data": {"operator_id": ADMIN_OPERATOR, "status": "active", "role": "commander"}
             }
+        # 2. Check Discord Vault Keys
         else:
-            result = {
-                "status": "error",
-                "message": "INVALID_OR_EXPIRED_LICENSE"
-            }
+            discord_keys = fetch_discord_keys()
+            if key_input and key_input in discord_keys:
+                result = {
+                    "status": "success",
+                    "data": discord_keys[key_input]
+                }
+            else:
+                result = {
+                    "status": "error",
+                    "message": "INVALID_OR_EXPIRED_LICENSE"
+                }
             
         self.wfile.write(json.dumps(result).encode())
