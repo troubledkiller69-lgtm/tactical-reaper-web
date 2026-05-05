@@ -1,6 +1,5 @@
 import asyncio
 import aiohttp
-from duckduckgo_search import DDGS
 import re
 import csv
 import logging
