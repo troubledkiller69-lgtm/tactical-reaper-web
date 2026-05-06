@@ -2534,10 +2534,10 @@
                     actualDelay += (Math.random() * 4000 - 2000);
                 }
 
-                sniperLog(`PING [REQ-${sniperPingCount}] -> /api/snipe?target=${encodeURIComponent(target)}${authParams}`, "info");
+                sniperLog(`PING [REQ-${sniperPingCount}] -> /api/sniper_v2?target=${encodeURIComponent(target)}${authParams}`, "info");
 
                 try {
-                    const resp = await fetch(`/api/snipe?target=${encodeURIComponent(target)}${authParams}`);
+                    const resp = await fetch(`/api/sniper_v2?target=${encodeURIComponent(target)}${authParams}`);
                     const data = await resp.json();
 
                     if (data.error) {
