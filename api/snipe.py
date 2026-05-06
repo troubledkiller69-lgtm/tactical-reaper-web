@@ -1,14 +1,27 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import urllib.parse
-from curl_cffi import requests
+import traceback
+
+try:
+    from curl_cffi import requests
+    USE_CURL_CFFI = True
+except ImportError:
+    import requests
+    USE_CURL_CFFI = False
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.handle_request()
+        try:
+            self.handle_request()
+        except Exception as e:
+            self.send_error_json(f"CRITICAL_FAILURE: {str(e)}\n{traceback.format_exc()}")
 
     def do_POST(self):
-        self.handle_request()
+        try:
+            self.handle_request()
+        except Exception as e:
+            self.send_error_json(f"CRITICAL_FAILURE: {str(e)}\n{traceback.format_exc()}")
 
     def handle_request(self):
         parsed_path = urllib.parse.urlparse(self.path)
@@ -34,10 +47,15 @@ class handler(BaseHTTPRequestHandler):
                     return
 
             # 2. Execute Snipe
+            get_kwargs = {"timeout": 10}
+            if USE_CURL_CFFI:
+                get_kwargs["impersonate"] = "chrome120"
+            else:
+                session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
+            
             response = session.get(
                 target_url if action != "login" else f"{target_url}/inventory", 
-                impersonate="chrome120",
-                timeout=10
+                **get_kwargs
             )
             
             status_code = response.status_code
@@ -74,8 +92,12 @@ class handler(BaseHTTPRequestHandler):
             "login": "submit" # Common button name
         }
         
+        post_kwargs = {"data": payload, "timeout": 10}
+        if USE_CURL_CFFI:
+            post_kwargs["impersonate"] = "chrome120"
+        
         try:
-            resp = session.post(login_url, data=payload, impersonate="chrome120", timeout=10)
+            resp = session.post(login_url, **post_kwargs)
             if resp.status_code == 200 and ("logout" in resp.text.lower() or "profile" in resp.text.lower()):
                 return {"success": True, "msg": "Login Successful"}
             return {"success": False, "msg": f"Login Failed (Status {resp.status_code})", "debug": resp.text[:200]}
