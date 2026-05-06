@@ -52,12 +52,14 @@ def run_bot():
 # AUTHENTICATION API
 # ---------------------------------------------------------
 def discord_request(url, method="GET", body=None):
-    if not DISCORD_TOKEN: 
-        return 500, "MISSING_DISCORD_TOKEN_SECRET"
-    req = urllib.request.Request(url, method=method)
-    req.add_header("Authorization", f"Bot {DISCORD_TOKEN}")
-    req.add_header("Content-Type", "application/json")
     try:
+        if not DISCORD_TOKEN: 
+            return 500, "MISSING_DISCORD_TOKEN_SECRET"
+        req = urllib.request.Request(url, method=method)
+        # We strip the token here too just in case
+        clean_token = DISCORD_TOKEN.strip()
+        req.add_header("Authorization", f"Bot {clean_token}")
+        req.add_header("Content-Type", "application/json")
         data = json.dumps(body).encode() if body else None
         with urllib.request.urlopen(req, data=data, timeout=10) as res:
             return res.getcode(), json.loads(res.read().decode())
@@ -68,7 +70,7 @@ def discord_request(url, method="GET", body=None):
             return e.code, "HTTP_ERROR_NO_BODY"
     except Exception as e:
         err_str = str(e) or repr(e)
-        return 500, f"PYTHON_EXCEPTION: {err_str}"
+        return 500, f"INTERNAL_CRASH: {err_str}"
 
 import time
 
@@ -156,7 +158,7 @@ async def post_auth(request: Request):
         else:
             return {"status": "failed", "discord_error_code": code, "error": str(err_msg)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "failed", "discord_error_code": 500, "error": f"POST_AUTH_CRASH: {str(e)}"}
 
 # ---------------------------------------------------------
 # DISRUPTION API
