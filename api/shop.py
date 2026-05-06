@@ -615,7 +615,7 @@ class handler(BaseHTTPRequestHandler):
 
         m = merchants[0]
         if m["status"] == "pending":
-            self._json(403, {"error": "PENDING_APPROVAL: Your application is awaiting admin review. Contact @your_telegram for faster processing."})
+            self._json(403, {"error": "PENDING_APPROVAL: Your application is awaiting admin review. Contact @rxtribution on Telegram for faster processing."})
             return
         if m["status"] != "active":
             self._json(403, {"error": "Account suspended or banned"})
