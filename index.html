@@ -891,7 +891,6 @@
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
                     <a onclick="switchTab('cheats')" id="nav-cheats" style="color:#e74c3c;">CHEATS</a>
-                    <a onclick="switchTab('phishing')" id="nav-phishing" style="color:#ff3366;">PHISHING</a>
                     <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
     
                     <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
@@ -1504,49 +1503,6 @@
                     <h3 style="font-weight:900; letter-spacing:3px; color: #e74c3c; margin-bottom: 1rem; font-size: 0.8rem;">MY PURCHASES</h3>
                     <div id="cheat-my-purchases" style="max-height: 400px; overflow-y: auto;">
                         <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.65rem; padding: 1rem;">No purchases yet.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ PHANTOM PHISHING TAB ═══ -->
-        <div id="tab-phishing" class="tab-content">
-            <div style="margin-top:2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
-                    <h2 style="font-weight:900; letter-spacing:4px; color: #ff3366;">PHANTOM PHISHING</h2>
-                    <button class="btn" style="width: auto; padding: 0.6rem 1.2rem; font-size: 0.6rem; background: transparent; border: 1px solid #ff3366; color: #ff3366; font-weight: 900;" onclick="loadPhishingCreds()">REFRESH DATA</button>
-                </div>
-                
-                <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">CREDENTIAL HARVESTING DASHBOARD (SUPABASE BACKEND)</p>
-
-                <div class="card" style="border: 1px solid #222; margin-bottom: 2rem;">
-                    <h3 style="color: #ff3366;">CAMPAIGN LINKS</h3>
-                    <div style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa; margin-bottom: 1rem;">Distribute these payload URLs to targets. Credentials will stream below.</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div style="background: #0a0a0a; border: 1px solid #333; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="color: #fff; font-weight: bold; margin-bottom: 0.3rem;">MICROSOFT 365</div>
-                                <div style="color: var(--primary);">https://login-auth-msft.com/secure/v2</div>
-                            </div>
-                            <button class="btn" style="width: auto; padding: 0.4rem 0.8rem; background: #222;" onclick="navigator.clipboard.writeText('https://login-auth-msft.com/secure/v2')">COPY</button>
-                        </div>
-                        <div style="background: #0a0a0a; border: 1px solid #333; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="color: #fff; font-weight: bold; margin-bottom: 0.3rem;">DISCORD NITRO SPONSOR</div>
-                                <div style="color: var(--primary);">https://discord-promos.com/claim</div>
-                            </div>
-                            <button class="btn" style="width: auto; padding: 0.4rem 0.8rem; background: #222;" onclick="navigator.clipboard.writeText('https://discord-promos.com/claim')">COPY</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card" style="border: 1px solid #ff3366;">
-                    <h3 style="color: #ff3366;">CAPTURED CREDENTIALS</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr 1.5fr 1fr 2fr; padding: 0.8rem 1rem; border-bottom: 2px solid #333; font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 1rem;">
-                        <span>CAMPAIGN</span><span>USERNAME / EMAIL</span><span>PASSWORD</span><span>IP ADDRESS</span><span>TIMESTAMP / UA</span>
-                    </div>
-                    <div id="phish-creds-list" style="max-height: 500px; overflow-y: auto;">
-                        <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">> AWAITING PAYLOAD EXFILTRATION...</div>
                     </div>
                 </div>
             </div>
@@ -2517,41 +2473,6 @@
                 res.innerText = out;
                 addLog(`LINK TRACER DEPLOYED: ${token} -> ${dest}`);
             }, 800);
-        }
-
-        /* ═══ PHISHING LOGIC ═══ */
-        async function loadPhishingCreds() {
-            const list = document.getElementById('phish-creds-list');
-            list.innerHTML = `<div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">> REFRESHING DATA...</div>`;
-            try {
-                const response = await fetch('/api/phish?action=list');
-                const data = await response.json();
-                if (data.error) {
-                    list.innerHTML = `<div style="color: var(--error); font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">> ERROR: ${data.error}</div>`;
-                    return;
-                }
-                
-                if (!data.data || data.data.length === 0) {
-                    list.innerHTML = `<div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">> NO CREDENTIALS CAPTURED YET.</div>`;
-                    return;
-                }
-                
-                let html = '';
-                data.data.forEach(cred => {
-                    html += `
-                        <div style="display: grid; grid-template-columns: 1fr 1.5fr 1.5fr 1fr 2fr; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #111; font-family: 'JetBrains Mono'; font-size: 0.65rem;">
-                            <span style="color: #fff;">${cred.campaign || 'N/A'}</span>
-                            <span style="color: var(--primary);">${cred.username}</span>
-                            <span style="color: var(--error);">${cred.password}</span>
-                            <span style="color: #aaa;">${cred.ip_address || 'Unknown'}</span>
-                            <span style="color: #555; font-size: 0.55rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cred.user_agent}">${new Date(cred.created_at).toLocaleString()}<br>${cred.user_agent || ''}</span>
-                        </div>
-                    `;
-                });
-                list.innerHTML = html;
-            } catch(e) {
-                list.innerHTML = `<div style="color: var(--error); font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">> CONNECTION FAILED</div>`;
-            }
         }
 
         // --- SNIPER LOGIC ---
