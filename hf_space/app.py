@@ -25,7 +25,7 @@ app.add_middleware(
 
 # Configuration from Hugging Face Secrets
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID")
+AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID", "1501042968776147051")
 ADMIN_KEY = os.getenv("ADMIN_KEY")
 ADMIN_OPERATOR = os.getenv("ADMIN_OPERATOR", "ADMIN")
 
@@ -102,6 +102,12 @@ def fetch_keys():
 async def get_auth(request: Request):
     action = request.query_params.get('action', 'verify')
     pass_key = request.query_params.get('pass')
+    
+    if action == 'debug':
+        return {
+            "channel_id": AUTH_CHANNEL_ID,
+            "token_prefix": DISCORD_TOKEN[:10] if DISCORD_TOKEN else "None"
+        }
     
     if action == 'verify':
         if ADMIN_KEY and pass_key == ADMIN_KEY:
