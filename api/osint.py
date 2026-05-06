@@ -132,8 +132,41 @@ class handler(BaseHTTPRequestHandler):
         except: return {"error": "PARSE_ERROR"}
 
     def maigret_scan(self, username):
-        # Simulated Maigret for Vercel (Avoids heavy subprocess)
-        return {"status": "success", "username": username, "results": ["Twitter: Found", "GitHub: Found", "Instagram: Not Found"]}
+        if not username: return {"error": "MISSING_USERNAME"}
+        
+        # Real-time lightweight social media checker
+        sites = {
+            "Instagram": f"https://www.instagram.com/{username}/",
+            "Twitter": f"https://twitter.com/{username}",
+            "GitHub": f"https://github.com/{username}",
+            "Reddit": f"https://www.reddit.com/user/{username}",
+            "Pinterest": f"https://www.pinterest.com/{username}/",
+            "Tumblr": f"https://{username}.tumblr.com/",
+            "Steam": f"https://steamcommunity.com/id/{username}",
+            "TikTok": f"https://www.tiktok.com/@{username}"
+        }
+        
+        results = {}
+        # We can't use asyncio easily here without complexity, so we'll do quick sequential checks
+        # Vercel timeout is 10s usually, so we limit sites
+        for site, url in sites.items():
+            try:
+                headers = {
+                    "User-Agent": "Mozilla/5.0",
+                    "Referer": "https://www.google.com/",
+                    "Origin": "https://www.google.com/"
+                }
+                r = requests.get(url, headers=headers, timeout=1.5)
+                if r.status_code == 200:
+                    results[site] = "found"
+                elif r.status_code == 404:
+                    results[site] = "not_found"
+                else:
+                    results[site] = f"error_{r.status_code}"
+            except:
+                results[site] = "timeout"
+                
+        return {"status": "success", "username": username, "results": results}
 
     def ghunt_scan(self, email):
         # Simulated Ghunt for Vercel
