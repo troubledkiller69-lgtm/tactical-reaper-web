@@ -3,8 +3,6 @@ import json
 import urllib.parse
 import requests
 
-HF_UPLINK = "https://rxtri-bifrost.hf.space/api/sniper"
-
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # 1. Parse Query
@@ -18,21 +16,54 @@ class handler(BaseHTTPRequestHandler):
             self.send_response_json({"error": "Missing target URL", "success": False})
             return
 
-        # 2. Proxy to HuggingFace Bypass Engine
+        # 2. Advanced Direct Impersonation
         try:
-            params = {
-                "target": target_url,
-                "user": username,
-                "pass": password
-            }
-            # We hit our own HF space which has curl_cffi installed
-            resp = requests.get(HF_UPLINK, params=params, timeout=20)
-            result = resp.json()
-        except Exception as e:
-            result = {"error": f"UPLINK_FAILED: {str(e)}", "success": False}
+            session = requests.Session()
+            # Modern Chrome 120 Headers
+            session.headers.update({
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": '"Windows"',
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1"
+            })
+            
+            # Prime the session (Get cookies)
+            try:
+                session.get(target_url, timeout=5)
+            except: pass
 
-        # 3. Respond
-        self.send_response_json(result)
+            # 3. Handle Login
+            if username and password:
+                login_url = f"{target_url.rstrip('/')}/login"
+                session.headers.update({"Referer": target_url, "Origin": target_url, "Sec-Fetch-Site": "same-origin"})
+                try:
+                    session.post(login_url, data={"username": username, "password": password, "login": "submit"}, timeout=5)
+                except: pass
+
+            # 4. Execute Snipe
+            resp = session.get(target_url, timeout=10)
+            
+            result = {
+                "success": True,
+                "status_code": resp.status_code,
+                "cloudflare_blocked": "cloudflare" in resp.text.lower() or resp.status_code in [403, 503],
+                "content_length": len(resp.text),
+                "title": "BIFROST Target"
+            }
+            
+            self.send_response_json(result)
+            
+        except Exception as e:
+            self.send_response_json({"error": str(e), "success": False})
 
     def do_POST(self):
         self.do_GET()
