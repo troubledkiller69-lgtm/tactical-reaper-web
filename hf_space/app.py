@@ -53,6 +53,10 @@ def run_bot():
 # ---------------------------------------------------------
 import requests
 import asyncio
+import urllib3
+
+# Disable insecure request warnings for diagnostic mode
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def discord_request(url, method="GET", body=None):
     try:
@@ -65,15 +69,17 @@ def discord_request(url, method="GET", body=None):
             "Content-Type": "application/json"
         }
         
-        # Increase timeout to 20s because HF can be slow
+        # Diagnostic: Disable verify=False to bypass potential proxy SSL drops
         if method.upper() == "POST":
-            response = requests.post(url, json=body, headers=headers, timeout=20)
+            response = requests.post(url, json=body, headers=headers, timeout=20, verify=False)
         else:
-            response = requests.get(url, headers=headers, timeout=20)
+            response = requests.get(url, headers=headers, timeout=20, verify=False)
             
         return response.status_code, response.text
+    except requests.exceptions.SSLError as e:
+        return 500, f"SSL_ERROR: {str(e)}. This usually means the Hugging Face firewall is blocking Discord."
     except requests.exceptions.Timeout:
-        return 500, "REQUEST_TIMEOUT: Discord API is not responding within 20s. Check if your bot token is valid and has Server/Message intents enabled."
+        return 500, "REQUEST_TIMEOUT: Discord API is not responding. Possible network block."
     except requests.exceptions.RequestException as e:
         return 500, f"REQUEST_ERROR: {str(e)}"
     except Exception as e:
