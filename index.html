@@ -2213,37 +2213,31 @@
                     dnsData.Answer.forEach(r => { out += `  → ${r.data}\n`; });
                 } else { out += `MX:       NO MX RECORDS FOUND\n`; }
             } catch(e) { out += `MX:       LOOKUP FAILED\n`; }
-            // Check breach via HIBP (public, no key needed for breach count)
-            out += `\n> CHECKING BREACH DATABASES...\n`;
+            // Check breach and gravatar via backend
             try {
-                const hibpResp = await fetch(`https://haveibeenpwned.com/unifiedsearch/${encodeURIComponent(email)}`, { headers: { 'Accept': 'application/json' } });
-                if (hibpResp.status === 200) {
-                    const hibpData = await hibpResp.json();
-                    const breaches = hibpData.Breaches || [];
-                    out += `BREACHES: ${breaches.length} FOUND\n`;
-                    breaches.slice(0, 10).forEach(b => {
-                        out += `  → ${b.Name} (${b.BreachDate || 'N/A'}) — ${(b.DataClasses||[]).join(', ')}\n`;
+                const bResp = await fetch(`/api/osint?action=email_intel&target=${encodeURIComponent(email)}`);
+                const bData = await bResp.json();
+                
+                out += `\n> CHECKING BREACH DATABASES...\n`;
+                if (bData.breach_status === "FOUND") {
+                    out += `BREACHES: ${bData.breach_count} FOUND\n`;
+                    bData.breaches.forEach(b => {
+                        out += `  → ${b.name} (${b.date || 'N/A'}) — ${(b.classes||[]).join(', ')}\n`;
                     });
-                    if (breaches.length > 10) out += `  ... and ${breaches.length - 10} more\n`;
-                } else if (hibpResp.status === 404) {
-                    out += `BREACHES: NONE FOUND (CLEAN)\n`;
-                } else { out += `BREACHES: RATE LIMITED — TRY AGAIN LATER\n`; }
-            } catch(e) { out += `BREACHES: CHECK FAILED (CORS/RATE LIMIT)\n`; }
-            // Gravatar check
-            out += `\n> CHECKING GRAVATAR...\n`;
-            try {
-                const gravResp = await fetch(`https://en.gravatar.com/${email}.json`);
-                if (gravResp.ok) {
-                    const gravData = await gravResp.json();
-                    const entry = gravData.entry?.[0];
-                    if (entry) {
-                        out += `GRAVATAR: FOUND\n`;
-                        if (entry.displayName) out += `  NAME:   ${entry.displayName}\n`;
-                        if (entry.profileUrl) out += `  URL:    ${entry.profileUrl}\n`;
-                        if (entry.currentLocation) out += `  LOC:    ${entry.currentLocation}\n`;
-                    }
-                } else { out += `GRAVATAR: NOT FOUND\n`; }
-            } catch(e) { out += `GRAVATAR: CHECK FAILED\n`; }
+                    if (bData.breach_count > 10) out += `  ... and ${bData.breach_count - 10} more\n`;
+                } else {
+                    out += `BREACHES: ${bData.breach_status}\n`;
+                }
+                
+                out += `\n> CHECKING GRAVATAR...\n`;
+                if (bData.gravatar) {
+                    out += `GRAVATAR: FOUND\n`;
+                    if (bData.gravatar.username) out += `  USER:   ${bData.gravatar.username}\n`;
+                    if (bData.gravatar.profile_url) out += `  URL:    ${bData.gravatar.profile_url}\n`;
+                } else {
+                    out += `GRAVATAR: NOT FOUND\n`;
+                }
+            } catch(e) { out += `\n> BACKEND INTEL FETCH FAILED\n`; }
             res.innerText = out;
             addLog(`EMAIL OSINT: ${email}`);
         }

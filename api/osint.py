@@ -39,6 +39,8 @@ class handler(BaseHTTPRequestHandler):
             res = self.geo_scan(target)
         elif action == 'zillow':
             res = self.zillow_scan(target)
+        elif action == 'email_intel':
+            res = self.email_intel_scan(target)
         else:
             res = {"error": "INVALID_ACTION"}
         
@@ -109,6 +111,48 @@ class handler(BaseHTTPRequestHandler):
                 "lotAreaUnit": "acres"
             }]
         }
+
+    def email_intel_scan(self, email):
+        import hashlib
+        if not email or '@' not in email: return {"error": "INVALID_EMAIL"}
+        
+        result = {"email": email, "breaches": [], "breach_status": "NONE", "gravatar": None}
+        
+        # 1. HIBP Check (Unified Search often rate limits, but we try)
+        try:
+            r = requests.get(
+                f"https://haveibeenpwned.com/unifiedsearch/{urllib.parse.quote(email)}",
+                headers={"User-Agent": "BIFROST-Reaper-Engine/1.0", "Accept": "application/json"},
+                timeout=5
+            )
+            if r.status_code == 200:
+                data = r.json()
+                breaches = data.get("Breaches", [])
+                result["breaches"] = [{"name": b.get("Name"), "date": b.get("BreachDate"), "classes": b.get("DataClasses", [])} for b in breaches[:10]]
+                result["breach_count"] = len(breaches)
+                result["breach_status"] = "FOUND"
+            elif r.status_code == 404:
+                result["breach_status"] = "CLEAN"
+            else:
+                result["breach_status"] = f"RATE_LIMITED_{r.status_code}"
+        except:
+            result["breach_status"] = "API_ERROR"
+
+        # 2. Gravatar Check
+        try:
+            email_hash = hashlib.md5(email.strip().lower().encode('utf-8')).hexdigest()
+            r = requests.get(f"https://en.gravatar.com/{email_hash}.json", headers={"User-Agent": "Mozilla/5.0"}, timeout=3)
+            if r.status_code == 200:
+                data = r.json()
+                entry = data.get("entry", [{}])[0]
+                result["gravatar"] = {
+                    "username": entry.get("preferredUsername"),
+                    "profile_url": entry.get("profileUrl"),
+                    "photos": [p.get("value") for p in entry.get("photos", [])]
+                }
+        except: pass
+        
+        return result
 
     def _json(self, code, data):
         self.send_response(code); self.send_header('Content-type', 'application/json')
