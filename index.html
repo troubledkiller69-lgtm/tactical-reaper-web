@@ -1000,6 +1000,25 @@
                             <input type="text" id="admin-new-key" placeholder="BIFROST-XXXX-XXXX" style="margin-bottom: 0;">
                             <button class="btn" style="width: 80px; padding: 0;" onclick="rollKey()">ROLL</button>
                         </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">ACCESS ROLE</label>
+                                <select id="admin-new-role" style="background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; width: 100%; font-family: 'JetBrains Mono'; font-size: 0.75rem; appearance: none; cursor: pointer;">
+                                    <option value="operator">OPERATOR</option>
+                                    <option value="admin">ADMIN</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">DURATION</label>
+                                <select id="admin-new-duration" style="background: #000; border: 1px solid var(--border); color: #fff; padding: 0.8rem; width: 100%; font-family: 'JetBrains Mono'; font-size: 0.75rem; appearance: none; cursor: pointer;">
+                                    <option value="86400">24 HOURS</option>
+                                    <option value="604800">7 DAYS</option>
+                                    <option value="2592000">30 DAYS</option>
+                                    <option value="0">LIFETIME</option>
+                                </select>
+                            </div>
+                        </div>
                         
                         <button class="btn" id="btn-deploy-key" onclick="deployKey()" style="background: var(--success); color: #000; font-weight: 900;">DEPLOY TO VAULT</button>
                         <div id="admin-deploy-status" style="margin-top: 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
@@ -2279,27 +2298,31 @@
         async function deployKey() {
             const key = document.getElementById('admin-new-key').value;
             const op = document.getElementById('admin-new-op').value || 'OPERATOR';
+            const role = document.getElementById('admin-new-role').value;
+            const durationSec = parseInt(document.getElementById('admin-new-duration').value);
             const ak = sessionStorage.getItem('ak');
             const status = document.getElementById('admin-deploy-status');
             
             if (!key) return;
             status.innerHTML = '> DEPLOYING...';
+            const expires = durationSec > 0 ? Math.floor(Date.now() / 1000) + durationSec : 0;
             
             try {
                 const r = await fetch('https://rxtri-bifrost.hf.space/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Key': ak },
-                    body: JSON.stringify({ key, operator: op })
+                    body: JSON.stringify({ key, operator: op, role, expires })
                 });
                 const res = await r.json();
                 if (res.status === 'deployed') {
-                    status.innerHTML = '<span style="color:var(--success)">> DEPLOYED TO VAULT</span>';
+                    const expLabel = expires === 0 ? 'LIFETIME' : new Date(expires * 1000).toLocaleString();
+                    status.innerHTML = `<span style="color:var(--success)"> DEPLOYED | ROLE: ${role.toUpperCase()} | EXPIRES: ${expLabel}</span>`;
                     loadVault();
                 } else {
-                    status.innerHTML = '<span style="color:var(--error)">> FAILED: ' + (res.error || 'UNKNOWN') + '</span>';
+                    status.innerHTML = '<span style="color:var(--error)"> FAILED: ' + (res.error || 'UNKNOWN') + '</span>';
                 }
             } catch (e) {
-                status.innerHTML = '<span style="color:var(--error)">> ERROR: ' + e.message + '</span>';
+                status.innerHTML = '<span style="color:var(--error)"> ERROR: ' + e.message + '</span>';
             }
         }
 
@@ -2314,12 +2337,38 @@
                 });
                 const res = await r.json();
                 if (res.keys) {
-                    list.innerHTML = res.keys.map(k => `
-                        <div style="padding: 0.5rem; border-bottom: 1px solid #111; display: flex; justify-content: space-between;">
-                            <span>${k.content}</span>
-                            <span style="color: #444; font-size: 0.5rem;">${new Date(k.timestamp).toLocaleDateString()}</span>
-                        </div>
-                    `).join('') || '> NO ACTIVE KEYS IN VAULT';
+                    const now = Math.floor(Date.now() / 1000);
+                    list.innerHTML = res.keys.map(k => {
+                        const c = k.content || '';
+                        const roleMatch = c.match(/ROLE:\s*(\w+)/);
+                        const role = roleMatch ? roleMatch[1].toUpperCase() : 'OPERATOR';
+                        const roleBadge = role === 'ADMIN'
+                            ? '<span style="background:var(--error); color:#000; padding:2px 6px; font-size:0.5rem; font-weight:900; margin-left:6px;">ADMIN</span>'
+                            : '<span style="background:#333; color:#aaa; padding:2px 6px; font-size:0.5rem; margin-left:6px;">OP</span>';
+                        const expMatch = c.match(/EXPIRES:\s*(\d+)/);
+                        const expTs = expMatch ? parseInt(expMatch[1]) : 0;
+                        let expLabel = '<span style="color:var(--success);">LIFETIME</span>';
+                        if (expTs > 0) {
+                            if (expTs < now) {
+                                expLabel = '<span style="color:var(--error);">EXPIRED</span>';
+                            } else {
+                                const remaining = expTs - now;
+                                const days = Math.floor(remaining / 86400);
+                                const hours = Math.floor((remaining % 86400) / 3600);
+                                expLabel = `<span style="color:#f39c12;">${days}d ${hours}h LEFT</span>`;
+                            }
+                        }
+                        const keyMatch = c.match(/KEY:\s*([^|]+)/);
+                        const keyPreview = keyMatch ? keyMatch[1].trim() : c.substring(0, 20);
+                        const opMatch = c.match(/OP:\s*([^|]+)/);
+                        const opName = opMatch ? opMatch[1].trim() : '?';
+                        return `<div style="padding: 0.6rem; border-bottom: 1px solid #111; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; align-items: center; gap: 0.5rem;">
+                            <span style="color:#fff; font-size:0.6rem;">${keyPreview}</span>
+                            <span style="font-size:0.55rem; color:#888;">${opName}</span>
+                            <span>${roleBadge}</span>
+                            <span style="text-align:right; font-size:0.55rem;">${expLabel}</span>
+                        </div>`;
+                    }).join('') || '> NO ACTIVE KEYS IN VAULT';
                 } else {
                     list.innerHTML = '> VAULT LOCKED OR EMPTY';
                 }
