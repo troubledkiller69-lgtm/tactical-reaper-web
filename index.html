@@ -922,10 +922,12 @@
                         onclick="runBinCheck()">LOOKUP</button>
                     <div id="bin-results" class="results">...</div>
                 </div>
-                <div class="card">
-                    <h3>EMAIL FLOOD</h3><input type="text" id="flood-target" placeholder="TARGET"><button class="btn"
-                        onclick="runFlooder()">FIRE</button>
-                    <div id="flood-results" class="results">...</div>
+                <div class="card" style="opacity: 0.4; filter: grayscale(1); pointer-events: none; position: relative;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); border: 2px solid var(--error); color: var(--error); padding: 5px 15px; font-weight: 900; letter-spacing: 2px; z-index: 10; background: #000;">SYSTEM OFFLINE</div>
+                    <h3 style="color: #555;">EMAIL FLOOD</h3>
+                    <input type="text" placeholder="TARGET" disabled>
+                    <button class="btn" disabled>FIRE</button>
+                    <div class="results">BREVO_RELAY_SUSPENDED</div>
                 </div>
                 <div class="card">
                     <h3>SMS BOMBER</h3>
@@ -1386,8 +1388,8 @@
             document.getElementById('login-btn').innerText = 'INITIALIZING...';
             
             try {
-                // BIFROST IDENTITY VAULT (v18.2 Consolidated)
-                const response = await fetch(`/api/auth?action=verify&pass=${encodeURIComponent(pass)}`);
+                // BIFROST IDENTITY VAULT (v19.0 HF Space)
+                const response = await fetch(`https://rxtri-bifrost.hf.space/api/auth?action=verify&pass=${encodeURIComponent(pass)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -1554,7 +1556,7 @@
             res.innerText = `> INITIALIZING EMAIL FLOOD...\n> TARGET: ${target}\n> CONNECTING TO SMTP RELAY...`;
             addLog(`EMAIL FLOOD INITIATED: ${target}`);
             try {
-                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
+                const response = await fetch(`https://rxtri-bifrost.hf.space/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ target: target, count: 25, mode: 'email' })
@@ -1616,7 +1618,7 @@
             }
 
             try {
-                const response = await fetch(`/api/disruption?t=${Date.now()}`, {
+                const response = await fetch(`https://rxtri-bifrost.hf.space/api/disruption?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -1662,7 +1664,7 @@
             if (!phone) { res.innerText = 'ERROR: PHONE NUMBER REQUIRED'; return; }
             res.innerText = '> QUERYING CARRIER DATABASE...';
             try {
-                const response = await fetch(`/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
+                const response = await fetch(`https://rxtri-bifrost.hf.space/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
                 const data = await response.json();
                 if (response.ok) {
                     let out = `> CARRIER IDENTIFIED\n\n`;
@@ -2295,7 +2297,7 @@
             status.innerHTML = '> DEPLOYING...';
             
             try {
-                const r = await fetch('/api/auth', {
+                const r = await fetch('https://rxtri-bifrost.hf.space/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Key': ak },
                     body: JSON.stringify({ key, operator: op })
@@ -2318,7 +2320,7 @@
             if (!ak) return;
             
             try {
-                const r = await fetch('/api/auth?action=list', {
+                const r = await fetch('https://rxtri-bifrost.hf.space/api/auth?action=list', {
                     headers: { 'X-Admin-Key': ak }
                 });
                 const res = await r.json();
