@@ -1,23 +1,22 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import urllib.parse
-import traceback
 import requests
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            self.handle_request()
+            self.execute_sniper_logic()
         except Exception as e:
-            self.send_error_json(f"ENGINE_CRASH: {str(e)}\n{traceback.format_exc()}")
+            self.send_error_json(f"ENGINE_CRASH: {str(e)}")
 
     def do_POST(self):
         try:
-            self.handle_request()
+            self.execute_sniper_logic()
         except Exception as e:
-            self.send_error_json(f"ENGINE_CRASH: {str(e)}\n{traceback.format_exc()}")
+            self.send_error_json(f"ENGINE_CRASH: {str(e)}")
 
-    def handle_request(self):
+    def execute_sniper_logic(self):
         parsed_path = urllib.parse.urlparse(self.path)
         query = urllib.parse.parse_qs(parsed_path.query)
         
@@ -66,8 +65,11 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
     def send_error_json(self, msg):
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        self.wfile.write(json.dumps({"error": msg, "success": False}).encode('utf-8'))
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": msg, "success": False}).encode('utf-8'))
+        except:
+            pass
