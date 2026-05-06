@@ -2319,7 +2319,8 @@
                     status.innerHTML = `<span style="color:var(--success)"> DEPLOYED | ROLE: ${role.toUpperCase()} | EXPIRES: ${expLabel}</span>`;
                     loadVault();
                 } else {
-                    status.innerHTML = '<span style="color:var(--error)"> FAILED: ' + (res.error || 'UNKNOWN') + '</span>';
+                    const discordErr = res.discord_error_code ? `(Discord HTTP ${res.discord_error_code})` : '';
+                    status.innerHTML = '<span style="color:var(--error)"> FAILED: ' + (res.error || 'UNKNOWN') + ' ' + discordErr + '</span>';
                 }
             } catch (e) {
                 status.innerHTML = '<span style="color:var(--error)"> ERROR: ' + e.message + '</span>';

@@ -144,7 +144,11 @@ async def post_auth(request: Request):
         msg_content = f"KEY: {new_key} | OP: {op} | ROLE: {role} | EXPIRES: {expires}"
         url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages"
         code, _ = discord_request(url, "POST", {"content": msg_content})
-        return {"status": "deployed" if code in [200, 201] else "failed"}
+        
+        if code in [200, 201]:
+            return {"status": "deployed"}
+        else:
+            return {"status": "failed", "discord_error_code": code}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
