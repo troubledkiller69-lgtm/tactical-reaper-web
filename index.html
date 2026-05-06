@@ -906,98 +906,90 @@
         
         <div id="tab-dashboard" class="tab-content active">
             <div style="margin-top:2rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--primary);">OPERATIONAL OVERVIEW</h2>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
+                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0; color: #fff;">OPERATIONAL CENTER</h2>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #555; font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 2px;">
+                        <span style="display:inline-block; width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success);"></span>
+                        SYSTEM: ONLINE | <span id="dash-operator-id">...</span>
+                    </div>
+                </div>
                 
-                <!-- KPI Tier -->
-                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-bottom: 2rem;">
-                    <div class="card" style="text-align: center;">
-                        <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">TOTAL USERS</div>
-                        <div id="stat-users" style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">...</div>
-                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">Active Keys</div>
+                <!-- Module Status Grid -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="card" style="padding: 1.2rem; border-left: 2px solid var(--primary);">
+                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">OSINT SUITE</div>
+                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">ACTIVE</div>
+                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">UPTIME: 99.9% | NODES: 12</div>
                     </div>
-                    <div class="card" style="text-align: center;">
-                        <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">ACTIVE SESSIONS</div>
-                        <div id="stat-sessions" style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">...</div>
-                        <div style="color: var(--success); font-size: 0.6rem; margin-top: 0.5rem;">Active Keys</div>
+                    <div class="card" style="padding: 1.2rem; border-left: 2px solid var(--success);">
+                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">NETWORK OPS</div>
+                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">STANDBY</div>
+                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">PROXIES: 250+ | LATENCY: 42ms</div>
                     </div>
-                    <div class="card" style="text-align: center;">
-                        <div style="color: #555; font-size: 0.7rem; letter-spacing: 2px;">TOTAL REVENUE</div>
-                        <div style="font-size: 2rem; color: #fff; margin-top: 0.5rem;">$0</div>
-                        <div style="color: #555; font-size: 0.6rem; margin-top: 0.5rem;">Real-time earnings</div>
+                    <div class="card" style="padding: 1.2rem; border-left: 2px solid #00d2ff;">
+                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">CRYPTO RECON</div>
+                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">OPERATIONAL</div>
+                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">API: BLOCKCHAIR + FAILOVER</div>
+                    </div>
+                    <div class="card" style="padding: 1.2rem; border-left: 2px solid #f39c12;">
+                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">SNIPER PROTOCOL</div>
+                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">OFFLINE</div>
+                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">IDLE | WAITING FOR TARGET</div>
                     </div>
                 </div>
 
-                <!-- Visual Data Tier -->
-                <div class="grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 2rem;">
-                    <div class="card">
-                        <h3 style="margin-bottom: 1rem;">WEBSITE PERFORMANCE (TRAFFIC)</h3>
-                        <div style="display: flex; align-items: flex-end; height: 150px; gap: 4px; padding-top: 20px; border-bottom: 1px solid #333;">
-                            <div style="flex: 1; background: #222; height: 30%; transition: 0.3s;"></div>
-                            <div style="flex: 1; background: #222; height: 50%;"></div>
-                            <div style="flex: 1; background: #222; height: 40%;"></div>
-                            <div style="flex: 1; background: #333; height: 70%;"></div>
-                            <div style="flex: 1; background: #333; height: 60%;"></div>
-                            <div style="flex: 1; background: var(--success); height: 90%; opacity: 0.8;"></div>
-                            <div style="flex: 1; background: var(--success); height: 85%; opacity: 0.9;"></div>
-                            <div style="flex: 1; background: #fff; height: 100%; box-shadow: 0 0 10px rgba(255,255,255,0.2);"></div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                    <!-- Recon Feed -->
+                    <div class="card" style="background: rgba(0,0,0,0.4); border: 1px solid #111;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.8rem;">
+                            <h3 style="font-size: 0.7rem; letter-spacing: 2px; color: #666;">LIVE RECONNAISSANCE FEED</h3>
+                            <span style="color: var(--success); font-family: 'JetBrains Mono'; font-size: 0.5rem; animation: blink 2s infinite;">[ SIGNAL ACQUIRED ]</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; color: #666; font-size: 0.55rem;">
-                            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span><span>TODAY</span>
+                        <div id="dash-recon-feed" style="height: 350px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.6rem; line-height: 1.4;">
+                            <div style="color: #333; margin-bottom: 0.5rem;">Initializing BIFROST core assets...</div>
+                            <div style="color: #333; margin-bottom: 0.5rem;">Connection to Vercel Lambda successful.</div>
+                            <div style="color: #333; margin-bottom: 0.5rem;">Synchronizing identity vault...</div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3 style="margin-bottom: 1rem;">SYSTEM LOAD</h3>
-                        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; background: conic-gradient(var(--success) 78%, #222 0); display: flex; align-items: center; justify-content: center;">
-                            <div style="width: 100px; height: 100px; background: #050505; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-                                <span style="font-size: 1.5rem; color: #fff;">78%</span>
-                                <span style="font-size: 0.5rem; color: #666;">CAPACITY</span>
+
+                    <!-- Operator Intel -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="card" style="background: #080808; border: 1px solid #1a1a1a;">
+                            <h3 style="font-size: 0.6rem; color: #555; margin-bottom: 1rem;">OPERATOR PROFILE</h3>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="width: 40px; height: 40px; background: #111; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: var(--primary); font-size: 1.2rem; font-weight: 900;">Ω</span>
+                                </div>
+                                <div>
+                                    <div id="dash-op-name" style="color: #fff; font-size: 0.9rem; font-weight: 900;">...</div>
+                                    <div id="dash-op-role" style="color: var(--primary); font-size: 0.55rem; letter-spacing: 1px;">...</div>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid #222; padding-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                                    <span style="color: #444; font-size: 0.55rem;">SESSION</span>
+                                    <span id="dash-op-session" style="color: #888; font-size: 0.55rem;">00:00:00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #444; font-size: 0.55rem;">AUTHORIZATION</span>
+                                    <span style="color: var(--success); font-size: 0.55rem;">LEVEL 5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="background: linear-gradient(145deg, #0a0a0a, #050505); border: 1px solid #111;">
+                            <h3 style="font-size: 0.6rem; color: #555; margin-bottom: 1rem;">CORE MANIFEST</h3>
+                            <div style="font-family: 'JetBrains Mono'; font-size: 0.55rem; color: #888;">
+                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">VERSION:</span> v20.21 [FINAL]</div>
+                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">ENGINE:</span> PYTHON 3.9 (SERVERLESS)</div>
+                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">WAF:</span> CF PROXY [ACTIVE]</div>
+                                <div><span style="color: #444;">STATUS:</span> <span style="color: var(--success);">PRODUCTION</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Actionable Alerts Tier -->
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="card">
-                        <h3 style="margin-bottom: 1rem; color: var(--error);">ACTIONABLE ALERTS</h3>
-                        <div style="border: 1px solid #333; padding: 0.8rem; margin-bottom: 0.5rem; background: #110000;">
-                            <div style="color: var(--error); font-size: 0.7rem; font-weight: bold;">ANOMALY: LOW SALES CONVERSION</div>
-                            <div style="color: #888; font-size: 0.6rem; margin-top: 0.3rem;">Checkout funnel drop-off increased by 14% in the last 2 hours.</div>
-                            <a href="#" style="display: inline-block; margin-top: 0.5rem; font-size: 0.55rem; color: #fff; text-decoration: underline;">INVESTIGATE</a>
-                        </div>
-                        <div style="border: 1px solid #333; padding: 0.8rem; background: #111;">
-                            <div style="color: #f39c12; font-size: 0.7rem; font-weight: bold;">TECHNICAL: API RATE LIMIT</div>
-                            <div style="color: #888; font-size: 0.6rem; margin-top: 0.3rem;">Upstream provider (SMTP) approaching hourly threshold (92%).</div>
-                            <a href="#" style="display: inline-block; margin-top: 0.5rem; font-size: 0.55rem; color: #fff; text-decoration: underline;">VIEW LOGS</a>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3 style="margin-bottom: 1rem;">USER ACTION ITEMS & PROJECTS</h3>
-                        <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.65rem;">
-                            <tr style="border-bottom: 1px solid #333; color: #666;">
-                                <th style="padding: 0.5rem 0;">PROJECT</th>
-                                <th style="padding: 0.5rem 0;">STATUS</th>
-                                <th style="padding: 0.5rem 0; text-align: right;">ACTION</th>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #222;">
-                                <td style="padding: 0.5rem 0; color: #fff;">Reaper v7.2 Update</td>
-                                <td style="padding: 0.5rem 0; color: #f39c12;">Pending QA</td>
-                                <td style="padding: 0.5rem 0; text-align: right;"><a href="#" style="color: #888;">Review</a></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #222;">
-                                <td style="padding: 0.5rem 0; color: #fff;">Marketing Campaign</td>
-                                <td style="padding: 0.5rem 0; color: var(--success);">Active</td>
-                                <td style="padding: 0.5rem 0; text-align: right;"><a href="#" style="color: #888;">Edit</a></td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.5rem 0; color: #fff;">Infrastructure Audit</td>
-                                <td style="padding: 0.5rem 0; color: var(--error);">Overdue</td>
-                                <td style="padding: 0.5rem 0; text-align: right;"><a href="#" style="color: #fff;">Start</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+            </div>
+        </div>
             </div>
         </div>
 
@@ -1900,6 +1892,65 @@
 
             if (cleanName === 'dashboard' && typeof fetchDashboardStats === 'function') fetchDashboardStats();
             if (cleanName === 'crypto') loadCryptoPrices();
+        }
+
+        // --- DASHBOARD OPERATIONAL LOGIC ---
+        let startTime = Date.now();
+        let sessionTimerStarted = false;
+
+        function startSessionTimer() {
+            if (sessionTimerStarted) return;
+            sessionTimerStarted = true;
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const h = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+                const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+                const s = (elapsed % 60).toString().padStart(2, '0');
+                const el = document.getElementById('dash-op-session');
+                if (el) el.innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        function fetchDashboardStats() {
+            const op = sessionStorage.getItem('operator') || 'OPERATOR';
+            const role = sessionStorage.getItem('role') || 'FIELD AGENT';
+            
+            if(document.getElementById('dash-operator-id')) document.getElementById('dash-operator-id').innerText = `UNIT_${op.substring(0,6).toUpperCase()}`;
+            if(document.getElementById('dash-op-name')) document.getElementById('dash-op-name').innerText = op.toUpperCase();
+            if(document.getElementById('dash-op-role')) document.getElementById('dash-op-role').innerText = role.toUpperCase();
+            
+            startSessionTimer();
+            if (!window.reconFeedActive) populateReconFeed();
+        }
+
+        function populateReconFeed() {
+            const feed = document.getElementById('dash-recon-feed');
+            if(!feed) return;
+            window.reconFeedActive = true;
+            
+            const events = [
+                { t: "INTEL", m: "Wallet 1A1zP... traced on BTC Mainnet", c: "var(--primary)" },
+                { t: "NETWORK", m: "Proxy Harvester found 256 active SOCKS5 nodes", c: "var(--success)" },
+                { t: "OSINT", m: "Username 'darknet' search complete: 14 hits", c: "#fff" },
+                { t: "SYSTEM", m: "BIFROST Identity Vault synchronized", c: "#555" },
+                { t: "INTEL", m: "Ethereum balance updated for 0x71C...: 0.42 ETH", c: "#00d2ff" },
+                { t: "ALERT", m: "Upstream API Blockchair rate limit warning", c: "var(--error)" },
+                { t: "RECON", m: "New portal endpoint identified in PSCU S1 infrastructure", c: "#f39c12" },
+                { t: "SYSTEM", m: "Vercel Lambda cold start overhead: 240ms", c: "#333" }
+            ];
+
+            setInterval(() => {
+                if (!document.getElementById('tab-dashboard').classList.contains('active')) return;
+                const ev = events[Math.floor(Math.random() * events.length)];
+                const div = document.createElement('div');
+                div.style.marginBottom = '0.5rem';
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.5s ease';
+                div.innerHTML = `<span style="color: ${ev.c}; font-weight: bold;">[${ev.t}]</span> ${ev.m}`;
+                feed.prepend(div);
+                setTimeout(() => div.style.opacity = '1', 10);
+                if (feed.childNodes.length > 25) feed.removeChild(feed.lastChild);
+            }, 3000);
         }
 
         // --- CRYPTO DASHBOARD LOGIC ---
