@@ -867,6 +867,7 @@
                         <input type="password" id="merch-reg-pass" placeholder="PASSWORD (6+ CHARS)">
                         <input type="text" id="merch-reg-display" placeholder="DISPLAY NAME">
                         <input type="text" id="merch-reg-jabber" placeholder="TELEGRAM / JABBER CONTACT">
+                        <input type="text" id="merch-reg-invite" placeholder="INVITE CODE (REQUIRED)">
                         <button class="btn" onclick="handleMerchantRegister()">SUBMIT APPLICATION</button>
                         <p style="font-family:'JetBrains Mono'; font-size:0.5rem; color:#555; margin-top:0.8rem; line-height:1.6;">VENDOR ACCOUNTS REQUIRE ADMIN APPROVAL.<br>CONTACT <a href="https://t.me/rxtribution" target="_blank" style="color:var(--primary); text-decoration:none;">@RXTRIBUTION</a> ON TELEGRAM FOR FAST PROCESSING.</p>
                         <button class="btn" style="margin-top: 0.8rem; background: transparent; border: 1px solid var(--border); font-size: 0.6rem;" onclick="showMerchantLogin()">BACK TO LOGIN</button>
@@ -1127,6 +1128,18 @@
                     </div>
                     <div id="admin-vendor-list" style="max-height: 400px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa;">
                         > LOADING VENDORS...
+                    </div>
+                </div>
+
+                <!-- Invite Codes -->
+                <div class="card" style="margin-top: 2rem; border: 1px solid #9b59b6; background: rgba(155, 89, 182, 0.02);">
+                    <h3 style="color: #9b59b6;">VENDOR INVITE CODES</h3>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                        <input type="number" id="admin-invite-count" value="1" min="1" max="20" style="width: 80px; margin: 0;" title="Number of codes to generate">
+                        <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.6rem; background: #9b59b6; color: #fff; font-weight: 900;" onclick="generateInvites()">GENERATE CODES</button>
+                    </div>
+                    <div id="admin-invite-list" style="max-height: 200px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa;">
+                        > NO CODES GENERATED YET
                     </div>
                 </div>
 
@@ -2662,13 +2675,14 @@
             const p = document.getElementById('merch-reg-pass').value;
             const dn = document.getElementById('merch-reg-display').value.trim() || u;
             const jb = document.getElementById('merch-reg-jabber').value.trim();
+            const inv = document.getElementById('merch-reg-invite').value.trim();
             const err = document.getElementById('merch-error');
-            if (!u || !p || p.length < 6) { err.innerText = 'USERNAME + PASSWORD (6+ CHARS) REQUIRED'; return; }
+            if (!u || !p || p.length < 6 || !inv) { err.innerText = 'USERNAME, PASSWORD, AND INVITE CODE REQUIRED'; return; }
             err.innerText = 'REGISTERING...'; err.style.color = '#555';
             try {
                 const r = await fetch('/api/shop?action=merchant_register', {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({username: u, password: p, display_name: dn, jabber: jb})
+                    body: JSON.stringify({username: u, password: p, display_name: dn, jabber: jb, invite_code: inv})
                 });
                 const d = await r.json();
                 if (d.status === 'pending') {
@@ -2931,6 +2945,7 @@
             }
             if (tab === 'admin' || tab === 'tab-admin') {
                 loadVendors('pending');
+                loadInvites();
             }
         };
 
@@ -2976,6 +2991,38 @@
                 });
                 loadVendors('pending');
             } catch(e) {}
+        }
+
+        async function generateInvites() {
+            const ak = sessionStorage.getItem('ak');
+            const count = parseInt(document.getElementById('admin-invite-count').value) || 1;
+            try {
+                await fetch('/api/shop?action=generate_invite', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Admin-Key': ak},
+                    body: JSON.stringify({ count: count })
+                });
+                loadInvites();
+            } catch(e) {}
+        }
+
+        async function loadInvites() {
+            const ak = sessionStorage.getItem('ak');
+            if (!ak) return;
+            const list = document.getElementById('admin-invite-list');
+            try {
+                const r = await fetch('/api/shop?action=list_invites', { headers: {'X-Admin-Key': ak} });
+                const d = await r.json();
+                const invites = d.invites || [];
+                if (!invites.length) { list.innerHTML = '> NO CODES GENERATED YET'; return; }
+                list.innerHTML = invites.map(i => {
+                    const sc = i.status === 'active' ? 'var(--success)' : i.status === 'used' ? '#555' : 'var(--error)';
+                    const usedText = i.used_by ? ` USED BY ${i.used_by}` : '';
+                    return `<div style="padding:0.4rem 0; border-bottom:1px solid #111;">
+                        <span style="color:${sc}; font-weight:900;">${i.code}</span>
+                        <span style="color:#666; font-size:0.55rem; margin-left:1rem;">${i.status.toUpperCase()}${usedText}</span>
+                    </div>`;
+                }).join('');
+            } catch(e) { list.innerHTML = '> ERROR LOADING CODES'; }
         }
 
         async function adminCreditWallet() {

@@ -110,6 +110,8 @@ class handler(BaseHTTPRequestHandler):
             "deposit": self.admin_deposit,
             "list_vendors": self.list_vendors,
             "approve_vendor": self.approve_vendor,
+            "generate_invite": self.generate_invite,
+            "list_invites": self.list_invites,
             # Merchant-facing
             "merchant_register": self.merchant_register,
             "merchant_login": self.merchant_login,
@@ -557,17 +559,58 @@ class handler(BaseHTTPRequestHandler):
         else:
             self._json(500, {"error": str(result)})
 
+    def generate_invite(self, q, body):
+        """Admin-only: generate vendor invite codes."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        count = int(body.get("count", 1))
+        if count > 20:
+            count = 20
+        codes = []
+        for _ in range(count):
+            code_str = f"VND-{secrets.token_hex(3).upper()}-{secrets.token_hex(3).upper()}"
+            sb_post("invite_codes", {"code": code_str, "created_by": "COMMANDER", "status": "active"})
+            codes.append(code_str)
+        self._json(200, {"status": "generated", "codes": codes, "count": len(codes)})
+
+    def list_invites(self, q, body):
+        """Admin-only: list invite codes."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        status_filter = q.get("status", [""])[0]
+        params = "select=*&order=created_at.desc&limit=50"
+        if status_filter:
+            params += f"&status=eq.{status_filter}"
+        code, invites = sb_get("invite_codes", params)
+        if code == 200:
+            self._json(200, {"invites": invites})
+        else:
+            self._json(500, {"error": str(invites)})
+
     # ═══════════════════════════════════════════
     # MERCHANT ENDPOINTS
     # ═══════════════════════════════════════════
 
     def merchant_register(self, q, body):
-        """Register a new merchant account (pending approval)."""
+        """Register a new merchant account (requires invite code)."""
         username = body.get("username", "").strip().lower()
         password = body.get("password", "")
         display_name = body.get("display_name", username)
         jabber = body.get("jabber", "")
         telegram = body.get("telegram", "")
+        invite_code = body.get("invite_code", "").strip().upper()
+
+        if not invite_code:
+            self._json(400, {"error": "INVITE CODE REQUIRED. Contact @rxtribution on Telegram."})
+            return
+
+        # Validate invite code
+        ic_code, ic_result = sb_get("invite_codes", f"code=eq.{invite_code}&status=eq.active&select=*")
+        if ic_code != 200 or not ic_result:
+            self._json(403, {"error": "INVALID OR EXPIRED INVITE CODE."})
+            return
 
         if not username or not password or len(password) < 6:
             self._json(400, {"error": "Username and password (6+ chars) required"})
@@ -592,9 +635,15 @@ class handler(BaseHTTPRequestHandler):
         })
 
         if code in [200, 201]:
+            # Burn the invite code
+            sb_patch("invite_codes", f"code=eq.{invite_code}", {
+                "status": "used",
+                "used_by": username,
+                "used_at": "now()"
+            })
             self._json(200, {
                 "status": "pending",
-                "message": "Application submitted. Contact admin on Telegram for approval."
+                "message": "Application submitted. Your invite code has been verified. Awaiting final admin approval."
             })
         else:
             self._json(500, {"error": str(result)})
