@@ -888,6 +888,7 @@
                     <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
                     <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
+                    <a onclick="switchTab('network')" id="nav-network" style="color:var(--success);">NETWORK</a>
                     <a onclick="switchTab('crypto')" id="nav-crypto" style="color:#00d2ff;">CRYPTO</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
@@ -1345,17 +1346,40 @@
                         <button class="btn" onclick="generateTracer()">GENERATE TRACKER</button>
                         <div id="tracer-results" class="results">...</div>
                     </div>
-                    <div class="card">
-                        <h3>PROXY HARVESTER</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scrape unverified public proxies (Top 100).</p>
-                        <select id="proxy-protocol" style="margin-bottom:1rem; padding: 0.6rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono'; width: 100%;">
-                            <option value="socks5">SOCKS5</option>
-                            <option value="socks4">SOCKS4</option>
-                            <option value="http">HTTP</option>
-                            <option value="all">ALL</option>
-                        </select>
-                        <button class="btn" onclick="runProxyHarvest()">HARVEST PROXIES</button>
-                        <div id="proxy-results" class="results" style="max-height:300px;overflow-y:auto;font-size:0.6rem;">...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-network" class="tab-content">
+            <div style="margin-top:2rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--success);">NETWORK OPS</h2>
+                
+                <div class="card" style="border: 1px solid var(--success); background: #0a0a0a;">
+                    <h3 style="color: var(--success); margin-bottom: 0.5rem;">PROXY HARVESTER</h3>
+                    <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1.5rem;">Scrape unverified public proxies from multiple global sources.</p>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">PROTOCOL</label>
+                            <select id="network-proxy-proto" style="width: 100%; padding: 0.6rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';">
+                                <option value="socks5">SOCKS5</option>
+                                <option value="socks4">SOCKS4</option>
+                                <option value="http">HTTP</option>
+                                <option value="all">ALL</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; display: flex; align-items: flex-end;">
+                            <button class="btn" onclick="runNetworkHarvest()" style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success); color: var(--success);">HARVEST PROXIES</button>
+                        </div>
+                    </div>
+
+                    <div id="network-proxy-results" style="display: none; border-top: 1px solid #222; padding-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div id="network-proxy-count" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #555;">0 PROXIES FOUND</div>
+                            <button class="btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.6rem;" onclick="copyProxiesToClipboard()">COPY ALL</button>
+                        </div>
+                        <textarea id="network-proxy-list" style="height: 300px; font-size: 0.7rem; color: var(--success); border: 1px solid #111; background: #050505;" readonly></textarea>
                     </div>
                 </div>
             </div>
@@ -2430,6 +2454,49 @@
                 res.innerText = '> ERROR: LOOKUP FAILED';
                 console.error(err);
             }
+        }
+
+        // --- NETWORK OPS LOGIC ---
+        async function runNetworkHarvest() {
+            const protocol = document.getElementById('network-proxy-proto').value;
+            const results = document.getElementById('network-proxy-results');
+            const list = document.getElementById('network-proxy-list');
+            const countEl = document.getElementById('network-proxy-count');
+            
+            results.style.display = 'block';
+            countEl.innerText = 'INITIALIZING GLOBAL SCRAPE...';
+            list.value = '> CONNECTING TO PROXY NODES...\n> POLLING UPSTREAM PROVIDERS...';
+
+            try {
+                const response = await fetch(`/api/proxy?action=harvest&protocol=${protocol}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    countEl.innerText = `${data.count} PROXIES IDENTIFIED [${protocol.toUpperCase()}]`;
+                    list.value = data.proxies.join('\n');
+                    addLog(`PROXY HARVEST: ${data.count} nodes found [${protocol}]`);
+                } else {
+                    list.value = `> ERROR: ${data.error || 'FETCH FAILED'}`;
+                    countEl.innerText = 'SCRAPE FAILED';
+                }
+            } catch (e) {
+                list.value = `> ERROR: CONNECTION TIMEOUT`;
+                countEl.innerText = 'OFFLINE';
+            }
+        }
+
+        function copyProxiesToClipboard() {
+            const list = document.getElementById('network-proxy-list');
+            list.select();
+            document.execCommand('copy');
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'COPIED!';
+            btn.style.color = 'var(--success)';
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.color = '';
+            }, 2000);
         }
 
         async function runWhoisLookup() {

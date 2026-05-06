@@ -16,32 +16,44 @@ class handler(BaseHTTPRequestHandler):
             self._json(400, {"error": "Invalid action"})
 
     def harvest_proxies(self, protocol):
-        # Using proxyscrape as a reliable free source for raw proxies
-        url = f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={protocol}&timeout=10000&country=all&ssl=all&anonymity=all"
+        # Protocols mapping for different APIs
+        ps_proto = protocol if protocol != 'all' else 'socks5'
+        geo_proto = protocol if protocol != 'all' else 'socks5'
         
+        # Source 1: ProxyScrape
+        url1 = f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=all&ssl=all&anonymity=all"
+        
+        # Source 2: Geonode (Free List API)
+        url2 = f"https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}"
+
+        proxies = set()
+        
+        # Fetch from ProxyScrape
         try:
-            r = requests.get(url, timeout=10)
-            if r.status_code == 200:
-                # Raw list of proxies from the API
-                raw_proxies = [p.strip() for p in r.text.split('\n') if p.strip()]
-                
-                # We won't test them all here because serverless timeouts (10s limit).
-                # We will return the top 100 raw proxies to the client.
-                # In a real environment, the client would test them locally or we'd use a background queue.
-                
-                proxies_to_return = raw_proxies[:100]
-                
-                self._json(200, {
-                    "status": "success",
-                    "protocol": protocol,
-                    "count": len(proxies_to_return),
-                    "proxies": proxies_to_return,
-                    "note": "Proxies are raw and unverified. Some may be dead."
-                })
-            else:
-                self._json(500, {"error": "Failed to fetch from proxy provider"})
-        except Exception as e:
-            self._json(500, {"error": str(e)})
+            r1 = requests.get(url1, timeout=5)
+            if r1.status_code == 200:
+                for p in r1.text.split('\n'):
+                    if p.strip(): proxies.add(p.strip())
+        except: pass
+
+        # Fetch from Geonode
+        try:
+            r2 = requests.get(url2, timeout=5)
+            if r2.status_code == 200:
+                data = r2.json().get('data', [])
+                for item in data:
+                    proxies.add(f"{item['ip']}:{item['port']}")
+        except: pass
+
+        results = list(proxies)[:250] # Limit to 250 for response size/speed
+        
+        self._json(200, {
+            "status": "success",
+            "protocol": protocol,
+            "count": len(results),
+            "proxies": results,
+            "note": "Combined results from multiple upstream providers. Unverified."
+        })
 
     def _json(self, code, data):
         self.send_response(code)
