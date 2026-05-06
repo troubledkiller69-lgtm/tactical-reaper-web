@@ -2320,7 +2320,8 @@
                     loadVault();
                 } else {
                     const discordErr = res.discord_error_code ? `(Discord HTTP ${res.discord_error_code})` : '';
-                    status.innerHTML = '<span style="color:var(--error)"> FAILED: ' + (res.error || 'UNKNOWN') + ' ' + discordErr + '</span>';
+                    const rawError = res.error || 'UNKNOWN';
+                    status.innerHTML = `<span style="color:var(--error)"> FAILED: ${rawError} ${discordErr}</span>`;
                 }
             } catch (e) {
                 status.innerHTML = '<span style="color:var(--error)"> ERROR: ' + e.message + '</span>';

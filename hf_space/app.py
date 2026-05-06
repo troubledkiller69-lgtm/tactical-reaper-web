@@ -52,7 +52,8 @@ def run_bot():
 # AUTHENTICATION API
 # ---------------------------------------------------------
 def discord_request(url, method="GET", body=None):
-    if not DISCORD_TOKEN: return 500, None
+    if not DISCORD_TOKEN: 
+        return 500, "MISSING_DISCORD_TOKEN_SECRET"
     req = urllib.request.Request(url, method=method)
     req.add_header("Authorization", f"Bot {DISCORD_TOKEN}")
     req.add_header("Content-Type", "application/json")
@@ -61,11 +62,13 @@ def discord_request(url, method="GET", body=None):
         with urllib.request.urlopen(req, data=data, timeout=10) as res:
             return res.getcode(), json.loads(res.read().decode())
     except urllib.error.HTTPError as e:
-        return e.code, e.read().decode()
+        try:
+            return e.code, e.read().decode()
+        except:
+            return e.code, "HTTP_ERROR_NO_BODY"
     except Exception as e:
         err_str = str(e) or repr(e)
-        print(f"Discord API Error: {err_str}")
-        return 500, err_str
+        return 500, f"PYTHON_EXCEPTION: {err_str}"
 
 import time
 
