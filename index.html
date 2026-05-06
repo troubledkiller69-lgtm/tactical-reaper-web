@@ -1845,7 +1845,7 @@
             const res = document.getElementById('bin-results');
             if (!bin) return; res.innerHTML = `> QUERYING DATABASE [${bin}]...`;
             try {
-                const response = await fetch(`/api/bincheck?bin=${bin}`);
+                const response = await fetch(`/api/osint?action=bincheck&target=${bin}`);
                 const data = await response.json();
                 if (data.BIN) {
                     const b = data.BIN;
@@ -1980,7 +1980,7 @@
             if (!phone) { res.innerText = 'ERROR: PHONE NUMBER REQUIRED'; return; }
             res.innerText = '> QUERYING CARRIER DATABASE...';
             try {
-                const response = await fetch(`https://rxtri-bifrost.hf.space/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
+                const response = await fetch(`/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
                 const data = await response.json();
                 if (response.ok) {
                     let out = `> CARRIER IDENTIFIED\n\n`;
@@ -2255,7 +2255,7 @@
             res.innerText = '> QUERYING PHONE INTEL...';
             // Use the existing carrier lookup API first
             try {
-                const response = await fetch(`/api/carrier_lookup?phone=${encodeURIComponent(phone)}`);
+                const response = await fetch(`/api/osint?action=carrier&target=${encodeURIComponent(phone)}`);
                 const data = await response.json();
                 if (response.ok) {
                     let out = `> PHONE INTEL ACQUIRED\n\n`;
@@ -2349,7 +2349,7 @@
             res.innerText = `> INITIALIZING PROPERTY RECONNAISSANCE...\n> TARGET: ${address}\n> EXTRACTING VALUATION DATA...`;
             
             try {
-                const response = await fetch(`/api/zillow?address=${encodeURIComponent(address)}`);
+                const response = await fetch(`/api/osint?action=zillow&target=${encodeURIComponent(address)}`);
                 const data = await response.json();
                 
                 if (response.ok && data.success && data.results && data.results.length > 0) {
@@ -2404,7 +2404,7 @@
             if (!ip) { res.innerText = 'ERROR: IP REQUIRED'; return; }
             res.innerText = '> LOCATING IP...';
             try {
-                const response = await fetch(`/api/geo?ip=${encodeURIComponent(ip)}`);
+                const response = await fetch(`/api/osint?action=geo&target=${encodeURIComponent(ip)}`);
                 const data = await response.json();
                 if (data.success) {
                     let out = `> GEO DATA ACQUIRED\n\n`;
