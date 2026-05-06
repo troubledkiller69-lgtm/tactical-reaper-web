@@ -802,7 +802,7 @@
 
     <div id="main-app" class="container hidden">
         <header>
-            <div class="logo">BIFROST <span>v16.0</span></div>
+            <div class="logo">BIFROST V1</div>
             <nav class="nav-links">
                 <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                 <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
@@ -811,7 +811,7 @@
                 <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                 <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                 <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
-                <a onclick="switchTab('changelog')" id="nav-changelog">CHANGE LOG</a>
+
                 <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
                 <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
             </nav>
@@ -1166,9 +1166,7 @@
             </div>
         </div>
 
-        <div id="tab-changelog" class="tab-content">
-            <div style="margin-top:5rem; max-width:800px;" id="changelog-stream"></div>
-        </div>
+
         
         <div id="tab-sniper" class="tab-content">
             <div style="margin-top:2rem;">
@@ -1432,7 +1430,7 @@
                 document.getElementById('auth-gate').classList.add('hidden'); 
                 document.getElementById('main-app').classList.remove('hidden'); 
                 renderPortals(); 
-                renderChangeLog(); 
+
                 renderTgAccounts(); 
                 
                 // Commander Access
@@ -1511,16 +1509,7 @@
         }
         function filterPortals() { renderPortals(document.getElementById('portal-search').value); }
 
-        function renderChangeLog() {
-            const container = document.getElementById('changelog-stream');
-            const logs = [
-                { v: 'v7.1 SMS GATEWAY', d: 'MAY 2, 2026', c: '- Email-to-SMS gateway bomber (20 US carriers).<br>- Shotgun mode: fires all gateways simultaneously.<br>- Carrier Recon: reverse phone-to-carrier lookup.<br>- phonenumbers lib integration for MSISDN intelligence.' },
-                { v: 'v7.0 SERVERLESS SHIFT', d: 'MAY 2, 2026', c: '- Full migration to Vercel Edge functions.<br>- Supabase Identity-Bound Auth integration.<br>- Discord Interactions Endpoint implementation.' },
-                { v: 'v6.3 TG OPS', d: 'MAY 1, 2026', c: '- Telegram mass-reporting & spam engine integration.' },
-                { v: 'v6.2 PRECISION STRIKE', d: 'APRIL 30, 2026', c: '- Surgical offset correction for NA EAST and vertical grid drop.<br>- Locked centers to high-fidelity topographical targets.' }
-            ];
-            container.innerHTML = logs.map(l => `<div class="changelog-item"><div class="changelog-version">${l.v}</div><div class="changelog-date">${l.d}</div><div class="changelog-desc">${l.c}</div></div>`).join('');
-        }
+
 
 
 
