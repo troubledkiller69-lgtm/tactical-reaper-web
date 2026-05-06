@@ -51,26 +51,28 @@ def run_bot():
 # ---------------------------------------------------------
 # AUTHENTICATION API
 # ---------------------------------------------------------
+import requests
+
 def discord_request(url, method="GET", body=None):
     try:
         if not DISCORD_TOKEN: 
             return 500, "MISSING_DISCORD_TOKEN_SECRET"
-        req = urllib.request.Request(url, method=method)
-        # We strip the token here too just in case
-        clean_token = DISCORD_TOKEN.strip()
-        req.add_header("Authorization", f"Bot {clean_token}")
-        req.add_header("Content-Type", "application/json")
-        data = json.dumps(body).encode() if body else None
-        with urllib.request.urlopen(req, data=data, timeout=10) as res:
-            return res.getcode(), json.loads(res.read().decode())
-    except urllib.error.HTTPError as e:
-        try:
-            return e.code, e.read().decode()
-        except:
-            return e.code, "HTTP_ERROR_NO_BODY"
+        
+        headers = {
+            "Authorization": f"Bot {DISCORD_TOKEN.strip()}",
+            "Content-Type": "application/json"
+        }
+        
+        if method.upper() == "POST":
+            response = requests.post(url, json=body, headers=headers, timeout=10)
+        else:
+            response = requests.get(url, headers=headers, timeout=10)
+            
+        return response.status_code, response.text
+    except requests.exceptions.RequestException as e:
+        return 500, f"REQUEST_ERROR: {str(e)}"
     except Exception as e:
-        err_str = str(e) or repr(e)
-        return 500, f"INTERNAL_CRASH: {err_str}"
+        return 500, f"UNKNOWN_EXCEPTION: {str(e)}"
 
 import time
 
