@@ -60,9 +60,12 @@ def discord_request(url, method="GET", body=None):
         data = json.dumps(body).encode() if body else None
         with urllib.request.urlopen(req, data=data, timeout=10) as res:
             return res.getcode(), json.loads(res.read().decode())
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode()
     except Exception as e:
-        print(f"Discord API Error: {e}")
-        return 500, None
+        err_str = str(e) or repr(e)
+        print(f"Discord API Error: {err_str}")
+        return 500, err_str
 
 import time
 
@@ -143,12 +146,12 @@ async def post_auth(request: Request):
 
         msg_content = f"KEY: {new_key} | OP: {op} | ROLE: {role} | EXPIRES: {expires}"
         url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages"
-        code, _ = discord_request(url, "POST", {"content": msg_content})
+        code, err_msg = discord_request(url, "POST", {"content": msg_content})
         
         if code in [200, 201]:
             return {"status": "deployed"}
         else:
-            return {"status": "failed", "discord_error_code": code}
+            return {"status": "failed", "discord_error_code": code, "error": str(err_msg)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
