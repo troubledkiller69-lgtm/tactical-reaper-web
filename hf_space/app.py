@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import discord
 from discord.ext import commands
 import uvicorn
+from curl_cffi import requests as curl_requests
+from bs4 import BeautifulSoup
 
 app = FastAPI(title="BIFROST CORE")
 
@@ -204,6 +206,44 @@ async def osint_api(request: Request):
         except: return {"error": "PARSE_ERROR"}
     
     return {"status": "success", "message": "Simulated scan"}
+
+# ---------------------------------------------------------
+# SNIPER BYPASS ENGINE (v3)
+# ---------------------------------------------------------
+@app.get("/api/sniper")
+async def sniper_api(request: Request):
+    target = request.query_params.get('target')
+    username = request.query_params.get('user')
+    password = request.query_params.get('pass')
+    
+    if not target:
+        return {"error": "MISSING_TARGET"}
+
+    session = curl_requests.Session()
+    
+    try:
+        # 1. Login if needed
+        if username and password:
+            login_url = f"{target.rstrip('/')}/login"
+            session.post(login_url, data={"username": username, "password": password, "login": "submit"}, impersonate="chrome120", timeout=10)
+
+        # 2. Scrape Target
+        resp = session.get(target, impersonate="chrome120", timeout=15)
+        
+        # 3. Basic Title extraction
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        title = soup.title.string.strip() if soup.title else "No Title"
+        
+        return {
+            "success": True,
+            "status_code": resp.status_code,
+            "cloudflare_blocked": "cloudflare" in resp.text.lower() or resp.status_code in [403, 503],
+            "content_length": len(resp.text),
+            "title": title
+        }
+    except Exception as e:
+        return {"error": str(e), "success": False}
+
 
 @app.on_event("startup")
 async def startup_event():

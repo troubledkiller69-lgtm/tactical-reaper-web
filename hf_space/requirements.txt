@@ -3,3 +3,5 @@ uvicorn
 discord.py
 phonenumbers
 requests
+curl_cffi
+beautifulsoup4
