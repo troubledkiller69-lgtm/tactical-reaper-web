@@ -52,23 +52,28 @@ def run_bot():
 # AUTHENTICATION API
 # ---------------------------------------------------------
 import requests
+import asyncio
 
 def discord_request(url, method="GET", body=None):
     try:
         if not DISCORD_TOKEN: 
             return 500, "MISSING_DISCORD_TOKEN_SECRET"
         
+        token = DISCORD_TOKEN.strip()
         headers = {
-            "Authorization": f"Bot {DISCORD_TOKEN.strip()}",
+            "Authorization": f"Bot {token}",
             "Content-Type": "application/json"
         }
         
+        # Increase timeout to 20s because HF can be slow
         if method.upper() == "POST":
-            response = requests.post(url, json=body, headers=headers, timeout=10)
+            response = requests.post(url, json=body, headers=headers, timeout=20)
         else:
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=20)
             
         return response.status_code, response.text
+    except requests.exceptions.Timeout:
+        return 500, "REQUEST_TIMEOUT: Discord API is not responding within 20s. Check if your bot token is valid and has Server/Message intents enabled."
     except requests.exceptions.RequestException as e:
         return 500, f"REQUEST_ERROR: {str(e)}"
     except Exception as e:
