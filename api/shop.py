@@ -13,7 +13,9 @@ from urllib.parse import urlparse, parse_qs
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 ADMIN_KEY = os.getenv("ADMIN_KEY", "").strip()
+PLISIO_KEY = os.getenv("PLISIO_KEY", "").strip()
 REST = f"{SUPABASE_URL}/rest/v1"
+PLISIO_API = "https://plisio.net/api/v1"
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -100,6 +102,10 @@ class handler(BaseHTTPRequestHandler):
             "acquire": self.acquire_cards,
             "wallet": self.get_wallet,
             "my_cards": self.my_cards,
+            "create_deposit": self.create_deposit,
+            "check_payment": self.check_payment,
+            # Plisio callback
+            "payment_callback": self.payment_callback,
             # Admin
             "deposit": self.admin_deposit,
             "list_vendors": self.list_vendors,
@@ -289,6 +295,157 @@ class handler(BaseHTTPRequestHandler):
             # Auto-create wallet with 0 balance
             sb_post("wallets", {"operator_id": operator_id, "balance": 0, "total_deposited": 0, "total_spent": 0})
             self._json(200, {"balance": 0.00, "total_deposited": 0.00, "total_spent": 0.00})
+
+    # ═══════════════════════════════════════════
+    # PLISIO CRYPTO DEPOSITS
+    # ═══════════════════════════════════════════
+
+    def create_deposit(self, q, body):
+        """Create a Plisio invoice for crypto deposit."""
+        operator_id = self.headers.get("X-Operator-Id", "") or body.get("operator_id", "")
+        amount = float(body.get("amount", 0))
+        currency = body.get("currency", "BTC").upper()
+
+        if not operator_id or amount < 5:
+            self._json(400, {"error": "Operator ID and minimum $5 deposit required"})
+            return
+
+        if currency not in ["BTC", "LTC", "ETH"]:
+            self._json(400, {"error": "Supported currencies: BTC, LTC, ETH"})
+            return
+
+        # Generate unique order ID
+        order_id = f"BIFROST-{operator_id}-{secrets.token_hex(4)}-{int(time.time())}"
+
+        # Determine callback URL (same API route)
+        # Vercel auto-detects host from the request
+        host = self.headers.get("Host", "")
+        scheme = "https" if host else "http"
+        callback_url = f"{scheme}://{host}/api/shop?action=payment_callback&json=true"
+
+        try:
+            resp = http_client.get(f"{PLISIO_API}/invoices/new", params={
+                "source_currency": "USD",
+                "source_amount": str(amount),
+                "order_number": order_id,
+                "order_name": f"BIFROST Deposit - {operator_id}",
+                "currency": currency,
+                "api_key": PLISIO_KEY,
+                "callback_url": callback_url,
+                "email": "noreply@bifrost.local",
+            }, timeout=15)
+
+            data = resp.json()
+
+            if data.get("status") == "success" and data.get("data"):
+                invoice = data["data"]
+                # Store pending deposit in transactions
+                sb_post("transactions", {
+                    "operator_id": operator_id,
+                    "tx_type": "deposit",
+                    "amount": amount,
+                })
+
+                self._json(200, {
+                    "status": "invoice_created",
+                    "invoice_url": invoice.get("invoice_url", ""),
+                    "amount_crypto": invoice.get("amount", ""),
+                    "currency": currency,
+                    "wallet_address": invoice.get("wallet_hash", ""),
+                    "order_id": order_id,
+                    "txn_id": invoice.get("txn_id", ""),
+                    "amount_usd": amount,
+                    "expires_at": invoice.get("expire_utc", ""),
+                })
+            else:
+                error_msg = data.get("data", {}).get("message", "") if isinstance(data.get("data"), dict) else str(data)
+                self._json(500, {"error": f"Plisio error: {error_msg}"})
+
+        except Exception as e:
+            self._json(500, {"error": f"Payment gateway error: {str(e)}"})
+
+    def payment_callback(self, q, body):
+        """Plisio IPN callback — auto-credit wallet on confirmed payment."""
+        # Plisio sends POST with payment data
+        cb = body if body else {}
+        # Also check query params (Plisio sometimes sends as GET params)
+        if not cb:
+            cb = {k: v[0] for k, v in q.items()}
+
+        status = cb.get("status", "")
+        order_number = cb.get("order_number", "")
+        amount_usd = cb.get("source_amount", cb.get("amount", "0"))
+
+        if not order_number:
+            self._json(400, {"error": "Missing order_number"})
+            return
+
+        # Parse operator_id from order: BIFROST-{operator_id}-{hex}-{ts}
+        parts = order_number.split("-")
+        if len(parts) < 3:
+            self._json(400, {"error": "Invalid order format"})
+            return
+        operator_id = parts[1]
+
+        # Only credit on completed/confirmed status
+        if status in ["completed", "confirmed"]:
+            try:
+                amt = float(amount_usd)
+            except:
+                amt = 0
+
+            if amt <= 0:
+                self._json(400, {"error": "Invalid amount"})
+                return
+
+            # Credit wallet
+            code, wallets = sb_get("wallets", f"operator_id=eq.{operator_id}&select=*")
+            if code == 200 and wallets:
+                w = wallets[0]
+                new_bal = float(w["balance"]) + amt
+                new_dep = float(w["total_deposited"]) + amt
+                sb_patch("wallets", f"operator_id=eq.{operator_id}", {
+                    "balance": new_bal,
+                    "total_deposited": new_dep,
+                    "updated_at": "now()"
+                })
+            else:
+                sb_post("wallets", {
+                    "operator_id": operator_id,
+                    "balance": amt,
+                    "total_deposited": amt,
+                    "total_spent": 0
+                })
+
+            self._json(200, {"status": "credited", "operator": operator_id, "amount": amt})
+        elif status in ["pending", "confirming"]:
+            self._json(200, {"status": "pending", "message": "Waiting for confirmations"})
+        else:
+            self._json(200, {"status": "ignored", "payment_status": status})
+
+    def check_payment(self, q, body):
+        """Check payment status via Plisio."""
+        txn_id = q.get("txn_id", [""])[0]
+        if not txn_id:
+            self._json(400, {"error": "txn_id required"})
+            return
+        try:
+            resp = http_client.get(f"{PLISIO_API}/operations/{txn_id}", params={
+                "api_key": PLISIO_KEY
+            }, timeout=10)
+            data = resp.json()
+            if data.get("status") == "success":
+                op = data.get("data", {})
+                self._json(200, {
+                    "status": op.get("status", "unknown"),
+                    "amount": op.get("source_amount", "0"),
+                    "currency": op.get("currency", ""),
+                    "confirmations": op.get("confirmations", 0),
+                })
+            else:
+                self._json(500, {"error": str(data)})
+        except Exception as e:
+            self._json(500, {"error": str(e)})
 
     def my_cards(self, q, body):
         """Get operator's purchased cards."""
