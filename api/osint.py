@@ -286,13 +286,19 @@ class handler(BaseHTTPRequestHandler):
             network_id = "solana"
             network_name = "Solana (SOL)"
 
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Accept": "application/json"
+        }
+
         try:
-            r = requests.get(f"https://api.blockchair.com/{network_id}/dashboards/address/{wallet}?limit=10", timeout=5)
+            r = requests.get(f"https://api.blockchair.com/{network_id}/dashboards/address/{wallet}?limit=10", headers=headers, timeout=5)
+            
+            # Handle success
             if r.status_code == 200:
                 data = r.json().get("data", {}).get(wallet, {})
                 address_info = data.get("address", {})
                 
-                # Balance formatting based on network
                 raw_balance = address_info.get("balance", 0)
                 balance = 0.0
                 try:
@@ -304,7 +310,6 @@ class handler(BaseHTTPRequestHandler):
                         balance = float(raw_balance) / 1e9
                 except: pass
 
-                # Extract transactions (usually list of tx hashes)
                 txs_data = data.get("transactions", [])
                 
                 return {
@@ -315,10 +320,25 @@ class handler(BaseHTTPRequestHandler):
                     "first_seen": address_info.get("first_seen_receiving", "N/A"),
                     "recent_txs": txs_data[:10]
                 }
-            elif r.status_code == 404:
-                return {"error": f"Wallet not found or unsupported on {network_name}."}
+            
+            # Fallback for Bitcoin if Blockchair is rate limited (Error 430 / 429)
+            if network_id == "bitcoin" and (r.status_code == 430 or r.status_code == 429):
+                r_fb = requests.get(f"https://blockchain.info/rawaddr/{wallet}?limit=10", timeout=5)
+                if r_fb.status_code == 200:
+                    fb_data = r_fb.json()
+                    return {
+                        "network": "Bitcoin (BTC)",
+                        "wallet": wallet,
+                        "balance": fb_data.get("final_balance", 0) / 100000000.0,
+                        "tx_count": fb_data.get("n_tx", 0),
+                        "first_seen": "N/A",
+                        "recent_txs": [{"hash": tx.get("hash")} for tx in fb_data.get("txs", [])[:10]]
+                    }
+
+            if r.status_code == 404:
+                return {"error": f"Wallet not found on {network_name}."}
             else:
-                return {"error": f"Blockchair API Error: {r.status_code}"}
+                return {"error": f"API Error: {r.status_code} (Rate Limited)"}
         except Exception as e:
             return {"error": f"Network trace failed: {str(e)}"}
 
