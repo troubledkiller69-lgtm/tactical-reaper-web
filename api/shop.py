@@ -104,6 +104,10 @@ class handler(BaseHTTPRequestHandler):
             "my_cards": self.my_cards,
             "create_deposit": self.create_deposit,
             "check_payment": self.check_payment,
+            # Cheat shop (operator)
+            "browse_cheats": self.browse_cheats,
+            "purchase_cheat": self.purchase_cheat,
+            "my_cheats": self.my_cheats_list,
             # Plisio callback
             "payment_callback": self.payment_callback,
             # Admin
@@ -112,6 +116,11 @@ class handler(BaseHTTPRequestHandler):
             "approve_vendor": self.approve_vendor,
             "generate_invite": self.generate_invite,
             "list_invites": self.list_invites,
+            # Admin cheat management
+            "admin_create_cheat": self.admin_create_cheat,
+            "admin_list_cheats": self.admin_list_cheats,
+            "admin_update_cheat": self.admin_update_cheat,
+            "admin_delete_cheat": self.admin_delete_cheat,
             # Merchant-facing
             "merchant_register": self.merchant_register,
             "merchant_login": self.merchant_login,
@@ -873,6 +882,174 @@ class handler(BaseHTTPRequestHandler):
             self._json(200, {"status": "deleted", "base_id": base_id})
         else:
             self._json(500, {"error": str(result)})
+
+    # ═══════════════════════════════════════════
+    # CHEAT SHOP — ADMIN
+    # ═══════════════════════════════════════════
+
+    def admin_create_cheat(self, q, body):
+        """Admin-only: create a new cheat product."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        name = body.get("name", "").strip()
+        description = body.get("description", "").strip()
+        price = float(body.get("price", 0))
+        download_url = body.get("download_url", "").strip()
+        image_url = body.get("image_url", "").strip()
+
+        if not name or price <= 0:
+            self._json(400, {"error": "Name and price (>$0) required"})
+            return
+
+        code, result = sb_post("cheats", {
+            "name": name,
+            "description": description,
+            "price": price,
+            "download_url": download_url,
+            "image_url": image_url,
+            "status": "active"
+        })
+        if code in [200, 201]:
+            self._json(200, {"status": "created", "name": name, "price": price})
+        else:
+            self._json(500, {"error": str(result)})
+
+    def admin_list_cheats(self, q, body):
+        """Admin-only: list all cheats with download URLs."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        code, cheats = sb_get("cheats", "select=*&order=created_at.desc")
+        if code == 200:
+            self._json(200, {"cheats": cheats})
+        else:
+            self._json(500, {"error": str(cheats)})
+
+    def admin_update_cheat(self, q, body):
+        """Admin-only: update a cheat product."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        cheat_id = body.get("cheat_id", "")
+        if not cheat_id:
+            self._json(400, {"error": "cheat_id required"})
+            return
+        updates = {}
+        for field in ["name", "description", "price", "download_url", "image_url", "status"]:
+            if field in body:
+                updates[field] = body[field]
+        if not updates:
+            self._json(400, {"error": "No fields to update"})
+            return
+        updates["updated_at"] = "now()"
+        code, result = sb_patch("cheats", f"id=eq.{cheat_id}", updates)
+        if code == 200:
+            self._json(200, {"status": "updated", "cheat_id": cheat_id})
+        else:
+            self._json(500, {"error": str(result)})
+
+    def admin_delete_cheat(self, q, body):
+        """Admin-only: deactivate a cheat."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        cheat_id = body.get("cheat_id", "")
+        if not cheat_id:
+            self._json(400, {"error": "cheat_id required"})
+            return
+        code, result = sb_patch("cheats", f"id=eq.{cheat_id}", {"status": "inactive"})
+        if code == 200:
+            self._json(200, {"status": "deactivated"})
+        else:
+            self._json(500, {"error": str(result)})
+
+    # ═══════════════════════════════════════════
+    # CHEAT SHOP — OPERATOR
+    # ═══════════════════════════════════════════
+
+    def browse_cheats(self, q, body):
+        """List active cheats (no download URL exposed)."""
+        code, cheats = sb_get("cheats", "status=eq.active&select=id,name,description,price,image_url,created_at&order=created_at.desc")
+        if code == 200:
+            self._json(200, {"cheats": cheats})
+        else:
+            self._json(500, {"error": str(cheats)})
+
+    def purchase_cheat(self, q, body):
+        """Purchase a cheat — deduct wallet, return download link."""
+        operator_id = self.headers.get("X-Operator-Id", "") or body.get("operator_id", "")
+        cheat_id = body.get("cheat_id", "")
+
+        if not operator_id or not cheat_id:
+            self._json(400, {"error": "operator_id and cheat_id required"})
+            return
+
+        # Check if already purchased
+        pc, existing = sb_get("cheat_purchases", f"operator_id=eq.{operator_id}&cheat_id=eq.{cheat_id}&select=id")
+        if pc == 200 and existing:
+            # Already owns it — just return the download link
+            cc, cheat_data = sb_get("cheats", f"id=eq.{cheat_id}&select=download_url,name")
+            if cc == 200 and cheat_data:
+                self._json(200, {"status": "already_owned", "download_url": cheat_data[0]["download_url"], "name": cheat_data[0]["name"]})
+            else:
+                self._json(500, {"error": "Could not retrieve cheat"})
+            return
+
+        # Get cheat info
+        cc, cheats = sb_get("cheats", f"id=eq.{cheat_id}&status=eq.active&select=*")
+        if cc != 200 or not cheats:
+            self._json(404, {"error": "Cheat not found or inactive"})
+            return
+        cheat = cheats[0]
+        price = float(cheat["price"])
+
+        # Check wallet
+        wc, wallets = sb_get("wallets", f"operator_id=eq.{operator_id}&select=*")
+        if wc != 200 or not wallets:
+            self._json(400, {"error": "No wallet found. Deposit funds first."})
+            return
+        wallet = wallets[0]
+        balance = float(wallet["balance"])
+
+        if balance < price:
+            self._json(400, {"error": f"Insufficient balance. Need ${price:.2f}, have ${balance:.2f}"})
+            return
+
+        # Deduct balance
+        new_bal = balance - price
+        new_spent = float(wallet["total_spent"]) + price
+        sb_patch("wallets", f"operator_id=eq.{operator_id}", {
+            "balance": new_bal,
+            "total_spent": new_spent
+        })
+
+        # Record purchase
+        sb_post("cheat_purchases", {
+            "cheat_id": cheat_id,
+            "operator_id": operator_id,
+            "price_paid": price
+        })
+
+        self._json(200, {
+            "status": "purchased",
+            "name": cheat["name"],
+            "download_url": cheat["download_url"],
+            "price_paid": price,
+            "new_balance": new_bal
+        })
+
+    def my_cheats_list(self, q, body):
+        """Get operator's purchased cheats with download links."""
+        operator_id = self.headers.get("X-Operator-Id", "") or q.get("operator_id", [""])[0]
+        if not operator_id:
+            self._json(400, {"error": "operator_id required"})
+            return
+        code, purchases = sb_get("cheat_purchases", f"operator_id=eq.{operator_id}&select=*,cheats(name,description,download_url,image_url)&order=purchased_at.desc")
+        if code == 200:
+            self._json(200, {"purchases": purchases})
+        else:
+            self._json(500, {"error": str(purchases)})
 
     # ─── Response helper ───
 

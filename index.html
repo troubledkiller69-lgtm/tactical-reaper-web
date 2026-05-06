@@ -890,6 +890,7 @@
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
+                    <a onclick="switchTab('cheats')" id="nav-cheats" style="color:#e74c3c;">CHEATS</a>
                     <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
     
                     <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
@@ -1159,6 +1160,42 @@
                     </div>
                     <div id="admin-deposit-status" style="margin-top: 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
                 </div>
+
+                <!-- Cheat Management -->
+                <div class="card" style="margin-top: 2rem; border: 1px solid #e74c3c; background: rgba(231, 76, 60, 0.02);">
+                    <h3 style="color: #e74c3c;">CHEAT MANAGEMENT</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="font-size: 0.6rem; color: #666;">CHEAT NAME</label>
+                            <input type="text" id="admin-cheat-name" placeholder="e.g. AIMBOT v2.1" style="margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.6rem; color: #666;">PRICE ($)</label>
+                            <input type="number" id="admin-cheat-price" placeholder="25.00" min="0.50" step="0.50" style="margin-bottom:0;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <label style="font-size: 0.6rem; color: #666;">DESCRIPTION</label>
+                        <textarea id="admin-cheat-desc" placeholder="Features, game, version info..." style="height: 60px; margin-bottom: 0;"></textarea>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <label style="font-size: 0.6rem; color: #666;">DOWNLOAD URL (hidden from buyers until purchase)</label>
+                        <input type="text" id="admin-cheat-url" placeholder="https://mega.nz/... or direct link" style="margin-bottom:0;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="font-size: 0.6rem; color: #666;">IMAGE URL (optional preview image)</label>
+                        <input type="text" id="admin-cheat-img" placeholder="https://i.imgur.com/..." style="margin-bottom:0;">
+                    </div>
+                    <button class="btn" style="background: #e74c3c; color: #fff; font-weight: 900;" onclick="adminCreateCheat()">PUBLISH CHEAT</button>
+                    <div id="admin-cheat-status" style="margin-top: 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
+
+                    <div style="margin-top: 1.5rem; border-top: 1px solid #222; padding-top: 1rem;">
+                        <h4 style="color: #e74c3c; font-size: 0.7rem; margin-bottom: 0.8rem;">PUBLISHED CHEATS</h4>
+                        <div id="admin-cheat-list" style="max-height: 300px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa;">
+                            > LOADING...
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1412,6 +1449,33 @@
                 </div>
                 <div id="shop-my-cards" style="max-height: 400px; overflow-y: auto;">
                     <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.65rem; padding: 1rem;">No purchases yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ CHEAT SHOP TAB ═══ -->
+        <div id="tab-cheats" class="tab-content">
+            <div style="margin-top:2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                    <h2 style="font-weight:900; letter-spacing:4px; color: #e74c3c;">CHEAT SHOP</h2>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div>
+                            <div class="shop-wallet-label">BALANCE</div>
+                            <div class="shop-wallet-bal" id="cheat-balance">$0.00</div>
+                        </div>
+                        <button class="btn" style="width: auto; padding: 0.6rem 1.2rem; font-size: 0.6rem; background: var(--success); color: #000; font-weight: 900;" onclick="showDepositModal()">DEPOSIT</button>
+                    </div>
+                </div>
+
+                <div id="cheat-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">Loading cheats...</div>
+                </div>
+
+                <div style="margin-top: 3rem; border-top: 1px solid #222; padding-top: 2rem;">
+                    <h3 style="font-weight:900; letter-spacing:3px; color: #e74c3c; margin-bottom: 1rem; font-size: 0.8rem;">MY PURCHASES</h3>
+                    <div id="cheat-my-purchases" style="max-height: 400px; overflow-y: auto;">
+                        <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.65rem; padding: 1rem;">No purchases yet.</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2943,9 +3007,15 @@
                 loadShopBases();
                 loadMyCards();
             }
+            if (tab === 'cheats' || tab === 'tab-cheats') {
+                loadCheatWallet();
+                loadCheats();
+                loadMyCheatPurchases();
+            }
             if (tab === 'admin' || tab === 'tab-admin') {
                 loadVendors('pending');
                 loadInvites();
+                loadAdminCheats();
             }
         };
 
@@ -3120,6 +3190,166 @@
                     status.innerHTML = `<span style="color:var(--error)">${d.error || 'FAILED TO CREATE INVOICE'}</span>`;
                 }
             } catch(e) { status.innerHTML = '<span style="color:var(--error)">CONNECTION ERROR</span>'; }
+        }
+
+        // ═══════════════════════════════════════════
+        // CHEAT SHOP — OPERATOR
+        // ═══════════════════════════════════════════
+
+        async function loadCheatWallet() {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            try {
+                const r = await fetch('/api/shop?action=wallet&operator_id=' + op);
+                const d = await r.json();
+                const el = document.getElementById('cheat-balance');
+                if (el) el.innerText = '$' + parseFloat(d.balance || 0).toFixed(2);
+            } catch(e) {}
+        }
+
+        async function loadCheats() {
+            const grid = document.getElementById('cheat-grid');
+            if (!grid) return;
+            grid.innerHTML = '<div style="color:#555;font-family:JetBrains Mono;font-size:0.7rem;padding:2rem;text-align:center;">Loading...</div>';
+            try {
+                const r = await fetch('/api/shop?action=browse_cheats');
+                const d = await r.json();
+                const cheats = d.cheats || [];
+                if (!cheats.length) { grid.innerHTML = '<div style="color:#555;font-family:JetBrains Mono;font-size:0.7rem;padding:2rem;text-align:center;">No cheats available yet.</div>'; return; }
+                grid.innerHTML = cheats.map(c => {
+                    const img = c.image_url ? `<div style="width:100%;height:160px;background:url('${c.image_url}') center/cover no-repeat;border-bottom:1px solid #222;"></div>` : `<div style="width:100%;height:160px;background:linear-gradient(135deg,#1a0000,#0a0a0a);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #222;"><span style="font-size:2rem;">🎮</span></div>`;
+                    return `<div style="background:#050505;border:1px solid #222;transition:0.2s;cursor:pointer;" onmouseover="this.style.borderColor='#e74c3c'" onmouseout="this.style.borderColor='#222'">
+                        ${img}
+                        <div style="padding:1.2rem;">
+                            <div style="font-weight:900;font-size:0.85rem;color:#fff;margin-bottom:0.3rem;">${c.name}</div>
+                            <div style="font-family:'JetBrains Mono';font-size:0.55rem;color:#888;margin-bottom:1rem;line-height:1.6;">${c.description || 'No description.'}</div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-family:'JetBrains Mono';font-size:1.1rem;color:#e74c3c;font-weight:900;">$${parseFloat(c.price).toFixed(2)}</span>
+                                <button class="btn" style="width:auto;padding:0.5rem 1.2rem;font-size:0.6rem;background:#e74c3c;color:#fff;font-weight:900;" onclick="purchaseCheat('${c.id}','${c.name}',${c.price})">PURCHASE</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) { grid.innerHTML = '<div style="color:var(--error);padding:2rem;">ERROR LOADING CHEATS</div>'; }
+        }
+
+        async function purchaseCheat(cheatId, name, price) {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            if (!confirm(`Purchase ${name} for $${price.toFixed(2)}? This will deduct from your wallet.`)) return;
+            try {
+                const r = await fetch('/api/shop?action=purchase_cheat', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json', 'X-Operator-Id': op},
+                    body: JSON.stringify({ operator_id: op, cheat_id: cheatId })
+                });
+                const d = await r.json();
+                if (d.status === 'purchased' || d.status === 'already_owned') {
+                    const msg = d.status === 'already_owned' ? 'You already own this!' : `Purchased for $${d.price_paid.toFixed(2)}!`;
+                    alert(msg + '\nDownload link copied to clipboard.');
+                    navigator.clipboard.writeText(d.download_url);
+                    loadCheatWallet();
+                    loadMyCheatPurchases();
+                    // Also update shop balance since they share wallets
+                    loadShopWallet();
+                } else {
+                    alert(d.error || 'Purchase failed');
+                }
+            } catch(e) { alert('Connection error'); }
+        }
+
+        async function loadMyCheatPurchases() {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            const container = document.getElementById('cheat-my-purchases');
+            if (!container) return;
+            try {
+                const r = await fetch('/api/shop?action=my_cheats&operator_id=' + op, {
+                    headers: {'X-Operator-Id': op}
+                });
+                const d = await r.json();
+                const purchases = d.purchases || [];
+                if (!purchases.length) { container.innerHTML = '<div style="color:#555;font-family:JetBrains Mono;font-size:0.65rem;padding:1rem;">No purchases yet.</div>'; return; }
+                container.innerHTML = purchases.map(p => {
+                    const c = p.cheats || {};
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.8rem;border-bottom:1px solid #111;">
+                        <div>
+                            <div style="font-weight:900;color:#fff;font-size:0.75rem;">${c.name || 'Unknown'}</div>
+                            <div style="font-family:'JetBrains Mono';font-size:0.5rem;color:#555;">${c.description || ''}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.8rem;">
+                            <span style="font-family:'JetBrains Mono';font-size:0.6rem;color:#888;">$${parseFloat(p.price_paid).toFixed(2)}</span>
+                            <button class="btn" style="width:auto;padding:0.4rem 1rem;font-size:0.55rem;background:#e74c3c;color:#fff;" onclick="navigator.clipboard.writeText('${c.download_url || ''}');this.innerText='COPIED!';setTimeout(()=>this.innerText='DOWNLOAD',1500)">DOWNLOAD</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) { container.innerHTML = '<div style="color:var(--error);padding:1rem;">ERROR</div>'; }
+        }
+
+        // ═══════════════════════════════════════════
+        // ADMIN: CHEAT MANAGEMENT
+        // ═══════════════════════════════════════════
+
+        async function adminCreateCheat() {
+            const ak = sessionStorage.getItem('ak');
+            const name = document.getElementById('admin-cheat-name').value.trim();
+            const price = parseFloat(document.getElementById('admin-cheat-price').value) || 0;
+            const desc = document.getElementById('admin-cheat-desc').value.trim();
+            const url = document.getElementById('admin-cheat-url').value.trim();
+            const img = document.getElementById('admin-cheat-img').value.trim();
+            const status = document.getElementById('admin-cheat-status');
+
+            if (!name || price <= 0) { status.innerHTML = '<span style="color:var(--error)">NAME AND PRICE REQUIRED</span>'; return; }
+            status.innerHTML = '> PUBLISHING...';
+            try {
+                const r = await fetch('/api/shop?action=admin_create_cheat', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Admin-Key': ak},
+                    body: JSON.stringify({ name, description: desc, price, download_url: url, image_url: img })
+                });
+                const d = await r.json();
+                if (d.status === 'created') {
+                    status.innerHTML = `<span style="color:var(--success)">PUBLISHED: ${name} @ $${price.toFixed(2)}</span>`;
+                    document.getElementById('admin-cheat-name').value = '';
+                    document.getElementById('admin-cheat-price').value = '';
+                    document.getElementById('admin-cheat-desc').value = '';
+                    document.getElementById('admin-cheat-url').value = '';
+                    document.getElementById('admin-cheat-img').value = '';
+                    loadAdminCheats();
+                } else { status.innerHTML = `<span style="color:var(--error)">${d.error || 'FAILED'}</span>`; }
+            } catch(e) { status.innerHTML = '<span style="color:var(--error)">ERROR</span>'; }
+        }
+
+        async function loadAdminCheats() {
+            const ak = sessionStorage.getItem('ak');
+            if (!ak) return;
+            const list = document.getElementById('admin-cheat-list');
+            if (!list) return;
+            try {
+                const r = await fetch('/api/shop?action=admin_list_cheats', { headers: {'X-Admin-Key': ak} });
+                const d = await r.json();
+                const cheats = d.cheats || [];
+                if (!cheats.length) { list.innerHTML = '> NO CHEATS PUBLISHED'; return; }
+                list.innerHTML = cheats.map(c => {
+                    const sc = c.status === 'active' ? 'var(--success)' : '#555';
+                    const toggle = c.status === 'active'
+                        ? `<button onclick="toggleCheat('${c.id}','inactive')" style="background:var(--error);color:#000;border:none;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;">DEACTIVATE</button>`
+                        : `<button onclick="toggleCheat('${c.id}','active')" style="background:var(--success);color:#000;border:none;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;">ACTIVATE</button>`;
+                    return `<div style="display:grid;grid-template-columns:2fr 0.8fr 0.6fr auto;gap:0.5rem;align-items:center;padding:0.6rem 0;border-bottom:1px solid #111;">
+                        <span style="color:#fff;">${c.name}</span>
+                        <span style="color:#e74c3c;font-weight:900;">$${parseFloat(c.price).toFixed(2)}</span>
+                        <span style="color:${sc};font-size:0.55rem;font-weight:900;">${c.status.toUpperCase()}</span>
+                        <span>${toggle}</span>
+                    </div>`;
+                }).join('');
+            } catch(e) { list.innerHTML = '> ERROR'; }
+        }
+
+        async function toggleCheat(cheatId, newStatus) {
+            const ak = sessionStorage.getItem('ak');
+            try {
+                await fetch('/api/shop?action=admin_update_cheat', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Admin-Key': ak},
+                    body: JSON.stringify({ cheat_id: cheatId, status: newStatus })
+                });
+                loadAdminCheats();
+            } catch(e) {}
         }
 
     </script>
