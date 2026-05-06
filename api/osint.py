@@ -9,10 +9,61 @@ from urllib.parse import parse_qs, urlparse
 # BIFROST UNIFIED OSINT (v18.2)
 # Consolidates Carrier Lookup, Maigret, and Ghunt into a single endpoint.
 
+# ── US CARRIER → EMAIL GATEWAY MAP ──
 CARRIER_GATEWAYS = {
-    'AT&T': 'txt.att.net', 'T-Mobile': 'tmomail.net', 'Verizon': 'vtext.com',
-    'Sprint': 'messaging.sprintpcs.com', 'US Cellular': 'email.uscc.net'
+    'AT&T':              {'sms': 'txt.att.net',                'mms': 'mms.att.net'},
+    'T-Mobile':          {'sms': 'tmomail.net',                'mms': 'tmomail.net'},
+    'Verizon':           {'sms': 'vtext.com',                  'mms': 'vzwpix.com'},
+    'Sprint':            {'sms': 'messaging.sprintpcs.com',    'mms': 'pm.sprint.com'},
+    'US Cellular':       {'sms': 'email.uscc.net',             'mms': 'mms.uscc.net'},
+    'Boost Mobile':      {'sms': 'sms.myboostmobile.com',      'mms': 'myboostmobile.com'},
+    'Cricket':           {'sms': 'sms.cricketwireless.net',    'mms': 'mms.cricketwireless.net'},
+    'Metro PCS':         {'sms': 'mymetropcs.com',             'mms': 'mymetropcs.com'},
+    'Google Fi':         {'sms': 'msg.fi.google.com',          'mms': 'msg.fi.google.com'},
+    'Consumer Cellular': {'sms': 'mailmymobile.net',           'mms': 'mailmymobile.net'},
+    'Virgin Mobile':     {'sms': 'vmobl.com',                  'mms': 'vmpix.com'},
+    'Republic Wireless': {'sms': 'text.republicwireless.com',  'mms': 'text.republicwireless.com'},
+    'Xfinity Mobile':    {'sms': 'vtext.com',                  'mms': 'vzwpix.com'},
+    'Mint Mobile':       {'sms': 'tmomail.net',                'mms': 'tmomail.net'},
+    'Visible':           {'sms': 'vtext.com',                  'mms': 'vzwpix.com'},
+    'Straight Talk':     {'sms': 'vtext.com',                  'mms': 'mypixmessages.com'},
+    'TracFone':          {'sms': 'mmst5.tracfone.com',         'mms': 'mmst5.tracfone.com'},
+    'Ting':              {'sms': 'message.ting.com',            'mms': 'message.ting.com'},
+    'C Spire':           {'sms': 'cspire1.com',                'mms': 'cspire1.com'},
+    'Spectrum Mobile':   {'sms': 'vtext.com',                  'mms': 'vzwpix.com'},
 }
+
+CARRIER_ALIASES = {
+    'at&t': 'AT&T', 'att': 'AT&T', 'cingular': 'AT&T',
+    't-mobile': 'T-Mobile', 'metropcs': 'Metro PCS', 'metro by t-mobile': 'Metro PCS',
+    'verizon': 'Verizon', 'cellco': 'Verizon',
+    'sprint': 'Sprint',
+    'us cellular': 'US Cellular',
+    'boost mobile': 'Boost Mobile',
+    'cricket': 'Cricket',
+    'google fi': 'Google Fi',
+    'consumer cellular': 'Consumer Cellular',
+    'virgin mobile': 'Virgin Mobile',
+    'republic wireless': 'Republic Wireless',
+    'xfinity mobile': 'Xfinity Mobile', 'comcast': 'Xfinity Mobile',
+    'mint mobile': 'Mint Mobile',
+    'visible': 'Visible', 'page plus': 'Visible',
+    'straight talk': 'Straight Talk',
+    'tracfone': 'TracFone',
+    'ting': 'Ting',
+    'c spire': 'C Spire',
+    'spectrum mobile': 'Spectrum Mobile', 'charter': 'Spectrum Mobile',
+}
+
+def resolve_carrier(raw_name):
+    if not raw_name: return None
+    lower = raw_name.lower().strip()
+    if raw_name in CARRIER_GATEWAYS: return raw_name
+    if lower in CARRIER_ALIASES: return CARRIER_ALIASES[lower]
+    for alias, canonical in CARRIER_ALIASES.items():
+        if alias in lower or lower in alias:
+            return canonical
+    return None
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -49,10 +100,35 @@ class handler(BaseHTTPRequestHandler):
     def carrier_lookup(self, phone):
         if not phone: return {"error": "MISSING_PHONE"}
         try:
-            num = phonenumbers.parse(phone, "US")
-            carrier = pn_carrier.name_for_number(num, "en")
-            digits = ''.join(filter(str.isdigit, phone))
-            return {"status": "success", "phone": phone, "carrier": carrier, "digits": digits}
+            number = phonenumbers.parse(phone, "US")
+            if not phonenumbers.is_valid_number(number):
+                return {"error": "INVALID_PHONE"}
+            
+            national = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.NATIONAL)
+            digits = ''.join(filter(str.isdigit, national))
+            
+            # Offline lookup via phonenumbers library
+            raw_carrier = pn_carrier.name_for_number(number, "en") or "Unknown"
+            canonical = resolve_carrier(raw_carrier)
+            
+            result = {
+                "status": "success",
+                "phone": phone,
+                "national": national,
+                "digits": digits,
+                "carrier_raw": raw_carrier,
+                "carrier": canonical or raw_carrier,
+                "resolved": canonical is not None and canonical in CARRIER_GATEWAYS,
+            }
+            
+            if canonical and canonical in CARRIER_GATEWAYS:
+                gw = CARRIER_GATEWAYS[canonical]
+                result['sms_gateway'] = f"{digits}@{gw['sms']}"
+                result['mms_gateway'] = f"{digits}@{gw['mms']}"
+                result['sms_domain'] = gw['sms']
+                result['mms_domain'] = gw['mms']
+
+            return result
         except: return {"error": "PARSE_ERROR"}
 
     def maigret_scan(self, username):
