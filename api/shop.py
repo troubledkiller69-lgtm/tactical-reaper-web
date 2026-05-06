@@ -102,6 +102,8 @@ class handler(BaseHTTPRequestHandler):
             "my_cards": self.my_cards,
             # Admin
             "deposit": self.admin_deposit,
+            "list_vendors": self.list_vendors,
+            "approve_vendor": self.approve_vendor,
             # Merchant-facing
             "merchant_register": self.merchant_register,
             "merchant_login": self.merchant_login,
@@ -367,16 +369,48 @@ class handler(BaseHTTPRequestHandler):
 
         self._json(200, {"status": "deposited", "new_balance": new_bal})
 
+    def list_vendors(self, q, body):
+        """Admin-only: list all merchant accounts."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        status_filter = q.get("status", [""])[0]
+        params = "select=id,username,display_name,jabber,status,balance,created_at&order=created_at.desc"
+        if status_filter:
+            params += f"&status=eq.{status_filter}"
+        code, vendors = sb_get("merchants", params)
+        if code == 200:
+            self._json(200, {"vendors": vendors})
+        else:
+            self._json(500, {"error": str(vendors)})
+
+    def approve_vendor(self, q, body):
+        """Admin-only: approve or reject a vendor."""
+        if self.headers.get("X-Admin-Key") != ADMIN_KEY:
+            self._json(401, {"error": "UNAUTHORIZED"})
+            return
+        vendor_id = body.get("vendor_id", "")
+        new_status = body.get("status", "active")  # active, suspended, banned
+        if not vendor_id:
+            self._json(400, {"error": "vendor_id required"})
+            return
+        code, result = sb_patch("merchants", f"id=eq.{vendor_id}", {"status": new_status})
+        if code == 200:
+            self._json(200, {"status": "updated", "vendor_id": vendor_id, "new_status": new_status})
+        else:
+            self._json(500, {"error": str(result)})
+
     # ═══════════════════════════════════════════
     # MERCHANT ENDPOINTS
     # ═══════════════════════════════════════════
 
     def merchant_register(self, q, body):
-        """Register a new merchant account."""
+        """Register a new merchant account (pending approval)."""
         username = body.get("username", "").strip().lower()
         password = body.get("password", "")
         display_name = body.get("display_name", username)
         jabber = body.get("jabber", "")
+        telegram = body.get("telegram", "")
 
         if not username or not password or len(password) < 6:
             self._json(400, {"error": "Username and password (6+ chars) required"})
@@ -389,24 +423,21 @@ class handler(BaseHTTPRequestHandler):
             return
 
         pw_hash, salt = hash_password(password)
-        token = secrets.token_hex(32)
 
         code, result = sb_post("merchants", {
             "username": username,
             "password_hash": pw_hash,
             "salt": salt,
             "display_name": display_name,
-            "jabber": jabber,
-            "session_token": token
+            "jabber": jabber or telegram,
+            "status": "pending",
+            "session_token": ""
         })
 
         if code in [200, 201]:
-            m = result[0] if isinstance(result, list) else result
             self._json(200, {
-                "status": "registered",
-                "token": token,
-                "merchant_id": m.get("id", ""),
-                "display_name": display_name
+                "status": "pending",
+                "message": "Application submitted. Contact admin on Telegram for approval."
             })
         else:
             self._json(500, {"error": str(result)})
@@ -426,8 +457,11 @@ class handler(BaseHTTPRequestHandler):
             return
 
         m = merchants[0]
+        if m["status"] == "pending":
+            self._json(403, {"error": "PENDING_APPROVAL: Your application is awaiting admin review. Contact @your_telegram for faster processing."})
+            return
         if m["status"] != "active":
-            self._json(403, {"error": "Account suspended"})
+            self._json(403, {"error": "Account suspended or banned"})
             return
 
         if not verify_password(password, m["password_hash"], m["salt"]):

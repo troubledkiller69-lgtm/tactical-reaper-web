@@ -866,8 +866,9 @@
                         <input type="text" id="merch-reg-user" placeholder="USERNAME">
                         <input type="password" id="merch-reg-pass" placeholder="PASSWORD (6+ CHARS)">
                         <input type="text" id="merch-reg-display" placeholder="DISPLAY NAME">
-                        <input type="text" id="merch-reg-jabber" placeholder="JABBER / CONTACT (OPTIONAL)">
-                        <button class="btn" onclick="handleMerchantRegister()">CREATE ACCOUNT</button>
+                        <input type="text" id="merch-reg-jabber" placeholder="TELEGRAM / JABBER CONTACT">
+                        <button class="btn" onclick="handleMerchantRegister()">SUBMIT APPLICATION</button>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.5rem; color:#555; margin-top:0.8rem; line-height:1.6;">VENDOR ACCOUNTS REQUIRE ADMIN APPROVAL.<br>CONTACT <a href="https://t.me/rxtribution" target="_blank" style="color:var(--primary); text-decoration:none;">@RXTRIBUTION</a> ON TELEGRAM FOR FAST PROCESSING.</p>
                         <button class="btn" style="margin-top: 0.8rem; background: transparent; border: 1px solid var(--border); font-size: 0.6rem;" onclick="showMerchantLogin()">BACK TO LOGIN</button>
                     </div>
                     <p id="merch-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
@@ -1113,6 +1114,37 @@
                         </div>
                         <button class="btn" style="margin-top: 1rem; background: transparent; border: 1px solid #333; font-size: 0.6rem;" onclick="loadVault()">REFRESH VAULT</button>
                     </div>
+                    </div>
+                </div>
+
+                <!-- Vendor Management -->
+                <div class="card" style="margin-top: 2rem; border: 1px solid #f39c12; background: rgba(243, 156, 18, 0.02);">
+                    <h3 style="color: #f39c12;">VENDOR MANAGEMENT</h3>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                        <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.55rem; background: #f39c12; color: #000;" onclick="loadVendors('pending')">PENDING</button>
+                        <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.55rem; background: transparent; border: 1px solid #333;" onclick="loadVendors('active')">ACTIVE</button>
+                        <button class="btn" style="width: auto; padding: 0.5rem 1rem; font-size: 0.55rem; background: transparent; border: 1px solid #333;" onclick="loadVendors('')">ALL</button>
+                    </div>
+                    <div id="admin-vendor-list" style="max-height: 400px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa;">
+                        > LOADING VENDORS...
+                    </div>
+                </div>
+
+                <!-- Wallet Deposit -->
+                <div class="card" style="margin-top: 2rem; border: 1px solid var(--primary);">
+                    <h3 style="color: var(--primary);">CREDIT OPERATOR WALLET</h3>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.8rem; align-items: end;">
+                        <div>
+                            <label style="font-size: 0.6rem; color: #666;">OPERATOR ID</label>
+                            <input type="text" id="admin-deposit-op" placeholder="Operator name" style="margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.6rem; color: #666;">AMOUNT ($)</label>
+                            <input type="number" id="admin-deposit-amt" placeholder="25.00" min="0.50" step="0.50" style="margin-bottom:0;">
+                        </div>
+                        <button class="btn" style="width: auto; padding: 0.8rem 1.5rem; background: var(--primary); color: #000;" onclick="adminCreditWallet()">CREDIT</button>
+                    </div>
+                    <div id="admin-deposit-status" style="margin-top: 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
                 </div>
             </div>
         </div>
@@ -2638,13 +2670,13 @@
                     body: JSON.stringify({username: u, password: p, display_name: dn, jabber: jb})
                 });
                 const d = await r.json();
-                if (d.status === 'registered') {
-                    sessionStorage.setItem('merchant_token', d.token);
-                    sessionStorage.setItem('merchant_id', d.merchant_id);
-                    sessionStorage.setItem('merchant_name', d.display_name);
-                    sessionStorage.setItem('is_merchant', 'true');
-                    location.reload();
-                } else { err.style.color = 'var(--error)'; err.innerText = d.error || 'REGISTRATION FAILED'; }
+                if (d.status === 'pending') {
+                    err.style.color = 'var(--success)';
+                    err.innerText = d.message || 'APPLICATION SUBMITTED. AWAITING ADMIN APPROVAL.';
+                    document.getElementById('merch-reg-user').value = '';
+                    document.getElementById('merch-reg-pass').value = '';
+                } else if (d.error) { err.style.color = 'var(--error)'; err.innerText = d.error; }
+                else { err.style.color = 'var(--error)'; err.innerText = 'UNEXPECTED RESPONSE'; }
             } catch(e) { err.style.color = 'var(--error)'; err.innerText = 'CONNECTION ERROR'; }
         }
 
@@ -2896,7 +2928,73 @@
                 loadShopBases();
                 loadMyCards();
             }
+            if (tab === 'admin' || tab === 'tab-admin') {
+                loadVendors('pending');
+            }
         };
+
+        // ═══════════════════════════════════════════
+        // ADMIN: VENDOR MANAGEMENT + WALLET CREDIT
+        // ═══════════════════════════════════════════
+        async function loadVendors(statusFilter) {
+            const ak = sessionStorage.getItem('ak');
+            if (!ak) return;
+            const list = document.getElementById('admin-vendor-list');
+            list.innerHTML = '> LOADING...';
+            try {
+                let url = '/api/shop?action=list_vendors';
+                if (statusFilter) url += '&status=' + statusFilter;
+                const r = await fetch(url, { headers: {'X-Admin-Key': ak} });
+                const d = await r.json();
+                const vendors = d.vendors || [];
+                if (!vendors.length) { list.innerHTML = '> NO VENDORS FOUND'; return; }
+                list.innerHTML = vendors.map(v => {
+                    const sc = v.status === 'active' ? 'var(--success)' : v.status === 'pending' ? '#f39c12' : 'var(--error)';
+                    const actions = v.status === 'pending'
+                        ? `<button onclick="approveVendor('${v.id}','active')" style="background:var(--success);color:#000;border:none;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;margin-right:4px;">APPROVE</button><button onclick="approveVendor('${v.id}','banned')" style="background:var(--error);color:#000;border:none;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;">REJECT</button>`
+                        : v.status === 'active'
+                        ? `<button onclick="approveVendor('${v.id}','suspended')" style="background:#333;color:var(--error);border:1px solid #555;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;">SUSPEND</button>`
+                        : `<button onclick="approveVendor('${v.id}','active')" style="background:#333;color:var(--success);border:1px solid #555;padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono';font-size:0.5rem;">REACTIVATE</button>`;
+                    return `<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 0.8fr auto;gap:0.5rem;align-items:center;padding:0.6rem 0.8rem;border-bottom:1px solid #111;">
+                        <span style="color:#fff;">${v.display_name} <span style="color:#555;font-size:0.5rem;">(${v.username})</span></span>
+                        <span style="color:#888;font-size:0.55rem;">${v.jabber || 'No contact'}</span>
+                        <span style="color:#888;font-size:0.55rem;">$${parseFloat(v.balance || 0).toFixed(2)}</span>
+                        <span style="color:${sc};font-size:0.55rem;font-weight:900;">${v.status.toUpperCase()}</span>
+                        <span>${actions}</span>
+                    </div>`;
+                }).join('');
+            } catch(e) { list.innerHTML = '> ERROR: ' + e.message; }
+        }
+
+        async function approveVendor(vendorId, newStatus) {
+            const ak = sessionStorage.getItem('ak');
+            try {
+                await fetch('/api/shop?action=approve_vendor', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Admin-Key': ak},
+                    body: JSON.stringify({ vendor_id: vendorId, status: newStatus })
+                });
+                loadVendors('pending');
+            } catch(e) {}
+        }
+
+        async function adminCreditWallet() {
+            const ak = sessionStorage.getItem('ak');
+            const op = document.getElementById('admin-deposit-op').value.trim();
+            const amt = parseFloat(document.getElementById('admin-deposit-amt').value) || 0;
+            const status = document.getElementById('admin-deposit-status');
+            if (!op || amt <= 0) { status.innerHTML = '<span style="color:var(--error)">OPERATOR ID + AMOUNT REQUIRED</span>'; return; }
+            status.innerHTML = '> PROCESSING...';
+            try {
+                const r = await fetch('/api/shop?action=deposit', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Admin-Key': ak},
+                    body: JSON.stringify({ operator_id: op, amount: amt })
+                });
+                const d = await r.json();
+                if (d.status === 'deposited') {
+                    status.innerHTML = `<span style="color:var(--success)">CREDITED $${amt.toFixed(2)} → ${op} | NEW BAL: $${d.new_balance.toFixed(2)}</span>`;
+                } else { status.innerHTML = `<span style="color:var(--error)">${d.error || 'FAILED'}</span>`; }
+            } catch(e) { status.innerHTML = '<span style="color:var(--error)">ERROR</span>'; }
+        }
 
     </script>
 </body>
