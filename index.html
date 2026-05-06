@@ -2108,6 +2108,15 @@
             if (sessionTimerStarted) return;
             sessionTimerStarted = true;
             setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const h = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+                const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+                const s = (elapsed % 60).toString().padStart(2, '0');
+                const el = document.getElementById('dash-op-session-v2');
+                if (el) el.innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
         function fetchDashboardStats() {
             const op = sessionStorage.getItem('operator') || 'OPERATOR';
             const role = sessionStorage.getItem('role') || 'FIELD AGENT';
