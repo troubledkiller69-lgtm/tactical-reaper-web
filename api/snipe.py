@@ -3,12 +3,8 @@ import json
 import urllib.parse
 import traceback
 
-try:
-    from curl_cffi import requests
-    USE_CURL_CFFI = True
-except ImportError:
-    import requests
-    USE_CURL_CFFI = False
+import requests
+USE_CURL_CFFI = False
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
