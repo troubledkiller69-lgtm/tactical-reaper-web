@@ -1458,8 +1458,12 @@
                     loadVault();
                 }
 
-                // Route handling (v17.2)
-                const path = window.location.pathname.replace('/', '') || 'dashboard';
+                // Route handling (v17.2) - Secured
+                let path = window.location.pathname.replace('/', '') || 'dashboard';
+                if (path === 'admin' && sessionStorage.getItem('role') !== 'commander') {
+                    path = 'dashboard';
+                    history.replaceState(null, '', '/');
+                }
                 switchTab(path, false);
             } 
         };
@@ -1471,6 +1475,11 @@
         }
 
         function switchTab(tab, updateHistory = true) {
+            // Permission Check
+            if (tab === 'admin' && sessionStorage.getItem('role') !== 'commander') {
+                return switchTab('dashboard', updateHistory);
+            }
+
             console.log('Switching to tab:', tab);
             
             // Clean tab ID
