@@ -776,6 +776,61 @@
         .carrier-result-value { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--success); word-break: break-all; }
 
         @media (max-width: 900px) { .tg-layout { grid-template-columns: 1fr; } .tg-add-row { grid-template-columns: 1fr 1fr; } }
+
+        /* ═══ CARD SHOP ═══ */
+        .shop-wallet-bar { display: flex; justify-content: space-between; align-items: center; background: #050505; border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--success); }
+        .shop-wallet-bal { font-family: 'JetBrains Mono'; font-size: 1.4rem; color: var(--success); font-weight: 900; }
+        .shop-wallet-label { font-size: 0.55rem; color: #555; text-transform: uppercase; letter-spacing: 2px; }
+        .shop-filters { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .shop-filters input, .shop-filters select { flex: 1; min-width: 120px; padding: 0.6rem; background: #000; border: 1px solid var(--border); color: #fff; font-family: 'JetBrains Mono'; font-size: 0.7rem; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.2rem; }
+        .shop-base-card { background: #050505; border: 1px solid var(--border); padding: 0; transition: 0.3s; position: relative; overflow: hidden; }
+        .shop-base-card:hover { border-color: #444; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,210,255,0.08); }
+        .shop-base-header { padding: 1.2rem 1.2rem 0.8rem; border-bottom: 1px solid #111; }
+        .shop-base-name { font-weight: 900; font-size: 0.8rem; color: #fff; margin-bottom: 0.3rem; }
+        .shop-base-vendor { font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .shop-base-body { padding: 1rem 1.2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+        .shop-base-stat { }
+        .shop-base-stat-label { font-family: 'JetBrains Mono'; font-size: 0.45rem; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+        .shop-base-stat-value { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #ccc; margin-top: 0.15rem; }
+        .shop-base-footer { display: flex; gap: 0.5rem; padding: 1rem 1.2rem; border-top: 1px solid #111; }
+        .shop-base-footer button { flex: 1; padding: 0.6rem; font-family: 'JetBrains Mono'; font-size: 0.6rem; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; border: none; transition: 0.3s; }
+        .shop-preview-btn { background: #111; color: var(--primary); border: 1px solid var(--border) !important; }
+        .shop-preview-btn:hover { background: #1a1a1a; }
+        .shop-acquire-btn { background: var(--success); color: #000; }
+        .shop-acquire-btn:hover { background: #00e6b8; }
+        .shop-price-tag { position: absolute; top: 0; right: 0; background: var(--success); color: #000; padding: 0.4rem 0.8rem; font-family: 'JetBrains Mono'; font-size: 0.75rem; font-weight: 900; }
+        .shop-qty-available { color: var(--success); }
+        .shop-section-title { font-weight: 900; letter-spacing: 3px; font-size: 0.85rem; color: #fff; text-transform: uppercase; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #222; }
+        .shop-acquired-card { background: #0a0a0a; border: 1px solid #222; padding: 0.8rem 1rem; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--success); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .shop-acquired-card .copy-btn { background: #222; border: 1px solid #333; color: #888; padding: 3px 8px; font-size: 0.5rem; cursor: pointer; font-family: 'JetBrains Mono'; }
+        .shop-acquired-card .copy-btn:hover { color: #fff; border-color: #fff; }
+
+        /* Modal overlay */
+        .shop-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .shop-modal-box { background: #0a0a0a; border: 1px solid var(--border); padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .shop-modal-box h3 { font-size: 0.85rem; font-weight: 900; letter-spacing: 3px; color: #fff; margin-bottom: 1.5rem; }
+        .shop-modal-close { background: none; border: 1px solid #333; color: var(--error); padding: 0.5rem 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem; cursor: pointer; float: right; }
+
+        /* ═══ MERCHANT DASHBOARD ═══ */
+        .merchant-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        .merchant-nav-btn { flex: 1; padding: 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #555; background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.3s; text-align: center; }
+        .merchant-nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(0,210,255,0.03); }
+        .merchant-panel { display: none; }
+        .merchant-panel.active { display: block; }
+        .merchant-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .merchant-stat-card { background: #050505; border: 1px solid var(--border); padding: 1.2rem; text-align: center; }
+        .merchant-stat-val { font-size: 1.8rem; color: #fff; font-weight: 900; }
+        .merchant-stat-lbl { font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-top: 0.3rem; }
+        .merchant-base-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #111; font-family: 'JetBrains Mono'; font-size: 0.65rem; }
+        .merchant-base-row:hover { background: #0a0a0a; }
+
+        @media (max-width: 768px) {
+            .shop-grid { grid-template-columns: 1fr !important; }
+            .shop-filters { flex-direction: column; }
+            .shop-wallet-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
+            .merchant-base-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        }
     </style>
 </head>
 
@@ -785,7 +840,8 @@
     <div id="auth-gate">
         <div class="auth-card">
             <div class="auth-tabs">
-                <div class="auth-tab active">OPERATOR AUTHENTICATION</div>
+                <div class="auth-tab active" onclick="switchAuthMode('operator')">OPERATOR</div>
+                <div class="auth-tab" onclick="switchAuthMode('merchant')">MERCHANT</div>
             </div>
             <div class="auth-body">
                 <div id="auth-login">
@@ -796,6 +852,25 @@
                     <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
                     <button class="btn" style="margin-top: 1rem; background: rgba(0,210,255,0.05); border: 1px solid var(--border);" onclick="demoLogin()">DEMO ACCESS</button>
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
+                </div>
+                <div id="auth-merchant" class="hidden">
+                    <h2 style="font-weight:900; letter-spacing:12px; margin-bottom:2rem; font-size:2.5rem; background: var(--black-ice); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 100%; animation: ice-shimmer 10s linear infinite;">VENDOR
+                    </h2>
+                    <div id="merchant-login-form">
+                        <input type="text" id="merch-user" placeholder="USERNAME">
+                        <input type="password" id="merch-pass" placeholder="PASSWORD">
+                        <button class="btn" onclick="handleMerchantLogin()">AUTHENTICATE</button>
+                        <button class="btn" style="margin-top: 0.8rem; background: transparent; border: 1px solid var(--border); font-size: 0.6rem;" onclick="showMerchantRegister()">NEW VENDOR? REGISTER</button>
+                    </div>
+                    <div id="merchant-register-form" class="hidden">
+                        <input type="text" id="merch-reg-user" placeholder="USERNAME">
+                        <input type="password" id="merch-reg-pass" placeholder="PASSWORD (6+ CHARS)">
+                        <input type="text" id="merch-reg-display" placeholder="DISPLAY NAME">
+                        <input type="text" id="merch-reg-jabber" placeholder="JABBER / CONTACT (OPTIONAL)">
+                        <button class="btn" onclick="handleMerchantRegister()">CREATE ACCOUNT</button>
+                        <button class="btn" style="margin-top: 0.8rem; background: transparent; border: 1px solid var(--border); font-size: 0.6rem;" onclick="showMerchantLogin()">BACK TO LOGIN</button>
+                    </div>
+                    <p id="merch-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
             </div>
         </div>
@@ -812,6 +887,7 @@
                     <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
+                    <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
                     <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
     
                     <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
@@ -1259,12 +1335,119 @@
                 </div>
             </div>
         </div>
-        
+
+        <!-- ═══ CARD SHOP TAB ═══ -->
+        <div id="tab-shop" class="tab-content">
+            <div style="margin-top:2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                    <h2 style="font-weight:900; letter-spacing:4px; color: #f39c12;">CARD SHOP</h2>
+                    <div id="shop-wallet-display" class="shop-wallet-bar" style="border:none; padding: 0; background: transparent; margin: 0;">
+                        <div>
+                            <div class="shop-wallet-label">BALANCE</div>
+                            <div class="shop-wallet-bal" id="shop-balance">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shop-filters">
+                    <input type="text" id="shop-filter-bin" placeholder="BIN PREFIX" oninput="filterShop()">
+                    <input type="text" id="shop-filter-country" placeholder="COUNTRY" oninput="filterShop()">
+                    <input type="text" id="shop-filter-bank" placeholder="BANK" oninput="filterShop()">
+                    <button class="btn" style="padding: 0.6rem 1.5rem; width: auto; font-size: 0.6rem;" onclick="loadShopBases()">REFRESH</button>
+                </div>
+
+                <div class="shop-grid" id="shop-base-list">
+                    <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.7rem; padding: 2rem; text-align: center;">Loading bases...</div>
+                </div>
+
+                <div class="shop-section-title" style="margin-top: 3rem;">MY ACQUISITIONS</div>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
+                    <button class="btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.55rem; background: #222; border: 1px solid #333;" onclick="copyAllAcquired()">COPY ALL</button>
+                </div>
+                <div id="shop-my-cards" style="max-height: 400px; overflow-y: auto;">
+                    <div style="color: #555; font-family: 'JetBrains Mono'; font-size: 0.65rem; padding: 1rem;">No purchases yet.</div>
+                </div>
+            </div>
+        </div>
+
         </div>
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL
             REAPER CORE ]</footer>
     </div>
 </div>
+
+    <!-- ═══ MERCHANT DASHBOARD (separate app view) ═══ -->
+    <div id="merchant-app" class="hidden">
+        <header>
+            <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="logo" style="font-size: 1rem;">BIFROST <span style="color: #f39c12; -webkit-text-fill-color: #f39c12; font-size: 0.7rem; letter-spacing: 2px;">VENDOR</span></div>
+                <nav class="nav-links">
+                    <a onclick="switchMerchantPanel('overview')" id="mnav-overview" class="active">OVERVIEW</a>
+                    <a onclick="switchMerchantPanel('upload')" id="mnav-upload">UPLOAD BASE</a>
+                    <a onclick="switchMerchantPanel('mybases')" id="mnav-mybases">MY BASES</a>
+                    <a onclick="merchantLogout()" style="color:var(--error)">LOGOUT</a>
+                </nav>
+            </div>
+        </header>
+        <div class="container" style="margin-top: 2rem;">
+
+            <!-- Merchant Overview -->
+            <div id="mpanel-overview" class="merchant-panel active">
+                <div class="merchant-stat-grid">
+                    <div class="merchant-stat-card">
+                        <div class="merchant-stat-val" id="m-stat-balance">$0.00</div>
+                        <div class="merchant-stat-lbl">BALANCE</div>
+                    </div>
+                    <div class="merchant-stat-card">
+                        <div class="merchant-stat-val" id="m-stat-sold">0</div>
+                        <div class="merchant-stat-lbl">CARDS SOLD</div>
+                    </div>
+                    <div class="merchant-stat-card">
+                        <div class="merchant-stat-val" id="m-stat-revenue">$0.00</div>
+                        <div class="merchant-stat-lbl">TOTAL REVENUE</div>
+                    </div>
+                    <div class="merchant-stat-card">
+                        <div class="merchant-stat-val" id="m-stat-bases">0</div>
+                        <div class="merchant-stat-lbl">ACTIVE BASES</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>RECENT TRANSACTIONS</h3>
+                    <div id="m-recent-txs" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; max-height: 300px; overflow-y: auto;">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Upload Base -->
+            <div id="mpanel-upload" class="merchant-panel">
+                <div class="card">
+                    <h3>UPLOAD NEW BASE</h3>
+                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">BASE NAME</label>
+                    <input type="text" id="m-upload-name" placeholder="e.g. US VISA CLASSIC Q2">
+                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">PRICE PER CARD ($)</label>
+                    <input type="number" id="m-upload-price" value="5.00" min="0.50" step="0.50" placeholder="5.00">
+                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">CARD DATA (ONE PER LINE)</label>
+                    <p style="font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #444; margin-bottom: 0.5rem;">FORMAT: NUMBER|MM|YY|CVV|HOLDER|ADDRESS|ZIP|CITY|STATE|COUNTRY</p>
+                    <textarea id="m-upload-data" style="height: 300px;" placeholder="4147201234567890|05|27|123|JOHN DOE|123 MAIN ST|10001|NEW YORK|NY|US"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <span id="m-upload-count" style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #555;">0 cards detected</span>
+                        <button class="btn" style="width: auto; padding: 0.8rem 2rem;" onclick="merchantUploadBase()">UPLOAD BASE</button>
+                    </div>
+                    <div id="m-upload-status" style="margin-top: 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem;"></div>
+                </div>
+            </div>
+
+            <!-- My Bases -->
+            <div id="mpanel-mybases" class="merchant-panel">
+                <div class="card">
+                    <h3>MY BASES</h3>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; padding: 0.6rem 1rem; border-bottom: 2px solid #333; font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #555; text-transform: uppercase; letter-spacing: 1px;">
+                        <span>NAME</span><span>BIN</span><span>PRICE</span><span>AVAILABLE</span><span>SOLD</span><span>STATUS</span>
+                    </div>
+                    <div id="m-bases-list" style="max-height: 500px; overflow-y: auto;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const portals = [
@@ -2393,6 +2576,328 @@
                 list.innerHTML = '> VAULT CONNECTION ERROR';
             }
         }
+
+        // ═══════════════════════════════════════════
+        // AUTH MODE SWITCHER (Operator / Merchant)
+        // ═══════════════════════════════════════════
+        function switchAuthMode(mode) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('auth-login').classList.add('hidden');
+            document.getElementById('auth-merchant').classList.add('hidden');
+            if (mode === 'operator') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('auth-login').classList.remove('hidden');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('auth-merchant').classList.remove('hidden');
+            }
+        }
+        function showMerchantRegister() {
+            document.getElementById('merchant-login-form').classList.add('hidden');
+            document.getElementById('merchant-register-form').classList.remove('hidden');
+        }
+        function showMerchantLogin() {
+            document.getElementById('merchant-register-form').classList.add('hidden');
+            document.getElementById('merchant-login-form').classList.remove('hidden');
+        }
+
+        // ═══ MERCHANT AUTH ═══
+        async function handleMerchantLogin() {
+            const u = document.getElementById('merch-user').value.trim();
+            const p = document.getElementById('merch-pass').value;
+            const err = document.getElementById('merch-error');
+            if (!u || !p) { err.innerText = 'FILL ALL FIELDS'; return; }
+            err.innerText = 'AUTHENTICATING...'; err.style.color = '#555';
+            try {
+                const r = await fetch('/api/shop?action=merchant_login', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({username: u, password: p})
+                });
+                const d = await r.json();
+                if (d.status === 'authenticated') {
+                    sessionStorage.setItem('merchant_token', d.token);
+                    sessionStorage.setItem('merchant_id', d.merchant_id);
+                    sessionStorage.setItem('merchant_name', d.display_name);
+                    sessionStorage.setItem('is_merchant', 'true');
+                    location.reload();
+                } else { err.style.color = 'var(--error)'; err.innerText = d.error || 'LOGIN FAILED'; }
+            } catch(e) { err.style.color = 'var(--error)'; err.innerText = 'CONNECTION ERROR'; }
+        }
+
+        async function handleMerchantRegister() {
+            const u = document.getElementById('merch-reg-user').value.trim();
+            const p = document.getElementById('merch-reg-pass').value;
+            const dn = document.getElementById('merch-reg-display').value.trim() || u;
+            const jb = document.getElementById('merch-reg-jabber').value.trim();
+            const err = document.getElementById('merch-error');
+            if (!u || !p || p.length < 6) { err.innerText = 'USERNAME + PASSWORD (6+ CHARS) REQUIRED'; return; }
+            err.innerText = 'REGISTERING...'; err.style.color = '#555';
+            try {
+                const r = await fetch('/api/shop?action=merchant_register', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({username: u, password: p, display_name: dn, jabber: jb})
+                });
+                const d = await r.json();
+                if (d.status === 'registered') {
+                    sessionStorage.setItem('merchant_token', d.token);
+                    sessionStorage.setItem('merchant_id', d.merchant_id);
+                    sessionStorage.setItem('merchant_name', d.display_name);
+                    sessionStorage.setItem('is_merchant', 'true');
+                    location.reload();
+                } else { err.style.color = 'var(--error)'; err.innerText = d.error || 'REGISTRATION FAILED'; }
+            } catch(e) { err.style.color = 'var(--error)'; err.innerText = 'CONNECTION ERROR'; }
+        }
+
+        function merchantLogout() { sessionStorage.clear(); location.href = '/'; }
+
+        // ═══ MERCHANT ONLOAD ═══
+        (function checkMerchantSession() {
+            if (sessionStorage.getItem('is_merchant') === 'true') {
+                document.getElementById('auth-gate').classList.add('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('merchant-app').classList.remove('hidden');
+                loadMerchantDashboard();
+            }
+        })();
+
+        // ═══ MERCHANT DASHBOARD ═══
+        function switchMerchantPanel(panel) {
+            document.querySelectorAll('.merchant-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('[id^="mnav-"]').forEach(a => a.classList.remove('active'));
+            const el = document.getElementById('mpanel-' + panel);
+            const nav = document.getElementById('mnav-' + panel);
+            if (el) el.classList.add('active');
+            if (nav) nav.classList.add('active');
+            if (panel === 'mybases') loadMerchantBases();
+        }
+
+        async function loadMerchantDashboard() {
+            const tk = sessionStorage.getItem('merchant_token');
+            try {
+                const r = await fetch('/api/shop?action=merchant_stats', { headers: {'X-Merchant-Token': tk} });
+                const d = await r.json();
+                document.getElementById('m-stat-balance').innerText = '$' + (d.balance || 0).toFixed(2);
+                document.getElementById('m-stat-sold').innerText = d.total_sold || 0;
+                document.getElementById('m-stat-revenue').innerText = '$' + (d.total_sales || 0).toFixed(2);
+            } catch(e) {}
+            try {
+                const r2 = await fetch('/api/shop?action=merchant_bases', { headers: {'X-Merchant-Token': tk} });
+                const d2 = await r2.json();
+                const active = (d2.bases || []).filter(b => b.status === 'active');
+                document.getElementById('m-stat-bases').innerText = active.length;
+            } catch(e) {}
+            try {
+                const r3 = await fetch('/api/shop?action=merchant_balance', { headers: {'X-Merchant-Token': tk} });
+                const d3 = await r3.json();
+                const txDiv = document.getElementById('m-recent-txs');
+                const txs = d3.transactions || [];
+                txDiv.innerHTML = txs.length ? txs.slice(0, 20).map(t =>
+                    `<div style="padding:0.4rem 0; border-bottom:1px solid #111;">${t.tx_type.toUpperCase()} | $${parseFloat(t.amount).toFixed(2)} | ${new Date(t.created_at).toLocaleString()}</div>`
+                ).join('') : '> No transactions yet.';
+            } catch(e) {}
+        }
+
+        async function loadMerchantBases() {
+            const tk = sessionStorage.getItem('merchant_token');
+            try {
+                const r = await fetch('/api/shop?action=merchant_bases', { headers: {'X-Merchant-Token': tk} });
+                const d = await r.json();
+                const list = document.getElementById('m-bases-list');
+                const bases = d.bases || [];
+                list.innerHTML = bases.length ? bases.map(b => {
+                    const sold = (b.quantity_total || 0) - (b.quantity_available || 0);
+                    const sc = b.status === 'active' ? 'var(--success)' : 'var(--error)';
+                    return `<div class="merchant-base-row">
+                        <span style="color:#fff;">${b.name}</span>
+                        <span style="color:var(--primary);">${b.bin || 'N/A'}</span>
+                        <span style="color:var(--success);">$${parseFloat(b.price_per_card).toFixed(2)}</span>
+                        <span>${b.quantity_available}</span>
+                        <span>${sold}</span>
+                        <span style="color:${sc};">${b.status.toUpperCase()}</span>
+                    </div>`;
+                }).join('') : '<div style="padding:1rem;color:#555;">No bases uploaded yet.</div>';
+            } catch(e) { document.getElementById('m-bases-list').innerHTML = '> ERROR LOADING BASES'; }
+        }
+
+        // Upload card count preview
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'm-upload-data') {
+                const lines = e.target.value.trim().split('\n').filter(l => l.split('|').length >= 4);
+                const el = document.getElementById('m-upload-count');
+                if (el) el.innerText = lines.length + ' cards detected';
+            }
+        });
+
+        async function merchantUploadBase() {
+            const tk = sessionStorage.getItem('merchant_token');
+            const name = document.getElementById('m-upload-name').value.trim() || 'Unnamed Base';
+            const price = parseFloat(document.getElementById('m-upload-price').value) || 5.00;
+            const data = document.getElementById('m-upload-data').value.trim();
+            const status = document.getElementById('m-upload-status');
+            if (!data) { status.innerHTML = '<span style="color:var(--error)">NO CARD DATA</span>'; return; }
+            status.innerHTML = '> UPLOADING...';
+            try {
+                const r = await fetch('/api/shop?action=upload_base', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Merchant-Token': tk},
+                    body: JSON.stringify({ name, price, data })
+                });
+                const d = await r.json();
+                if (d.status === 'uploaded') {
+                    status.innerHTML = `<span style="color:var(--success)">UPLOADED: ${d.cards_inserted} cards @ $${d.price_per_card}/ea</span>`;
+                    document.getElementById('m-upload-data').value = '';
+                    document.getElementById('m-upload-count').innerText = '0 cards detected';
+                } else { status.innerHTML = `<span style="color:var(--error)">${d.error || 'UPLOAD FAILED'}</span>`; }
+            } catch(e) { status.innerHTML = '<span style="color:var(--error)">CONNECTION ERROR</span>'; }
+        }
+
+        // ═══════════════════════════════════════════
+        // SHOP (OPERATOR SIDE)
+        // ═══════════════════════════════════════════
+        let shopBasesCache = [];
+
+        async function loadShopWallet() {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            try {
+                const r = await fetch('/api/shop?action=wallet&operator_id=' + encodeURIComponent(op), {
+                    headers: {'X-Operator-Id': op}
+                });
+                const d = await r.json();
+                document.getElementById('shop-balance').innerText = '$' + (d.balance || 0).toFixed(2);
+            } catch(e) { document.getElementById('shop-balance').innerText = '$0.00'; }
+        }
+
+        async function loadShopBases() {
+            const bin = document.getElementById('shop-filter-bin')?.value || '';
+            const country = document.getElementById('shop-filter-country')?.value || '';
+            const bank = document.getElementById('shop-filter-bank')?.value || '';
+            let url = '/api/shop?action=browse';
+            if (bin) url += '&bin=' + encodeURIComponent(bin);
+            if (country) url += '&country=' + encodeURIComponent(country);
+            if (bank) url += '&bank=' + encodeURIComponent(bank);
+            try {
+                const r = await fetch(url);
+                const d = await r.json();
+                shopBasesCache = d.bases || [];
+                renderShopBases(shopBasesCache);
+            } catch(e) {
+                document.getElementById('shop-base-list').innerHTML = '<div style="color:var(--error);padding:1rem;">FAILED TO LOAD BASES</div>';
+            }
+        }
+
+        function filterShop() {
+            clearTimeout(window._shopFilterTimer);
+            window._shopFilterTimer = setTimeout(() => loadShopBases(), 400);
+        }
+
+        function renderShopBases(bases) {
+            const grid = document.getElementById('shop-base-list');
+            if (!bases.length) { grid.innerHTML = '<div style="color:#555;font-family:JetBrains Mono;font-size:0.7rem;padding:2rem;text-align:center;">No bases available.</div>'; return; }
+            grid.innerHTML = bases.map(b => `
+                <div class="shop-base-card">
+                    <div class="shop-price-tag">$${parseFloat(b.price_per_card).toFixed(2)}</div>
+                    <div class="shop-base-header">
+                        <div class="shop-base-name">${b.name}</div>
+                        <div class="shop-base-vendor">BY ${b.merchant_name || 'UNKNOWN'}</div>
+                    </div>
+                    <div class="shop-base-body">
+                        <div class="shop-base-stat"><div class="shop-base-stat-label">BIN</div><div class="shop-base-stat-value" style="color:var(--primary);">${b.bin || 'N/A'}</div></div>
+                        <div class="shop-base-stat"><div class="shop-base-stat-label">BANK</div><div class="shop-base-stat-value">${b.bank || 'N/A'}</div></div>
+                        <div class="shop-base-stat"><div class="shop-base-stat-label">COUNTRY</div><div class="shop-base-stat-value">${b.country || 'N/A'}</div></div>
+                        <div class="shop-base-stat"><div class="shop-base-stat-label">AVAILABLE</div><div class="shop-base-stat-value shop-qty-available">${b.quantity_available}</div></div>
+                    </div>
+                    <div class="shop-base-footer">
+                        <button class="shop-preview-btn" onclick="previewBase('${b.id}')">PREVIEW</button>
+                        <button class="shop-acquire-btn" onclick="showAcquireModal('${b.id}', '${b.name}', ${b.price_per_card}, ${b.quantity_available})">ACQUIRE</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function previewBase(baseId) {
+            try {
+                const r = await fetch('/api/shop?action=preview&base_id=' + baseId);
+                const d = await r.json();
+                const samples = d.samples || [];
+                let html = `<div class="shop-modal" onclick="if(event.target===this)this.remove()"><div class="shop-modal-box">
+                    <button class="shop-modal-close" onclick="this.closest('.shop-modal').remove()">CLOSE</button>
+                    <h3>PREVIEW (MASKED)</h3>`;
+                samples.forEach(s => {
+                    html += `<div style="padding:0.5rem;border-bottom:1px solid #111;font-family:'JetBrains Mono';font-size:0.65rem;">
+                        <span style="color:var(--primary)">${s.number}</span> | ${s.exp} | ${s.holder} | ${s.location}</div>`;
+                });
+                if (!samples.length) html += '<div style="color:#555;padding:1rem;">No preview available.</div>';
+                html += '</div></div>';
+                document.body.insertAdjacentHTML('beforeend', html);
+            } catch(e) { alert('Preview failed'); }
+        }
+
+        function showAcquireModal(baseId, name, price, available) {
+            const html = `<div class="shop-modal" id="acquire-modal" onclick="if(event.target===this)this.remove()"><div class="shop-modal-box">
+                <button class="shop-modal-close" onclick="this.closest('.shop-modal').remove()">CLOSE</button>
+                <h3>ACQUIRE: ${name}</h3>
+                <div style="font-family:'JetBrains Mono';font-size:0.65rem;color:#888;margin-bottom:1rem;">PRICE: $${price.toFixed(2)}/card | ${available} AVAILABLE</div>
+                <label style="font-size:0.6rem;color:#666;">QUANTITY</label>
+                <input type="number" id="acquire-qty" value="1" min="1" max="${available}" oninput="document.getElementById('acquire-total').innerText='$'+(this.value*${price}).toFixed(2)">
+                <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:var(--success);margin:1rem 0;">TOTAL: <span id="acquire-total">$${price.toFixed(2)}</span></div>
+                <button class="btn" style="background:var(--success);color:#000;" onclick="executeAcquire('${baseId}', document.getElementById('acquire-qty').value)">CONFIRM PURCHASE</button>
+                <div id="acquire-status" style="margin-top:0.8rem;font-family:'JetBrains Mono';font-size:0.6rem;"></div>
+            </div></div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function executeAcquire(baseId, count) {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            const status = document.getElementById('acquire-status');
+            status.innerHTML = '> PROCESSING...';
+            try {
+                const r = await fetch('/api/shop?action=acquire', {
+                    method: 'POST', headers: {'Content-Type':'application/json', 'X-Operator-Id': op},
+                    body: JSON.stringify({ base_id: baseId, count: parseInt(count) })
+                });
+                const d = await r.json();
+                if (d.status === 'acquired') {
+                    status.innerHTML = `<span style="color:var(--success)">ACQUIRED ${d.cards.length} CARDS | CHARGED: $${d.total_charged.toFixed(2)} | BAL: $${d.new_balance.toFixed(2)}</span>`;
+                    document.getElementById('shop-balance').innerText = '$' + d.new_balance.toFixed(2);
+                    loadShopBases();
+                    loadMyCards();
+                    setTimeout(() => { const m = document.getElementById('acquire-modal'); if(m) m.remove(); }, 2000);
+                } else { status.innerHTML = `<span style="color:var(--error)">${d.error || 'FAILED'}</span>`; }
+            } catch(e) { status.innerHTML = '<span style="color:var(--error)">CONNECTION ERROR</span>'; }
+        }
+
+        async function loadMyCards() {
+            const op = sessionStorage.getItem('operator') || 'DEMO';
+            try {
+                const r = await fetch('/api/shop?action=my_cards&operator_id=' + encodeURIComponent(op), {
+                    headers: {'X-Operator-Id': op}
+                });
+                const d = await r.json();
+                const div = document.getElementById('shop-my-cards');
+                const cards = d.cards || [];
+                if (!cards.length) { div.innerHTML = '<div style="color:#555;font-family:JetBrains Mono;font-size:0.65rem;padding:1rem;">No purchases yet.</div>'; return; }
+                div.innerHTML = cards.map(c => {
+                    const line = `${c.number}|${c.exp}|${c.cvv}|${c.holder}|${c.address}|${c.zip}|${c.city}|${c.state}|${c.country}`;
+                    return `<div class="shop-acquired-card"><span>${line}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${line}');this.innerText='COPIED';setTimeout(()=>this.innerText='COPY',1000)">COPY</button></div>`;
+                }).join('');
+            } catch(e) {}
+        }
+
+        function copyAllAcquired() {
+            const cards = document.querySelectorAll('.shop-acquired-card span');
+            const text = Array.from(cards).map(s => s.innerText).join('\n');
+            if (text) { navigator.clipboard.writeText(text); }
+        }
+
+        // ═══ SHOP TAB INIT ═══
+        const origSwitchTab = switchTab;
+        switchTab = function(tab, updateHistory) {
+            origSwitchTab(tab, updateHistory);
+            if (tab === 'shop' || tab === 'tab-shop') {
+                loadShopWallet();
+                loadShopBases();
+                loadMyCards();
+            }
+        };
+
     </script>
 </body>
 </html>
