@@ -1,46 +1,72 @@
 import os
 import json
-import urllib.request
+import time
+import requests
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
-# BIFROST SECURE AUTH ENGINE (v18.3)
-# Zero-dependency implementation for maximum reliability.
+# BIFROST SECURE AUTH ENGINE (V1 FINAL - VERCEL RELAY)
+# Optimized for serverless execution and bypassing network blocks.
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID")
-ADMIN_KEY = os.getenv("ADMIN_KEY")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "").strip()
+AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID", "").strip()
+ADMIN_KEY = os.getenv("ADMIN_KEY", "").strip()
 ADMIN_OPERATOR = os.getenv("ADMIN_OPERATOR", "ADMIN")
 
 def discord_request(url, method="GET", body=None):
-    if not DISCORD_TOKEN: return None
-    req = urllib.request.Request(url, method=method)
-    req.add_header("Authorization", f"Bot {DISCORD_TOKEN}")
-    req.add_header("Content-Type", "application/json")
+    if not DISCORD_TOKEN: return 500, "MISSING_TOKEN"
+    headers = {
+        "Authorization": f"Bot {DISCORD_TOKEN}",
+        "Content-Type": "application/json"
+    }
     try:
-        data = json.dumps(body).encode() if body else None
-        with urllib.request.urlopen(req, data=data, timeout=10) as res:
-            return res.getcode(), json.loads(res.read().decode())
+        if method.upper() == "POST":
+            res = requests.post(url, json=body, headers=headers, timeout=10)
+        else:
+            res = requests.get(url, headers=headers, timeout=10)
+        return res.status_code, res.json() if res.status_code == 200 else res.text
     except Exception as e:
-        print(f"Discord API Error: {e}")
-        return 500, None
+        return 500, str(e)
 
 def fetch_keys():
     if not AUTH_CHANNEL_ID: return {}, []
-    url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages?limit=50"
+    url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages?limit=100"
     code, messages = discord_request(url)
     keys = {}
     raw = []
-    if code == 200 and messages:
+    now = time.time()
+    
+    if code == 200 and isinstance(messages, list):
         for msg in messages:
             content = msg.get("content", "")
-            raw.append({"content": content, "timestamp": msg.get("timestamp"), "id": msg.get("id")})
+            raw.append({
+                "content": content, 
+                "timestamp": msg.get("timestamp"), 
+                "id": msg.get("id")
+            })
+            
             if "KEY:" in content:
                 try:
                     parts = content.split("|")
                     k = parts[0].replace("KEY:", "").strip()
                     op = parts[1].replace("OP:", "").strip() if len(parts) > 1 else "OPERATOR"
-                    keys[k] = {"operator_id": op, "status": "active"}
+                    
+                    # Parse Role and Expiration
+                    role = "operator"
+                    expires = 0
+                    for p in parts:
+                        p = p.strip()
+                        if p.startswith("ROLE:"):
+                            role = p.replace("ROLE:", "").strip().lower()
+                        if p.startswith("EXPIRES:"):
+                            try: expires = int(p.replace("EXPIRES:", "").strip())
+                            except: expires = 0
+                    
+                    # Skip expired keys
+                    if expires > 0 and expires < now:
+                        continue
+                        
+                    keys[k] = {"operator_id": op, "status": "active", "role": role, "expires": expires}
                 except: continue
     return keys, raw
 
@@ -55,22 +81,22 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         query = parse_qs(urlparse(self.path).query)
         action = query.get('action', ['verify'])[0]
-        key_input = query.get('pass', [None])[0]
+        pass_key = query.get('pass', [None])[0]
         
         if action == 'verify':
-            if ADMIN_KEY and key_input == ADMIN_KEY:
+            if ADMIN_KEY and pass_key == ADMIN_KEY:
                 self._json(200, {"status": "success", "data": {"operator_id": ADMIN_OPERATOR, "role": "commander"}})
             else:
                 keys, _ = fetch_keys()
-                if key_input in keys:
-                    self._json(200, {"status": "success", "data": keys[key_input]})
+                if pass_key in keys:
+                    self._json(200, {"status": "success", "data": keys[pass_key]})
                 else:
                     self._json(400, {"status": "error", "message": "INVALID_KEY"})
 
         elif action == 'list':
             if self.headers.get('X-Admin-Key') == ADMIN_KEY:
                 _, raw = fetch_keys()
-                self._json(200, {"keys": raw})
+                self._json(200, {"status": "success", "keys": raw})
             else:
                 self._json(401, {"error": "UNAUTHORIZED"})
 
@@ -81,12 +107,21 @@ class handler(BaseHTTPRequestHandler):
         try:
             cl = int(self.headers.get('Content-Length', 0))
             body = json.loads(self.rfile.read(cl))
-            new_key, op = body.get('key'), body.get('operator', 'OPERATOR')
+            new_key = body.get('key')
+            op = body.get('operator', 'OPERATOR')
+            role = body.get('role', 'operator')
+            duration = body.get('expires', 0) # This is the timestamp from the frontend
+
             if not new_key: self._json(400, {"error": "MISSING_KEY"}); return
 
+            msg_content = f"KEY: {new_key} | OP: {op} | ROLE: {role} | EXPIRES: {duration}"
             url = f"https://discord.com/api/v10/channels/{AUTH_CHANNEL_ID}/messages"
-            code, _ = discord_request(url, "POST", {"content": f"KEY: {new_key} | OP: {op}"})
-            self._json(200, {"status": "deployed" if code in [200, 201] else "failed"})
+            code, res_body = discord_request(url, "POST", {"content": msg_content})
+            
+            if code in [200, 201]:
+                self._json(200, {"status": "deployed"})
+            else:
+                self._json(200, {"status": "failed", "discord_error_code": code, "error": str(res_body)})
         except Exception as e:
             self._json(500, {"error": str(e)})
 

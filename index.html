@@ -2308,7 +2308,7 @@
             const expires = durationSec > 0 ? Math.floor(Date.now() / 1000) + durationSec : 0;
             
             try {
-                const r = await fetch('https://rxtri-bifrost.hf.space/api/auth', {
+                const r = await fetch('/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Key': ak },
                     body: JSON.stringify({ key, operator: op, role, expires })
@@ -2334,7 +2334,7 @@
             if (!ak) return;
             
             try {
-                const r = await fetch('https://rxtri-bifrost.hf.space/api/auth?action=list', {
+                const r = await fetch('/api/auth?action=list', {
                     headers: { 'X-Admin-Key': ak }
                 });
                 const res = await r.json();
