@@ -25,7 +25,7 @@ app.add_middleware(
 
 # Configuration from Hugging Face Secrets
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID", "1501042968776147051")
+AUTH_CHANNEL_ID = os.getenv("AUTH_CHANNEL_ID", "1501042968776147051").strip()
 ADMIN_KEY = os.getenv("ADMIN_KEY")
 ADMIN_OPERATOR = os.getenv("ADMIN_OPERATOR", "ADMIN")
 
