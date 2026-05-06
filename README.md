@@ -1,4 +1,4 @@
-# BIFROST | Industrial OSINT & Disruption (v18.4)
+# BIFROST | Industrial OSINT & Disruption (v19.0)
 
 BIFROST is a high-efficiency command console designed for industrial data acquisition and operational intelligence.
 
@@ -6,37 +6,37 @@ BIFROST is a high-efficiency command console designed for industrial data acquis
 
 | Directory | Purpose |
 | :--- | :--- |
-| `api/` | Consolidated serverless backend routes (Vercel). Kept to 10 functions to bypass Hobby limit. |
+| `api/` | Consolidated serverless backend routes (Vercel). Kept under 12 functions to bypass Hobby limit. |
 | `core/` | Shared logic, database models, and engines. |
 | `data/` | Static datasets (CSV/JSON). |
 | `utils/` | Maintenance scripts (Key Gen, Discord Bot). |
 | `tests/` | Debugging and connectivity verification. |
 | `archive/`| Retired legacy modules and logs. |
+| `hf_space/`| Dockerized Hugging Face Space for long-running bots and heavy background processes. |
 
 ## 🚀 Deployment & Hosting
 
-### Frontend
-Hosted on **Vercel** for global edge performance. Supports SPA routing (e.g., `/osint`).
+### Frontend & Core APIs
+Hosted on **Vercel** for global edge performance. The primary Auth Engine, Disruption Suite, and SPA routing run here to bypass external firewall restrictions.
 
-### Background Operations & API ("The Brain")
-We are migrating heavy operations to **Hugging Face Spaces (`rxtri/bifrost`)** using a Docker SDK.
-This overcomes Vercel's strict 10-second serverless execution limits and 12-function count restrictions on the Hobby tier.
+### Background Operations ("The Brain")
+Long-running processes (e.g., the persistent Discord Bot) are hosted on **Hugging Face Spaces (`rxtri/bifrost`)** using a Docker SDK.
 
 ## 🔑 Authentication
-Authentication is managed via the **Discord-Sync Auth Bridge**. New keys are generated in Discord and synced to the `AUTH_CHANNEL_ID` vault.
+Authentication is managed via the **Discord-Sync Auth Bridge** hosted on Vercel. New keys are generated in Discord and synced to the `AUTH_CHANNEL_ID` vault.
 Administrative access is secured via `ADMIN_KEY` giving access to the hidden Commander Console on the frontend for deploying licenses.
+**Security:** Mandatory Access Control (MAC) enforces role-based access (`commander`) to prevent unauthorized URL bypasses into the admin deck.
 
-## 📈 Recent Changes (v18.0 -> v18.4)
-- **Deep Purge**: Archived all legacy clutter.
-- **Serverless Limits Bypassed**: Consolidated 14 API functions down to 10 unified endpoints (`auth`, `disruption`, `osint`) to fit Vercel Hobby plan constraints.
-- **Commander Console**: Added an exclusive Admin UI directly in the dashboard to generate and deploy licenses to Discord without leaving the browser.
-- **Zero-Dependency Auth**: Rewrote `api/auth.py` using pure Python `urllib` to eliminate cold-start `NameError` crashes with external libraries like `requests`. Fixed return-type `ValueError` when environment variables are missing.
-- **UI State**: Grayed out the Email Flood tool (`[SYSTEM OFFLINE]`) due to Brevo account suspension.
+## 📈 Recent Changes (v18.4 -> v19.0)
+- **Vercel API Migration Pivot**: Moved the BIFROST Auth Engine and Disruption API back to Vercel. Discovered a hard firewall block on Hugging Face that prevented outgoing Python `requests` to Discord APIs (resulting in persistent HTTP 500 crashes).
+- **Mandatory Access Control (MAC)**: Hardened the Commander Console. Non-admin operators are instantly redirected to the dashboard if they attempt to bypass UI navigation and hit `/admin` directly.
+- **Cinematic UI Overhaul**: Re-engineered the main header to be a full-width edge-to-edge band, improving visual balance for widescreen displays while maintaining centered content alignment.
+- **Extreme Diagnostic Tracing**: Added verbose exception propagation to the frontend to accurately trace network failures during the HF debugging phase.
 
 ## 📝 Current Plans
-- **Hugging Face Migration**: Complete the migration of the BIFROST "Super-Server" (FastAPI backend + Discord Bot) to the new Hugging Face Space.
-- **Relink Frontend**: Re-point Vercel frontend tools to call the new Hugging Face endpoints instead of Vercel serverless routes.
+- **Operational Expansion**: Begin building out the Storm Matrix and Sniper tools.
+- **Bot Persistence**: Ensure the Hugging Face Space maintains the persistent Discord Bot connection independently from the Vercel API routes.
 
 ## ⚠️ Known Issues
 - **Brevo Suspension**: The primary SMTP relay account on Brevo has been suspended, rendering the Email Flood tool inoperable for the time being.
-- **Hugging Face Secrets Config**: Encountered severe UI glitches/rate limits when trying to automate adding secrets to the HF Space settings. Had to resort to manual user input.
+- **Hugging Face Discord Block**: Hugging Face Spaces block direct outbound HTTP requests to discord.com/api, meaning all vault and logging APIs must reside on Vercel.
