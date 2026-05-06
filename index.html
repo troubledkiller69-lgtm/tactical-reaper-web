@@ -906,87 +906,122 @@
         
         <div id="tab-dashboard" class="tab-content active">
             <div style="margin-top:2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
-                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0; color: #fff;">OPERATIONAL CENTER</h2>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #555; font-family: 'JetBrains Mono'; font-size: 0.6rem; letter-spacing: 2px;">
-                        <span style="display:inline-block; width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success);"></span>
-                        SYSTEM: ONLINE | <span id="dash-operator-id">...</span>
-                    </div>
-                </div>
-                
-                <!-- Module Status Grid -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                    <div class="card" style="padding: 1.2rem; border-left: 2px solid var(--primary);">
-                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">OSINT SUITE</div>
-                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">ACTIVE</div>
-                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">UPTIME: 99.9% | NODES: 12</div>
-                    </div>
-                    <div class="card" style="padding: 1.2rem; border-left: 2px solid var(--success);">
-                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">NETWORK OPS</div>
-                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">STANDBY</div>
-                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">PROXIES: 250+ | LATENCY: 42ms</div>
-                    </div>
-                    <div class="card" style="padding: 1.2rem; border-left: 2px solid #00d2ff;">
-                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">CRYPTO RECON</div>
-                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">OPERATIONAL</div>
-                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">API: BLOCKCHAIR + FAILOVER</div>
-                    </div>
-                    <div class="card" style="padding: 1.2rem; border-left: 2px solid #f39c12;">
-                        <div style="color: #666; font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">SNIPER PROTOCOL</div>
-                        <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">OFFLINE</div>
-                        <div style="color: #444; font-size: 0.5rem; margin-top: 0.4rem;">IDLE | WAITING FOR TARGET</div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-                    <!-- Recon Feed -->
-                    <div class="card" style="background: rgba(0,0,0,0.4); border: 1px solid #111;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.8rem;">
-                            <h3 style="font-size: 0.7rem; letter-spacing: 2px; color: #666;">LIVE RECONNAISSANCE FEED</h3>
-                            <span style="color: var(--success); font-family: 'JetBrains Mono'; font-size: 0.5rem; animation: blink 2s infinite;">[ SIGNAL ACQUIRED ]</span>
-                        </div>
-                        <div id="dash-recon-feed" style="height: 350px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.6rem; line-height: 1.4;">
-                            <div style="color: #333; margin-bottom: 0.5rem;">Initializing BIFROST core assets...</div>
-                            <div style="color: #333; margin-bottom: 0.5rem;">Connection to Vercel Lambda successful.</div>
-                            <div style="color: #333; margin-bottom: 0.5rem;">Synchronizing identity vault...</div>
-                        </div>
-                    </div>
-
-                    <!-- Operator Intel -->
+                <div style="display: grid; grid-template-columns: 250px 1fr 300px; gap: 1.5rem; height: 600px;">
+                    
+                    <!-- Left: System Diagnostics -->
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div class="card" style="background: #080808; border: 1px solid #1a1a1a;">
-                            <h3 style="font-size: 0.6rem; color: #555; margin-bottom: 1rem;">OPERATOR PROFILE</h3>
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                                <div style="width: 40px; height: 40px; background: #111; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                                    <span style="color: var(--primary); font-size: 1.2rem; font-weight: 900;">Ω</span>
+                        <div class="card" style="flex: 1; display: flex; flex-direction: column; background: rgba(5,5,5,0.8); border: 1px solid #111;">
+                            <h3 style="font-size: 0.6rem; letter-spacing: 2px; color: #444; margin-bottom: 1.5rem;">CORE DIAGNOSTICS</h3>
+                            
+                            <div style="flex: 1; display: flex; justify-content: space-around; align-items: flex-end; padding-bottom: 1rem;">
+                                <div style="width: 12px; height: 100%; background: #111; position: relative; border-radius: 2px;">
+                                    <div id="diag-bar-1" style="position: absolute; bottom: 0; width: 100%; height: 70%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: height 1s ease; border-radius: 2px;"></div>
+                                    <div style="position: absolute; top: -15px; width: 100%; text-align: center; font-size: 0.4rem; color: #555;">ENC</div>
                                 </div>
-                                <div>
-                                    <div id="dash-op-name" style="color: #fff; font-size: 0.9rem; font-weight: 900;">...</div>
-                                    <div id="dash-op-role" style="color: var(--primary); font-size: 0.55rem; letter-spacing: 1px;">...</div>
+                                <div style="width: 12px; height: 100%; background: #111; position: relative; border-radius: 2px;">
+                                    <div id="diag-bar-2" style="position: absolute; bottom: 0; width: 100%; height: 45%; background: var(--success); box-shadow: 0 0 15px var(--success); transition: height 1.2s ease; border-radius: 2px;"></div>
+                                    <div style="position: absolute; top: -15px; width: 100%; text-align: center; font-size: 0.4rem; color: #555;">LNK</div>
+                                </div>
+                                <div style="width: 12px; height: 100%; background: #111; position: relative; border-radius: 2px;">
+                                    <div id="diag-bar-3" style="position: absolute; bottom: 0; width: 100%; height: 85%; background: #00d2ff; box-shadow: 0 0 15px #00d2ff; transition: height 0.8s ease; border-radius: 2px;"></div>
+                                    <div style="position: absolute; top: -15px; width: 100%; text-align: center; font-size: 0.4rem; color: #555;">PKT</div>
+                                </div>
+                                <div style="width: 12px; height: 100%; background: #111; position: relative; border-radius: 2px;">
+                                    <div id="diag-bar-4" style="position: absolute; bottom: 0; width: 100%; height: 60%; background: #f39c12; box-shadow: 0 0 15px #f39c12; transition: height 1.5s ease; border-radius: 2px;"></div>
+                                    <div style="position: absolute; top: -15px; width: 100%; text-align: center; font-size: 0.4rem; color: #555;">CPU</div>
                                 </div>
                             </div>
-                            <div style="border-top: 1px solid #222; padding-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
-                                    <span style="color: #444; font-size: 0.55rem;">SESSION</span>
-                                    <span id="dash-op-session" style="color: #888; font-size: 0.55rem;">00:00:00</span>
+
+                            <div style="font-family: 'JetBrains Mono'; font-size: 0.5rem; color: #333; border-top: 1px solid #111; padding-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                    <span>LATENCY</span><span style="color: var(--success);">24ms</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: #444; font-size: 0.55rem;">AUTHORIZATION</span>
-                                    <span style="color: var(--success); font-size: 0.55rem;">LEVEL 5</span>
+                                    <span>UPTIME</span><span>99.98%</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="card" style="background: linear-gradient(145deg, #0a0a0a, #050505); border: 1px solid #111;">
-                            <h3 style="font-size: 0.6rem; color: #555; margin-bottom: 1rem;">CORE MANIFEST</h3>
-                            <div style="font-family: 'JetBrains Mono'; font-size: 0.55rem; color: #888;">
-                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">VERSION:</span> v20.21 [FINAL]</div>
-                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">ENGINE:</span> PYTHON 3.9 (SERVERLESS)</div>
-                                <div style="margin-bottom: 0.5rem;"><span style="color: #444;">WAF:</span> CF PROXY [ACTIVE]</div>
-                                <div><span style="color: #444;">STATUS:</span> <span style="color: var(--success);">PRODUCTION</span></div>
+                        <div class="card" style="height: 180px; background: #050505; border: 1px solid #111;">
+                            <h3 style="font-size: 0.6rem; color: #444; margin-bottom: 1rem;">OPERATOR</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                                <div id="dash-op-name-v2" style="font-size: 0.9rem; font-weight: 900; color: #fff; letter-spacing: 1px;">...</div>
+                                <div style="font-family: 'JetBrains Mono'; font-size: 0.5rem; color: var(--primary);">
+                                    ID: <span id="dash-op-unit-v2">...</span><br>
+                                    ROLE: <span id="dash-op-role-v2">...</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: #888; font-family: 'JetBrains Mono';" id="dash-op-session-v2">00:00:00</div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Center: Operations Map -->
+                    <div class="card" style="background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); border: 1px solid #111; position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="font-size: 0.7rem; letter-spacing: 4px; color: #fff;">GLOBAL OPERATIONS MAP</h3>
+                            <div style="color: var(--success); font-family: 'JetBrains Mono'; font-size: 0.5rem;">[ LIVE TRACKING ACTIVE ]</div>
+                        </div>
+                        
+                        <div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; opacity: 0.4;">
+                            <!-- Simplified minimalist world map SVG -->
+                            <svg viewBox="0 0 1000 500" style="width: 100%; height: auto; fill: #111; stroke: #222; stroke-width: 0.5;">
+                                <path d="M150,150 L250,120 L350,150 L450,180 L550,150 L650,120 L750,150 L850,180 L950,150 L950,350 L850,380 L750,350 L650,380 L550,350 L450,380 L350,350 L250,380 L150,350 Z" />
+                                <!-- Pulsing Nodes -->
+                                <circle cx="200" cy="200" r="5" fill="var(--primary)" class="map-node">
+                                    <animate attributeName="r" values="3;7;3" dur="2s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="450" cy="180" r="5" fill="#00d2ff" class="map-node">
+                                    <animate attributeName="r" values="3;7;3" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="700" cy="280" r="5" fill="var(--success)" class="map-node">
+                                    <animate attributeName="r" values="3;7;3" dur="2.5s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="850" cy="150" r="5" fill="#f39c12" class="map-node">
+                                    <animate attributeName="r" values="3;7;3" dur="4s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="1;0.3;1" dur="4s" repeatCount="indefinite" />
+                                </circle>
+                            </svg>
+                        </div>
+
+                        <!-- Scanline Effect Overlay -->
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0, rgba(0,210,255,0.03) 1px, transparent 2px); background-size: 100% 4px;"></div>
+                        
+                        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                            <div style="background: rgba(0,0,0,0.8); border: 1px solid #222; padding: 0.8rem; border-radius: 4px;">
+                                <div style="color: #444; font-size: 0.45rem; letter-spacing: 1px;">ACTIVE PROXIES</div>
+                                <div style="color: var(--success); font-size: 1rem; font-weight: 900; margin-top: 0.2rem;">256</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.8); border: 1px solid #222; padding: 0.8rem; border-radius: 4px;">
+                                <div style="color: #444; font-size: 0.45rem; letter-spacing: 1px;">INTEL HITS</div>
+                                <div style="color: var(--primary); font-size: 1rem; font-weight: 900; margin-top: 0.2rem;">1,402</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.8); border: 1px solid #222; padding: 0.8rem; border-radius: 4px;">
+                                <div style="color: #444; font-size: 0.45rem; letter-spacing: 1px;">API UPTIME</div>
+                                <div style="color: #00d2ff; font-size: 1rem; font-weight: 900; margin-top: 0.2rem;">99.9%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Data Stream -->
+                    <div class="card" style="background: #050505; border: 1px solid #111; display: flex; flex-direction: column;">
+                        <h3 style="font-size: 0.6rem; letter-spacing: 2px; color: #444; margin-bottom: 1.5rem;">INTEL DATA STREAM</h3>
+                        <div id="dash-recon-feed-v2" style="flex: 1; overflow-y: hidden; font-family: 'JetBrains Mono'; font-size: 0.55rem; color: #444; line-height: 1.6; display: flex; flex-direction: column-reverse;">
+                            <!-- Data will scroll up -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Quick Bar -->
+                <div style="margin-top: 1.5rem; background: #0a0a0a; border: 1px solid #111; padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
+                    <div style="display: flex; gap: 2rem;">
+                        <span style="color: #333; font-size: 0.6rem;">CORE: <span style="color: #666;">BIFROST-v20.22</span></span>
+                        <span style="color: #333; font-size: 0.6rem;">ENGINE: <span style="color: #666;">PYTHON-3.9</span></span>
+                        <span style="color: #333; font-size: 0.6rem;">WAF: <span style="color: var(--success);">ACTIVE</span></span>
+                    </div>
+                    <div style="color: #555; font-size: 0.6rem; letter-spacing: 2px; font-weight: bold;" id="dash-clock-v2">00:00:00 UTC</div>
                 </div>
             </div>
         </div>
@@ -1902,55 +1937,87 @@
             if (sessionTimerStarted) return;
             sessionTimerStarted = true;
             setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const h = Math.floor(elapsed / 3600).toString().padStart(2, '0');
-                const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
-                const s = (elapsed % 60).toString().padStart(2, '0');
-                const el = document.getElementById('dash-op-session');
-                if (el) el.innerText = `${h}:${m}:${s}`;
-            }, 1000);
-        }
-
         function fetchDashboardStats() {
             const op = sessionStorage.getItem('operator') || 'OPERATOR';
             const role = sessionStorage.getItem('role') || 'FIELD AGENT';
             
-            if(document.getElementById('dash-operator-id')) document.getElementById('dash-operator-id').innerText = `UNIT_${op.substring(0,6).toUpperCase()}`;
-            if(document.getElementById('dash-op-name')) document.getElementById('dash-op-name').innerText = op.toUpperCase();
-            if(document.getElementById('dash-op-role')) document.getElementById('dash-op-role').innerText = role.toUpperCase();
+            // v2 Elements
+            if(document.getElementById('dash-op-unit-v2')) document.getElementById('dash-op-unit-v2').innerText = `UNIT_${op.substring(0,6).toUpperCase()}`;
+            if(document.getElementById('dash-op-name-v2')) document.getElementById('dash-op-name-v2').innerText = op.toUpperCase();
+            if(document.getElementById('dash-op-role-v2')) document.getElementById('dash-op-role-v2').innerText = role.toUpperCase();
             
             startSessionTimer();
             if (!window.reconFeedActive) populateReconFeed();
+            if (!window.diagLoopActive) startDiagnosticsLoop();
+            if (!window.clockActive) startClock();
+        }
+
+        function startClock() {
+            window.clockActive = true;
+            setInterval(() => {
+                const now = new Date();
+                const el = document.getElementById('dash-clock-v2');
+                if (el) el.innerText = now.toUTCString().split(' ')[4] + ' UTC';
+            }, 1000);
+        }
+
+        function startDiagnosticsLoop() {
+            window.diagLoopActive = true;
+            setInterval(() => {
+                if (!document.getElementById('tab-dashboard').classList.contains('active')) return;
+                for (let i = 1; i <= 4; i++) {
+                    const el = document.getElementById(`diag-bar-${i}`);
+                    if (el) {
+                        const newHeight = Math.floor(Math.random() * 60) + 40; // 40% to 100%
+                        el.style.height = `${newHeight}%`;
+                    }
+                }
+            }, 2000);
         }
 
         function populateReconFeed() {
-            const feed = document.getElementById('dash-recon-feed');
+            const feed = document.getElementById('dash-recon-feed-v2');
             if(!feed) return;
             window.reconFeedActive = true;
             
             const events = [
-                { t: "INTEL", m: "Wallet 1A1zP... traced on BTC Mainnet", c: "var(--primary)" },
-                { t: "NETWORK", m: "Proxy Harvester found 256 active SOCKS5 nodes", c: "var(--success)" },
-                { t: "OSINT", m: "Username 'darknet' search complete: 14 hits", c: "#fff" },
-                { t: "SYSTEM", m: "BIFROST Identity Vault synchronized", c: "#555" },
-                { t: "INTEL", m: "Ethereum balance updated for 0x71C...: 0.42 ETH", c: "#00d2ff" },
-                { t: "ALERT", m: "Upstream API Blockchair rate limit warning", c: "var(--error)" },
-                { t: "RECON", m: "New portal endpoint identified in PSCU S1 infrastructure", c: "#f39c12" },
-                { t: "SYSTEM", m: "Vercel Lambda cold start overhead: 240ms", c: "#333" }
+                "TRACING INCOMING PACKET: 192.168.1.1",
+                "SYNCING NODE: HONG_KONG_S2",
+                "ENCRYPTION KEY ROTATED [RSA-4096]",
+                "LATENCY SPIKE DETECTED IN US-EAST-1",
+                "NEW INTEL HIT: EMAIL@DOMAIN.COM",
+                "DATABASE QUERY: PORTAL_ACCESS_LOGS",
+                "HEARTBEAT RECEIVED FROM REAPER_V7",
+                "MEM_LOAD: 42% | CPU_LOAD: 12%",
+                "IDENTIFYING ASSET: 0x71C...42",
+                "PROXY NODE 256 REFRESHED"
             ];
 
             setInterval(() => {
                 if (!document.getElementById('tab-dashboard').classList.contains('active')) return;
                 const ev = events[Math.floor(Math.random() * events.length)];
                 const div = document.createElement('div');
-                div.style.marginBottom = '0.5rem';
+                div.style.marginBottom = '0.4rem';
                 div.style.opacity = '0';
                 div.style.transition = 'opacity 0.5s ease';
-                div.innerHTML = `<span style="color: ${ev.c}; font-weight: bold;">[${ev.t}]</span> ${ev.m}`;
-                feed.prepend(div);
-                setTimeout(() => div.style.opacity = '1', 10);
-                if (feed.childNodes.length > 25) feed.removeChild(feed.lastChild);
-            }, 3000);
+                div.innerText = `> ${ev}`;
+                feed.appendChild(div);
+                setTimeout(() => div.style.opacity = '0.5', 10);
+                if (feed.childNodes.length > 20) feed.removeChild(feed.firstChild);
+            }, 2500);
+        }
+
+        function startSessionTimer() {
+            if (sessionTimerStarted) return;
+            sessionTimerStarted = true;
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const h = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+                const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+                const s = (elapsed % 60).toString().padStart(2, '0');
+                const el = document.getElementById('dash-op-session-v2');
+                if (el) el.innerText = `${h}:${m}:${s}`;
+            }, 1000);
         }
 
         // --- CRYPTO DASHBOARD LOGIC ---
