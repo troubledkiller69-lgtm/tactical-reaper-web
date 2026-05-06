@@ -850,7 +850,7 @@
                     <input type="text" id="login-user" placeholder="OPERATOR ID">
                     <input type="password" id="login-pass" placeholder="ACCESS KEY">
                     <button class="btn" id="login-btn" onclick="handleLogin()">INITIALIZE</button>
-                    <button class="btn" style="margin-top: 1rem; background: rgba(0,210,255,0.05); border: 1px solid var(--border);" onclick="demoLogin()">DEMO ACCESS</button>
+
                     <p id="login-error" style="color:var(--error); font-size:0.6rem; margin-top:1rem;"></p>
                 </div>
                 <div id="auth-merchant" class="hidden">
@@ -1841,7 +1841,7 @@
                 console.error("Auth Fail:", err);
                 
                 // EMERGENCY RECOVERY BYPASS
-                if (pass === 'BIFROST-RECOVERY-2026' || pass === 'DEMO-ACCESS') {
+                if (pass === 'BIFROST-RECOVERY-2026') {
                     sessionStorage.setItem('logged', 'true');
                     sessionStorage.setItem('operator', 'EMERGENCY_OVERRIDE');
                     location.reload();
