@@ -92,6 +92,8 @@ class handler(BaseHTTPRequestHandler):
             res = self.zillow_scan(target)
         elif action == 'email_intel':
             res = self.email_intel_scan(target)
+        elif action == 'crypto':
+            res = self.crypto_scan(target)
         else:
             res = {"error": "INVALID_ACTION"}
         
@@ -262,6 +264,63 @@ class handler(BaseHTTPRequestHandler):
         except: pass
         
         return result
+
+    def crypto_scan(self, wallet):
+        if not wallet: return {"error": "MISSING_WALLET"}
+        
+        # Determine likely network based on wallet format
+        network_id = "bitcoin"
+        network_name = "Bitcoin (BTC)"
+        
+        if wallet.startswith("0x") and len(wallet) == 42:
+            network_id = "ethereum"
+            network_name = "Ethereum (ETH)"
+        elif wallet.startswith("L") or wallet.startswith("M") or wallet.startswith("ltc1"):
+            network_id = "litecoin"
+            network_name = "Litecoin (LTC)"
+        elif wallet.startswith("4") or wallet.startswith("8"):
+            # Monero is highly private, Blockchair supports it but wallet lookups are very limited
+            network_id = "monero" 
+            network_name = "Monero (XMR)"
+        elif len(wallet) >= 32 and not wallet.startswith("1") and not wallet.startswith("3") and not wallet.startswith("bc1"): 
+            network_id = "solana"
+            network_name = "Solana (SOL)"
+
+        try:
+            r = requests.get(f"https://api.blockchair.com/{network_id}/dashboards/address/{wallet}?limit=10", timeout=5)
+            if r.status_code == 200:
+                data = r.json().get("data", {}).get(wallet, {})
+                address_info = data.get("address", {})
+                
+                # Balance formatting based on network
+                raw_balance = address_info.get("balance", 0)
+                balance = 0.0
+                try:
+                    if network_id in ["bitcoin", "litecoin"]:
+                        balance = float(raw_balance) / 100000000.0
+                    elif network_id == "ethereum":
+                        balance = float(raw_balance) / 1e18
+                    elif network_id == "solana":
+                        balance = float(raw_balance) / 1e9
+                except: pass
+
+                # Extract transactions (usually list of tx hashes)
+                txs_data = data.get("transactions", [])
+                
+                return {
+                    "network": network_name,
+                    "wallet": wallet,
+                    "balance": balance,
+                    "tx_count": address_info.get("transaction_count", len(txs_data)),
+                    "first_seen": address_info.get("first_seen_receiving", "N/A"),
+                    "recent_txs": txs_data[:10]
+                }
+            elif r.status_code == 404:
+                return {"error": f"Wallet not found or unsupported on {network_name}."}
+            else:
+                return {"error": f"Blockchair API Error: {r.status_code}"}
+        except Exception as e:
+            return {"error": f"Network trace failed: {str(e)}"}
 
     def _json(self, code, data):
         self.send_response(code); self.send_header('Content-type', 'application/json')
