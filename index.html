@@ -89,7 +89,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 0 2rem;
             position: relative;
@@ -97,16 +97,17 @@
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
+            padding: 0;
             border-bottom: 1px solid var(--border);
             background: rgba(0, 0, 0, 0.9);
             position: sticky;
             top: 0;
             z-index: 100;
             backdrop-filter: blur(10px);
+        }
+
+        header .container {
+            padding: 1.5rem 2rem;
         }
 
         .logo {
@@ -130,7 +131,7 @@
 
         .nav-links {
             display: flex;
-            gap: 2.2rem;
+            gap: 1.5rem;
         }
 
         .nav-links a {
@@ -800,22 +801,26 @@
         </div>
     </div>
 
-    <div id="main-app" class="container hidden">
+    <div id="main-app" class="hidden">
         <header>
-            <div class="logo">BIFROST V1</div>
-            <nav class="nav-links">
-                <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
-                <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
-                <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
-                <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
-                <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
-                <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
-                <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
-
-                <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
-                <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
-            </nav>
+            <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="logo">BIFROST V1</div>
+                <nav class="nav-links">
+                    <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
+                    <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
+                    <a onclick="switchTab('storm')" id="nav-storm">STORM MATRIX</a>
+                    <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
+                    <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
+                    <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
+                    <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
+    
+                    <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
+                    <a onclick="logout()" style="color:var(--error)">TERMINATE</a>
+                </nav>
+            </div>
         </header>
+
+        <div class="container">
 
         
         <div id="tab-dashboard" class="tab-content active">
@@ -1259,6 +1264,7 @@
         <footer style="margin-top:4rem; text-align:center; color:#333; font-size:0.6rem; padding: 3rem 0;">[ TACTICAL
             REAPER CORE ]</footer>
     </div>
+</div>
 
     <script>
         const portals = [
