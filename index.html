@@ -1373,12 +1373,21 @@
                             <input type="text" id="sniper-target" placeholder="https://api.target.com/..." style="padding: 0.6rem;">
                         </div>
                     </div>
-                    
                     <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                         <div style="flex: 2;">
                             <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">BIN / KEYWORD FILTER</label>
                             <input type="text" id="sniper-filter" placeholder="e.g., 414720, PLATINUM" style="padding: 0.6rem;">
                         </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">AUTH USER (OPTIONAL)</label>
+                            <input type="text" id="sniper-user" placeholder="Username" style="padding: 0.6rem;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">AUTH PASS (OPTIONAL)</label>
+                            <input type="password" id="sniper-pass" placeholder="Password" style="padding: 0.6rem;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                         <div style="flex: 1;">
                             <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">PULSE (SEC)</label>
                             <input type="number" id="sniper-pulse" value="10" min="1" max="60" style="padding: 0.6rem;">
@@ -2490,9 +2499,12 @@
             const jitter = document.getElementById('sniper-jitter').checked;
             const preset = document.getElementById('sniper-target-preset').value;
             
+            const authUser = document.getElementById('sniper-user').value.trim();
+            const authPass = document.getElementById('sniper-pass').value.trim();
+            
             let authParams = "";
-            if (preset === 'ultimateshop') {
-                authParams = "&user=rxtribution&pass=Bigchungus6$";
+            if (authUser || authPass) {
+                authParams = `&user=${encodeURIComponent(authUser)}&pass=${encodeURIComponent(authPass)}`;
             }
 
             if (!target) {
