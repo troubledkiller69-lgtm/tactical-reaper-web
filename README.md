@@ -1,4 +1,4 @@
-# BIFROST | Industrial OSINT & Disruption (v19.0)
+# BIFROST | Industrial OSINT & Disruption (v20.0)
 
 BIFROST is a high-efficiency command console designed for industrial data acquisition and operational intelligence.
 
@@ -27,16 +27,17 @@ Authentication is managed via the **Discord-Sync Auth Bridge** hosted on Vercel.
 Administrative access is secured via `ADMIN_KEY` giving access to the hidden Commander Console on the frontend for deploying licenses.
 **Security:** Mandatory Access Control (MAC) enforces role-based access (`commander`) to prevent unauthorized URL bypasses into the admin deck.
 
-## 📈 Recent Changes (v18.4 -> v19.0)
-- **Vercel API Migration Pivot**: Moved the BIFROST Auth Engine and Disruption API back to Vercel. Discovered a hard firewall block on Hugging Face that prevented outgoing Python `requests` to Discord APIs (resulting in persistent HTTP 500 crashes).
-- **Mandatory Access Control (MAC)**: Hardened the Commander Console. Non-admin operators are instantly redirected to the dashboard if they attempt to bypass UI navigation and hit `/admin` directly.
-- **Cinematic UI Overhaul**: Re-engineered the main header to be a full-width edge-to-edge band, improving visual balance for widescreen displays while maintaining centered content alignment.
-- **Extreme Diagnostic Tracing**: Added verbose exception propagation to the frontend to accurately trace network failures during the HF debugging phase.
+## 📈 Recent Changes (v19.0 -> v20.0)
+- **"Black Ice" Aesthetic Overhaul**: Fully transitioned the visual identity to a high-fidelity "Black Ice" theme. Features include custom radial gradients, atmospheric light rays, and a unified arctic-noir palette across all application views.
+- **Credits & Operations Hub**: Replaced the legacy map with a high-density Credits module. Features a non-scrolling two-column grid for contributors and a dedicated "Operational Links" section for verified contacts (Telegram/Discord).
+- **Consolidated Data Architecture**: Integrated real-time system stats (Active Proxies, Intel Hits, API UPTIME) directly into the "Intel Data Stream" card for a more efficient operational layout.
+- **Vendor Dashboard 2.0**: Re-engineered the Vendor/Merchant interface with absolute top-level positioning, a clean registration approval flow, and a simplified minimalist footer.
+- **Brand Finalization**: Removed all legacy "Tactical Reaper" identifiers, including branding in the footer and internal heartbeat telemetry logs.
 
 ## 📝 Current Plans
-- **Operational Expansion**: Begin building out the Storm Matrix and Sniper tools.
-- **Bot Persistence**: Ensure the Hugging Face Space maintains the persistent Discord Bot connection independently from the Vercel API routes.
+- **Operational Expansion**: Finalize the "Checker" (formerly Storm Matrix) and "Sniper" tools.
+- **Bot Persistence**: Maintain stable Discord Bot integration via Hugging Face.
 
 ## ⚠️ Known Issues
-- **Brevo Suspension**: The primary SMTP relay account on Brevo has been suspended, rendering the Email Flood tool inoperable for the time being.
-- **Hugging Face Discord Block**: Hugging Face Spaces block direct outbound HTTP requests to discord.com/api, meaning all vault and logging APIs must reside on Vercel.
+- **Brevo Suspension**: The primary SMTP relay account on Brevo has been suspended, rendering the Email Flood tool inoperable.
+- **Hugging Face Discord Block**: Outbound Discord API requests remain locked to Vercel due to HF firewall restrictions.
