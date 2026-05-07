@@ -635,26 +635,20 @@
 
         .credit-list {
             flex: 1;
-            overflow-y: auto;
-            scrollbar-width: none;
-            padding-right: 5px;
-        }
-
-        .credit-list::-webkit-scrollbar {
-            width: 2px;
-        }
-        .credit-list::-webkit-scrollbar-thumb {
-            background: #222;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 1.5rem;
+            align-content: start;
         }
 
         .credit-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.8rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             font-family: 'JetBrains Mono';
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             transition: 0.2s;
         }
 
