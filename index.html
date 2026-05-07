@@ -598,13 +598,121 @@
         .results {
             margin-top: 1.5rem;
             background: #050505;
-            border: 1px solid var(--border);
-            padding: 1.2rem;
+            padding: 1rem;
+            border: 1px solid #111;
             font-family: 'JetBrains Mono';
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #aaa;
-            white-space: pre-wrap;
-            min-height: 80px;
+            word-wrap: break-word;
+        }
+
+        /* BIFROST CREDITS */
+        .credits-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 1.5rem;
+            height: 100%;
+            padding: 0.5rem;
+        }
+
+        .credits-panel {
+            background: rgba(5, 5, 5, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .credits-panel h4 {
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: #444;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+
+        .credit-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            padding-right: 5px;
+        }
+
+        .credit-list::-webkit-scrollbar {
+            width: 2px;
+        }
+        .credit-list::-webkit-scrollbar-thumb {
+            background: #222;
+        }
+
+        .credit-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono';
+            font-size: 0.65rem;
+            transition: 0.2s;
+        }
+
+        .credit-entry:hover {
+            background: rgba(0, 210, 255, 0.02);
+            padding-left: 5px;
+        }
+
+        .credit-name { color: #fff; font-weight: 900; letter-spacing: 1px; }
+        .credit-role { color: var(--primary); font-size: 0.5rem; text-transform: uppercase; opacity: 0.6; }
+
+        .socials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: #000;
+            border: 1px solid #111;
+            color: #666;
+            text-decoration: none;
+            font-family: 'JetBrains Mono';
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn:hover {
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 210, 255, 0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .social-btn:hover::before {
+            left: 100%;
+        }
+
+        .social-btn span {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 900;
         }
 
         #auth-gate {
@@ -881,7 +989,10 @@
     <div id="main-app" class="hidden">
         <header>
             <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="logo">BIFROST V1</div>
+                <div style="display: flex; flex-direction: column;">
+                    <div class="logo">BIFROST V1</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 0.4rem; color: #555; letter-spacing: 1.5px; text-transform: uppercase; margin-top: -2px; opacity: 0.8;">Connecting Earth And The Realm Of The Gods.</div>
+                </div>
                 <nav class="nav-links">
                     <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                     <a onclick="switchTab('recon')" id="nav-recon">PORTAL RECON</a>
@@ -955,39 +1066,93 @@
                         </div>
                     </div>
 
-                    <!-- Center: Operations Map -->
+                    <!-- Center: BIFROST Credits -->
                     <div class="card" style="background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%); border: 1px solid #111; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="font-size: 0.7rem; letter-spacing: 4px; color: #fff;">GLOBAL OPERATIONS MAP</h3>
-                            <div style="color: var(--success); font-family: 'JetBrains Mono'; font-size: 0.5rem;">[ LIVE TRACKING ACTIVE ]</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.7rem; letter-spacing: 4px; color: #fff;">BIFROST CREDITS</h3>
+                            <div style="color: var(--primary); font-family: 'JetBrains Mono'; font-size: 0.5rem; letter-spacing: 2px;">[ ELITE VANGUARD ]</div>
                         </div>
                         
-                        <div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; opacity: 0.4;">
-                            <!-- Simplified minimalist world map SVG -->
-                            <svg viewBox="0 0 1000 500" style="width: 100%; height: auto; fill: #111; stroke: #222; stroke-width: 0.5;">
-                                <path d="M150,150 L250,120 L350,150 L450,180 L550,150 L650,120 L750,150 L850,180 L950,150 L950,350 L850,380 L750,350 L650,380 L550,350 L450,380 L350,350 L250,380 L150,350 Z" />
-                                <!-- Pulsing Nodes -->
-                                <circle cx="200" cy="200" r="5" fill="var(--primary)" class="map-node">
-                                    <animate attributeName="r" values="3;7;3" dur="2s" repeatCount="indefinite" />
-                                    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
-                                </circle>
-                                <circle cx="450" cy="180" r="5" fill="#00d2ff" class="map-node">
-                                    <animate attributeName="r" values="3;7;3" dur="3s" repeatCount="indefinite" />
-                                    <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
-                                </circle>
-                                <circle cx="700" cy="280" r="5" fill="var(--success)" class="map-node">
-                                    <animate attributeName="r" values="3;7;3" dur="2.5s" repeatCount="indefinite" />
-                                    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite" />
-                                </circle>
-                                <circle cx="850" cy="150" r="5" fill="#f39c12" class="map-node">
-                                    <animate attributeName="r" values="3;7;3" dur="4s" repeatCount="indefinite" />
-                                    <animate attributeName="opacity" values="1;0.3;1" dur="4s" repeatCount="indefinite" />
-                                </circle>
-                            </svg>
+                        <div class="credits-container">
+                            <div class="credits-panel">
+                                <h4>CONTRIBUTORS</h4>
+                                <div class="credit-list" id="credits-contributors">
+                                    <div class="credit-entry">
+                                        <span class="credit-name">LO</span>
+                                        <span class="credit-role">Head Architect</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">ENI</span>
+                                        <span class="credit-role">Core Neural Logic</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">MR CLEAN</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">MAX PAYNE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">SILVIO DANTE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">MILO</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">RAMEN</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">PEEWEE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">AP</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">DREXO</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">LUKE CAGE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">OGDEE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">DUCKY</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">JNIZZLE</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                    <div class="credit-entry">
+                                        <span class="credit-name">POSTMANPAT</span>
+                                        <span class="credit-role">Contributor</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="credits-panel">
+                                <h4>OPERATIONAL LINKS</h4>
+                                <div class="socials-grid" id="credits-socials">
+                                    <a href="https://t.me/rxtribution" target="_blank" class="social-btn">TELEGRAM (OWNER) <span>@RXTRIBUTION</span></a>
+                                    <a href="https://t.me/Yuntoez" target="_blank" class="social-btn">TELEGRAM (DEV) <span>@YUNTOEZ</span></a>
+                                    <a href="#" class="social-btn">DISCORD <span>&gt;</span></a>
+                                    <a href="#" class="social-btn">JABBER <span>&gt;</span></a>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Scanline Effect Overlay -->
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0, rgba(0,210,255,0.03) 1px, transparent 2px); background-size: 100% 4px;"></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0, rgba(0,210,255,0.02) 1px, transparent 2px); background-size: 100% 4px;"></div>
                         
                         <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
                             <div style="background: rgba(0,0,0,0.8); border: 1px solid #222; padding: 0.8rem; border-radius: 4px;">
