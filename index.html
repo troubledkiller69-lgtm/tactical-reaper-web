@@ -915,6 +915,20 @@
         .shop-modal-close { background: none; border: 1px solid #333; color: var(--error); padding: 0.5rem 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem; cursor: pointer; float: right; }
 
         /* ═══ MERCHANT DASHBOARD ═══ */
+        #merchant-app {
+            min-height: 100vh;
+            background: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+            display: none;
+        }
+        #merchant-app:not(.hidden) {
+            display: block;
+        }
+
         .merchant-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
         .merchant-nav-btn { flex: 1; padding: 1rem; font-family: 'JetBrains Mono'; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #555; background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: 0.3s; text-align: center; }
         .merchant-nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(0,210,255,0.03); }
