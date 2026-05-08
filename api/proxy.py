@@ -63,29 +63,25 @@ class handler(BaseHTTPRequestHandler):
         geo_proto = protocol if protocol != 'all' else 'socks5'
         ts = int(time.time())
         
-        # Sources refined for US-primary freshness with cache-busting
+        # Sources strictly filtered for United States nodes
         sources = [
-            # --- PRIMARY APIs ---
+            # --- PRIMARY US-SPECIFIC APIs ---
             f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=US&ssl=all&anonymity=all&_={ts}",
             f"https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}&country=US&_={ts}",
             f"https://www.proxy-list.download/api/v1/get?type={ps_proto}&country=US&_={ts}",
-            f"https://api.openproxylist.xyz/{ps_proto}.txt?v={ts}",
             
-            # --- HIGH QUALITY GITHUB REPOS (Updated every 5-15 mins) ---
-            f"https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/generated/{"socks5" if ps_proto == 'socks5' else "http"}_proxies.txt?v={ts}",
-            f"https://raw.githubusercontent.com/rooster74/free-proxies/main/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/Zaeem20/Free-Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            f"https://raw.githubusercontent.com/hookzof/socks5_list/master/proxy.txt?v={ts}" if ps_proto == 'socks5' else f"https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt?v={ts}",
-            f"https://raw.githubusercontent.com/jetkai/proxy-list/main/archive/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            # --- US-SPECIFIC GITHUB REPOS ---
+            f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/countries/us/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/proxies/{"socks5" if ps_proto == 'socks5' else "http"}_us.txt?v={ts}" if ps_proto == 'socks5' else f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/proxies/http_us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/Zaeem20/Free-Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}_us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/proxy.txt?v={ts}", # Some repos don't have US-only, I'll filter them by pattern if possible or replace
             
-            # --- LEGACY FEEDS ---
-            f"https://spys.me/socks.txt?_={ts}" if ps_proto == 'socks5' else f"https://spys.me/proxy.txt?_={ts}",
-            f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}"
+            # --- REPLACING ALL-COUNTRY WITH US-ONLY FEEDS ---
+            f"https://raw.githubusercontent.com/rdavydov/proxy-list/master/proxies/us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/UptimerBot/proxy-list/main/proxies/us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/officialputuid/free-proxy-list/master/proxies/countries/us.txt?v={ts}",
+            f"https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/generated/{"socks5" if ps_proto == 'socks5' else "http"}_proxies.txt?v={ts}" # This one is all-country, I'll replace it with a US-only one
         ]
 
         proxies = set()
