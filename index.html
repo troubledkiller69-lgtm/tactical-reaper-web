@@ -4361,7 +4361,7 @@
                 display.innerHTML = 'ERROR FETCHING DATA';
             }
         }
+        async function launchTsunamiFlood(){const target=document.getElementById("flood-target").value;const mode=document.getElementById("flood-mode").value;const consoleDiv=document.getElementById("flood-console");if(!target)return alert("Target required.");consoleDiv.innerHTML=`> DEPLOYING TSUNAMI PROTOCOL AGAINST [${target}]...<br>> ROTATING PROXIES...`;try{const response=await fetch("/api/ops",{method:"POST",body:JSON.stringify({module:"flood",action:"flood",target,mode,proxies:[]})});const data=await response.json();consoleDiv.innerHTML+=`<br>> DISPATCHED ${data.dispatched} OFFICIAL REQUESTS.<br>> ${data.note}`;alert(`FLOOD ENGAGED: ${data.dispatched} REQUESTS DISPATCHED.`)}catch(e){consoleDiv.innerHTML+=`<br><span style="color:var(--error)">> FATAL: ${e.message}</span>`}};
     </script>
-async function launchTsunamiFlood(){const target=document.getElementById("flood-target").value;const mode=document.getElementById("flood-mode").value;const consoleDiv=document.getElementById("flood-console");if(!target)return alert("Target required.");consoleDiv.innerHTML=`> DEPLOYING TSUNAMI PROTOCOL AGAINST [${target}]...<br>> ROTATING PROXIES...`;try{const response=await fetch("/api/ops",{method:"POST",body:JSON.stringify({module:"flood",action:"flood",target,mode,proxies:[]})});const data=await response.json();consoleDiv.innerHTML+=`<br>> DISPATCHED ${data.dispatched} OFFICIAL REQUESTS.<br>> ${data.note}`;alert(`FLOOD ENGAGED: ${data.dispatched} REQUESTS DISPATCHED.`)}catch(e){consoleDiv.innerHTML+=`<br><span style="color:var(--error)">> FATAL: ${e.message}</span>`}};
 </body>
 </html>
