@@ -1118,6 +1118,8 @@
                     <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                     <a onclick="switchTab('network')" id="nav-network" style="color:var(--success);">NETWORK</a>
+                    <a onclick="switchTab('checker')" id="nav-checker" style="color:var(--primary);">CHECKER</a>
+                    <a onclick="switchTab('smtp')" id="nav-smtp" style="color:var(--error);">SMTP</a>
                     <a onclick="switchTab('crypto')" id="nav-crypto" style="color:#00d2ff;">CRYPTO</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
@@ -1708,6 +1710,43 @@
                                 </table>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-checker" class="tab-content">
+            <div style="margin-top:2rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--primary);">SHADOW CHECKER</h2>
+                <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                    <div class="card">
+                        <h3>COMBO INPUT (USER:PASS)</h3>
+                        <textarea id="shadow-combo" style="height:300px; font-size:0.7rem;" placeholder="user@email.com:pass123..."></textarea>
+                        <button class="btn" style="margin-top:1rem;" onclick="launchShadowCheck()">EXECUTE VALIDATION</button>
+                    </div>
+                    <div class="card">
+                        <h3>TELEMETRY</h3>
+                        <div id="shadow-stats" style="font-family:'JetBrains Mono'; font-size:1.2rem; color:var(--primary);">HITS: 0 | BAD: 0</div>
+                        <div id="shadow-results" class="results" style="height:250px; overflow-y:auto; margin-top:1rem;">AWAITING DATA...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-smtp" class="tab-content">
+            <div style="margin-top:2rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--error);">SMTP RELAY</h2>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="card">
+                        <h3>RELAY POOL</h3>
+                        <textarea id="smtp-relays" style="height:150px; font-size:0.7rem;" placeholder="host:port:user:pass"></textarea>
+                        <input type="text" id="smtp-target-email" placeholder="TARGET EMAIL" style="margin-top:1rem;">
+                        <input type="text" id="smtp-subject-text" placeholder="SUBJECT" style="margin-top:0.5rem;">
+                    </div>
+                    <div class="card">
+                        <h3>PAYLOAD</h3>
+                        <textarea id="smtp-body-text" style="height:200px; font-size:0.7rem;" placeholder="HTML or Plaintext message..."></textarea>
+                        <button class="btn" style="margin-top:1rem; background:var(--error); color:#fff;" onclick="launchSmtpBlast()">INITIATE BLAST</button>
                     </div>
                 </div>
             </div>
@@ -4261,6 +4300,83 @@
             } catch(e) {}
         }
 
+        async function launchShadowCheck() {
+            const combo = document.getElementById('shadow-combo').value.split('\n').filter(l => l.includes(':'));
+            if (combo.length === 0) return alert('No valid combo provided.');
+            
+            const resultsDiv = document.getElementById('shadow-results');
+            const statsDiv = document.getElementById('shadow-stats');
+            resultsDiv.innerHTML = '> INITIATING SHADOW PROTOCOL...';
+            
+            try {
+                const response = await fetch('/api/checker', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'check', combo: combo, target: 'generic' })
+                });
+                const data = await response.json();
+                
+                let hits = 0;
+                let bad = 0;
+                resultsDiv.innerHTML = '';
+                
+                data.results.forEach(res => {
+                    if (res.status === 'Hit') hits++;
+                    else bad++;
+                    
+                    const div = document.createElement('div');
+                    div.style.color = res.status === 'Hit' ? 'var(--success)' : '#555';
+                    div.textContent = `[${res.status}] ${res.account} - ${res.info}`;
+                    resultsDiv.appendChild(div);
+                });
+                
+                statsDiv.textContent = `HITS: ${hits} | BAD: ${bad}`;
+            } catch (e) {
+                resultsDiv.innerHTML = `<span style="color:var(--error)">ERR: ${e.message}</span>`;
+            }
+        }
+
+        async function launchSmtpBlast() {
+            const relays = document.getElementById('smtp-relays').value.split('\n').map(l => {
+                const p = l.split(':');
+                return { host: p[0], port: p[1], user: p[2], pass: p[3] };
+            }).filter(r => r.host && r.user);
+            
+            const target = document.getElementById('smtp-target-email').value;
+            const subject = document.getElementById('smtp-subject-text').value;
+            const body = document.getElementById('smtp-body-text').value;
+            
+            if (!target || !relays.length) return alert('Target and Relays required.');
+            
+            try {
+                const response = await fetch('/api/smtp', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'blast', relays, target, subject, body, amount: 10 })
+                });
+                const data = await response.json();
+                alert(`BLAST COMPLETE: ${data.sent} SENT, ${data.failed} FAILED`);
+            } catch (e) {
+                alert(`BLAST FAILED: ${e.message}`);
+            }
+        }
+
+        async function trackWallet() {
+            const address = document.getElementById('wallet-address').value;
+            if (!address) return;
+            const display = document.getElementById('wallet-display');
+            display.innerHTML = 'QUERYING CHAIN...';
+            try {
+                const res = await fetch(`/api/crypto?action=balance&address=${address}`);
+                const data = await res.json();
+                display.innerHTML = `
+                    <div class="card">
+                        <div style="color:#555; font-size:0.6rem;">BALANCE</div>
+                        <div style="font-size:1.5rem; color:var(--primary);">${data.balance} ${data.symbol}</div>
+                    </div>
+                `;
+            } catch (e) {
+                display.innerHTML = 'ERROR FETCHING DATA';
+            }
+        }
     </script>
 </body>
 </html>
