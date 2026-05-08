@@ -3149,7 +3149,7 @@
                 const response = await fetch('/api/proxy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'check', proxies: list })
+                    body: JSON.stringify({ module: 'checker', action: 'check', proxies: list })
                 });
                 const data = await response.json();
 
@@ -4311,9 +4311,9 @@
             resultsDiv.innerHTML = '> INITIATING SHADOW PROTOCOL...';
             
             try {
-                const response = await fetch('/api/checker', {
+                const response = await fetch('/api/ops', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'check', combo: combo, target: 'generic' })
+                    body: JSON.stringify({ module: 'checker', action: 'check', combo: combo, target: 'generic' })
                 });
                 const data = await response.json();
                 
@@ -4350,9 +4350,9 @@
             if (!target || !relays.length) return alert('Target and Relays required.');
             
             try {
-                const response = await fetch('/api/smtp', {
+                const response = await fetch('/api/ops', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'blast', relays, target, subject, body, amount: 10 })
+                    body: JSON.stringify({ module: 'smtp', action: 'blast', relays, target, subject, body, amount: 10 })
                 });
                 const data = await response.json();
                 alert(`BLAST COMPLETE: ${data.sent} SENT, ${data.failed} FAILED`);
@@ -4367,7 +4367,7 @@
             const display = document.getElementById('wallet-display');
             display.innerHTML = 'QUERYING CHAIN...';
             try {
-                const res = await fetch(`/api/crypto?action=balance&address=${address}`);
+                const res = await fetch(`/api/ops?module=crypto&address=${address}`);
                 const data = await res.json();
                 display.innerHTML = `
                     <div class="card">
