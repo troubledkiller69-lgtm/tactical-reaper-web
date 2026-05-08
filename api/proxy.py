@@ -65,18 +65,27 @@ class handler(BaseHTTPRequestHandler):
         
         # Sources refined for US-primary freshness with cache-busting
         sources = [
-            # Source 1: ProxyScrape (Targeting US)
+            # --- PRIMARY APIs ---
             f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=US&ssl=all&anonymity=all&_={ts}",
-            # Source 2: Geonode (Targeting US, sorted by lastChecked)
             f"https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}&country=US&_={ts}",
-            # Source 3: Spys.me (Daily list)
-            f"https://spys.me/socks.txt?_={ts}" if ps_proto == 'socks5' else f"https://spys.me/proxy.txt?_={ts}",
-            # Source 4: Monosans (High quality GitHub repo - using different branches for variety)
-            f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
-            # Source 5: Proxy-List.download
             f"https://www.proxy-list.download/api/v1/get?type={ps_proto}&country=US&_={ts}",
-            # Source 6: Hookzof (Alternative GitHub source)
-            f"https://raw.githubusercontent.com/hookzof/socks5_list/master/proxy.txt?v={ts}" if ps_proto == 'socks5' else f"https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt?v={ts}"
+            f"https://api.openproxylist.xyz/{ps_proto}.txt?v={ts}",
+            
+            # --- HIGH QUALITY GITHUB REPOS (Updated every 5-15 mins) ---
+            f"https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/generated/{"socks5" if ps_proto == 'socks5' else "http"}_proxies.txt?v={ts}",
+            f"https://raw.githubusercontent.com/rooster74/free-proxies/main/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/Zaeem20/Free-Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            f"https://raw.githubusercontent.com/hookzof/socks5_list/master/proxy.txt?v={ts}" if ps_proto == 'socks5' else f"https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt?v={ts}",
+            f"https://raw.githubusercontent.com/jetkai/proxy-list/main/archive/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
+            
+            # --- LEGACY FEEDS ---
+            f"https://spys.me/socks.txt?_={ts}" if ps_proto == 'socks5' else f"https://spys.me/proxy.txt?_={ts}",
+            f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}"
         ]
 
         proxies = set()
