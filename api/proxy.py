@@ -54,6 +54,29 @@ class handler(BaseHTTPRequestHandler):
             "results": results
         })
 
+    def batch_geo_filter(self, proxy_list):
+        # ip-api batch endpoint supports up to 15 queries per request
+        # We'll use blocks of 15 to stay within free limits and ensure reliability
+        verified_us = []
+        ips = [p.split(':')[0] for p in proxy_list]
+        
+        for i in range(0, len(ips), 15):
+            batch = ips[i:i+15]
+            try:
+                r = requests.post("http://ip-api.com/batch", json=batch, timeout=10)
+                if r.status_code == 200:
+                    results = r.json()
+                    for idx, res in enumerate(results):
+                        if res.get('countryCode') == 'US':
+                            verified_us.append(proxy_list[i + idx])
+            except: pass
+            
+            # Rate limiting for free tier (45 requests per minute)
+            if i % 45 == 0 and i > 0:
+                time.sleep(1)
+                
+        return verified_us
+
     def harvest_proxies(self, protocol):
         import time
         import random
@@ -65,26 +88,19 @@ class handler(BaseHTTPRequestHandler):
         
         # Sources strictly filtered for United States nodes
         sources = [
-            # --- PRIMARY US-SPECIFIC APIs ---
             f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=US&ssl=all&anonymity=all&_={ts}",
             f"https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}&country=US&_={ts}",
             f"https://www.proxy-list.download/api/v1/get?type={ps_proto}&country=US&_={ts}",
-            
-            # --- US-SPECIFIC GITHUB REPOS ---
             f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/us.txt?v={ts}",
             f"https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/countries/us/{"socks5" if ps_proto == 'socks5' else "http"}.txt?v={ts}",
             f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/proxies/{"socks5" if ps_proto == 'socks5' else "http"}_us.txt?v={ts}" if ps_proto == 'socks5' else f"https://raw.githubusercontent.com/mmpx12/proxy-list/master/proxies/http_us.txt?v={ts}",
             f"https://raw.githubusercontent.com/Zaeem20/Free-Proxy-List/master/{"socks5" if ps_proto == 'socks5' else "http"}_us.txt?v={ts}",
-            f"https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/proxy.txt?v={ts}", # Some repos don't have US-only, I'll filter them by pattern if possible or replace
-            
-            # --- REPLACING ALL-COUNTRY WITH US-ONLY FEEDS ---
             f"https://raw.githubusercontent.com/rdavydov/proxy-list/master/proxies/us.txt?v={ts}",
             f"https://raw.githubusercontent.com/UptimerBot/proxy-list/main/proxies/us.txt?v={ts}",
-            f"https://raw.githubusercontent.com/officialputuid/free-proxy-list/master/proxies/countries/us.txt?v={ts}",
-            f"https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/generated/{"socks5" if ps_proto == 'socks5' else "http"}_proxies.txt?v={ts}" # This one is all-country, I'll replace it with a US-only one
+            f"https://raw.githubusercontent.com/officialputuid/free-proxy-list/master/proxies/countries/us.txt?v={ts}"
         ]
 
-        proxies = set()
+        raw_proxies = set()
         
         for url in sources:
             try:
@@ -93,29 +109,31 @@ class handler(BaseHTTPRequestHandler):
                     if 'geonode' in url:
                         data = r.json().get('data', [])
                         for item in data:
-                            proxies.add(f"{item['ip']}:{item['port']}")
+                            raw_proxies.add(f"{item['ip']}:{item['port']}")
                     else:
                         for p in r.text.split('\n'):
                             p = p.strip()
                             if p and ':' in p and not p.startswith('#'):
-                                # Basic format check
                                 parts = p.split(':')
                                 if len(parts) >= 2:
-                                    proxies.add(f"{parts[0].strip()}:{parts[1].strip()}")
+                                    raw_proxies.add(f"{parts[0].strip()}:{parts[1].strip()}")
             except: pass
 
-        # Shuffle results to ensure variety on every request
-        results = list(proxies)
+        # Shuffle and take a smaller sample for the geo-filter (to keep it fast)
+        results = list(raw_proxies)
         random.shuffle(results)
-        results = results[:500] 
+        sample = results[:150] # Check 150 proxies to find enough US ones
+        
+        # Mandatory Geolocation Enforcement
+        verified_us = self.batch_geo_filter(sample)
         
         self._json(200, {
             "status": "success",
             "protocol": protocol,
             "country": "US",
-            "count": len(results),
-            "proxies": results,
-            "note": "Optimized with cache-busting, shuffling, and multi-source aggregation (US focus)."
+            "count": len(verified_us),
+            "proxies": verified_us,
+            "note": "STRICT US-ONLY ENFORCEMENT: All proxies verified via backend geo-validation."
         })
 
     def _json(self, code, data):
