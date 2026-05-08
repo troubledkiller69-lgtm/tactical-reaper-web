@@ -1697,6 +1697,7 @@
                                         <tr>
                                             <th>PROXY NODE</th>
                                             <th>STATUS</th>
+                                            <th>FRAUD SCORE</th>
                                             <th>GEO LOCATION</th>
                                             <th>LATENCY</th>
                                             <th>ANONYMITY</th>
@@ -3121,9 +3122,18 @@
                         const latencyText = `${r.latency}ms`;
                         const geoText = `${r.country}, ${r.region}, ${r.city}`;
                         
+                        let fraudScoreColor = '#777';
+                        let fraudScore = r.fraud_score;
+                        if (typeof fraudScore === 'number') {
+                            if (fraudScore < 30) fraudScoreColor = 'var(--success)';
+                            else if (fraudScore < 70) fraudScoreColor = '#f39c12';
+                            else fraudScoreColor = 'var(--error)';
+                        }
+
                         return `<tr>
                             <td style="color:#fff">${r.proxy}</td>
                             <td class="${statusClass}">${r.status.toUpperCase()}</td>
+                            <td style="color:${fraudScoreColor}; font-weight:900;">${fraudScore}</td>
                             <td style="color:#777; font-size:0.55rem;">${geoText}</td>
                             <td class="${latencyClass}">${latencyText}</td>
                             <td class="${anonClass}">${r.anonymity.toUpperCase()}</td>
