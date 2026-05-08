@@ -1687,7 +1687,10 @@
                         <textarea id="network-proxy-list" style="height: 150px; font-size: 0.7rem; color: var(--success); border: 1px solid #111; background: #050505;" readonly></textarea>
                         
                         <div id="network-proxy-check-area" style="display: none; margin-top: 2rem;">
-                            <h4 style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #444; letter-spacing: 2px; margin-bottom: 1rem;">VALIDATION REPORT</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #444; letter-spacing: 2px; margin: 0;">VALIDATION REPORT (LIVE ONLY)</h4>
+                                <button class="btn" id="network-proxy-export-btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.6rem; background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success); color: var(--success); display: none;" onclick="exportLiveProxies()">EXPORT LIVE LIST (.TXT)</button>
+                            </div>
                             <div style="max-height: 400px; overflow-y: auto;">
                                 <table class="proxy-table">
                                     <thead>
@@ -3088,6 +3091,7 @@
             const resArea = document.getElementById('network-proxy-check-area');
             const resTable = document.getElementById('network-proxy-check-results');
             const btn = document.getElementById('network-proxy-validate-btn');
+            const exportBtn = document.getElementById('network-proxy-export-btn');
             const countEl = document.getElementById('network-proxy-count');
 
             if (!list.length) return;
@@ -3096,6 +3100,7 @@
             btn.innerText = 'VALIDATING...';
             resArea.style.display = 'block';
             resTable.innerHTML = '';
+            exportBtn.style.display = 'none';
             countEl.innerText = `VALIDATING ${list.length} NODES...`;
 
             try {
@@ -3107,12 +3112,14 @@
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    resTable.innerHTML = data.results.map(r => {
-                        const statusClass = r.status === 'Live' ? 'status-live' : 'status-dead';
+                    const liveResults = data.results.filter(r => r.status === 'Live');
+                    
+                    resTable.innerHTML = liveResults.map(r => {
+                        const statusClass = 'status-live';
                         const anonClass = `anon-${r.anonymity.toLowerCase().substring(0, 5)}`;
                         const latencyClass = r.latency < 500 ? 'latency-fast' : r.latency < 1500 ? 'latency-mid' : 'latency-slow';
-                        const latencyText = r.latency > 0 ? `${r.latency}ms` : '---';
-                        const geoText = r.status === 'Live' ? `${r.country}, ${r.region}, ${r.city}` : 'N/A';
+                        const latencyText = `${r.latency}ms`;
+                        const geoText = `${r.country}, ${r.region}, ${r.city}`;
                         
                         return `<tr>
                             <td style="color:#fff">${r.proxy}</td>
@@ -3123,6 +3130,14 @@
                             <td style="color:#555">${r.protocol.toUpperCase()}</td>
                         </tr>`;
                     }).join('');
+                    
+                    if (liveResults.length === 0) {
+                        resTable.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:#555;">NO LIVE NODES IDENTIFIED IN THIS HARVEST</td></tr>';
+                    } else {
+                        exportBtn.style.display = 'block';
+                        // Store live list for export
+                        window._liveProxies = liveResults.map(r => r.proxy).join('\n');
+                    }
                     
                     countEl.innerText = `VALIDATION COMPLETE: ${data.live}/${data.total} LIVE NODES`;
                     addLog(`PROXY VALIDATION: ${data.live}/${data.total} live nodes identified`);
@@ -3136,6 +3151,21 @@
                 btn.disabled = false;
                 btn.innerText = 'VALIDATE';
             }
+        }
+
+        function exportLiveProxies() {
+            if (!window._liveProxies) return;
+            const blob = new Blob([window._liveProxies], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date().toISOString().split('T')[0];
+            a.href = url;
+            a.download = `bifrost_live_proxies_${now}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            addLog(`PROXY EXPORT: Live list downloaded.`);
         }
 
         function copyProxiesToClipboard() {
