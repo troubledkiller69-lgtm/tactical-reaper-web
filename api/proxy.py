@@ -14,14 +14,14 @@ class handler(BaseHTTPRequestHandler):
         protocol = query.get('protocol', ['socks5'])[0]
         
         if action == 'harvest':
-            proxies = asyncio.run(self.harvest_proxies_async(protocol))
+            proxies, verified = asyncio.run(self.harvest_proxies_async(protocol))
             self._json(200, {
                 "status": "success",
                 "protocol": protocol,
                 "country": "US",
                 "count": len(proxies),
                 "proxies": proxies,
-                "note": "STRICT US-ONLY ENFORCEMENT: Verified via async backend geo-validation."
+                "note": f"Verification: { 'STRICT' if verified else 'HEURISTIC' }. Optimized for US nodes."
             })
         elif action == 'check':
             proxies = query.get('proxies', [])
@@ -122,8 +122,15 @@ class handler(BaseHTTPRequestHandler):
                 except: pass
         results = list(raw_proxies)
         random.shuffle(results)
-        sample = results[:150]
-        return await self.batch_geo_filter_async(sample)
+        sample = results[:300] # Increased sample for higher yield
+        
+        verified_us = await self.batch_geo_filter_async(sample)
+        
+        # Fallback: if strict verification returns 0 (rate limit/error), 
+        # return the raw US-targeted sample as it's from US-only sources.
+        if len(verified_us) > 0:
+            return verified_us, True
+        return sample[:100], False
 
     def _json(self, code, data):
         self.send_response(code)
