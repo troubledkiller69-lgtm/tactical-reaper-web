@@ -1120,6 +1120,7 @@
                     <a onclick="switchTab('network')" id="nav-network" style="color:var(--success);">NETWORK</a>
                     <a onclick="switchTab('checker')" id="nav-checker" style="color:var(--primary);">CHECKER</a>
                     <a onclick="switchTab('smtp')" id="nav-smtp" style="color:var(--error);">SMTP</a>
+                    <a onclick="switchTab('flood')" id="nav-flood" style="color:#f39c12;">FLOOD</a>
                     <a onclick="switchTab('crypto')" id="nav-crypto" style="color:#00d2ff;">CRYPTO</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
@@ -1752,6 +1753,7 @@
             </div>
         </div>
 
+        <div id="tab-flood" class="tab-content"><div style="margin-top:2rem;"><h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #f39c12;">TSUNAMI FLOOD ENGINE</h2><div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;"><div class="card"><h3>TARGET SPECIFICATION</h3><label>PHONE OR EMAIL</label><input type="text" id="flood-target" placeholder="+1XXXXXXXXXX or target@email.com"><label>FLOOD MODE</label><select id="flood-mode" style="width:100%; padding:0.8rem; background:#000; border:1px solid #333; color:#f39c12; font-family:'JetBrains Mono';"><option value="sms">SMS / OTP BLITZ</option><option value="email">OFFICIAL NOTIFICATION STORM</option></select><button class="btn" style="margin-top:1.5rem; background:#f39c12; color:#000; font-weight:900;" onclick="launchTsunamiFlood()">INITIATE TSUNAMI</button></div><div class="card"><h3>OPERATIONAL CONSOLE</h3><div id="flood-console" class="results" style="height:300px; overflow-y:auto; font-family:'JetBrains Mono'; font-size:0.65rem;">&gt; AWAITING TARGET ACQUISITION...</div></div></div></div></div>
         <div id="tab-crypto" class="tab-content">
             <div style="margin-top:2rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #00d2ff;">CRYPTO RECON</h2>
@@ -4378,5 +4380,6 @@
             }
         }
     </script>
+async function launchTsunamiFlood(){const target=document.getElementById("flood-target").value;const mode=document.getElementById("flood-mode").value;const consoleDiv=document.getElementById("flood-console");if(!target)return alert("Target required.");consoleDiv.innerHTML=`> DEPLOYING TSUNAMI PROTOCOL AGAINST [${target}]...<br>> ROTATING PROXIES...`;try{const response=await fetch("/api/flood",{method:"POST",body:JSON.stringify({action:"flood",target,mode,proxies:[]})});const data=await response.json();consoleDiv.innerHTML+=`<br>> DISPATCHED ${data.dispatched} OFFICIAL REQUESTS.<br>> ${data.note}`;alert(`FLOOD ENGAGED: ${data.dispatched} REQUESTS DISPATCHED.`)}catch(e){consoleDiv.innerHTML+=`<br><span style="color:var(--error)">> FATAL: ${e.message}</span>`}};
 </body>
 </html>
