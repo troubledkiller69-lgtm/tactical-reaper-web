@@ -1114,20 +1114,17 @@
                 <nav class="nav-links">
                     <a onclick="switchTab('dashboard')" id="nav-dashboard" class="active">DASHBOARD</a>
                     <a onclick="switchTab('recon')" id="nav-recon">DX LINKS</a>
-                    <a onclick="switchTab('storm')" id="nav-storm">LOG CHK</a>
+                    <a onclick="switchTab('checker')" id="nav-checker" style="color:var(--primary);">LOG CHK</a>
                     <a onclick="switchTab('tgops')" id="nav-tgops">TG OPS</a>
                     <a onclick="switchTab('osint')" id="nav-osint">OSINT</a>
                     <a onclick="switchTab('network')" id="nav-network" style="color:var(--success);">NETWORK</a>
-                    <a onclick="switchTab('checker')" id="nav-checker" style="color:var(--primary);">LOG CHK</a>
-                    <a onclick="switchTab('smtp')" id="nav-smtp" style="color:var(--error);">SMTP</a>
                     <a onclick="switchTab('flood')" id="nav-flood" style="color:#f39c12;">FLOOD</a>
+                    <a onclick="switchTab('smtp')" id="nav-smtp" style="color:var(--error);">SMTP</a>
                     <a onclick="switchTab('crypto')" id="nav-crypto" style="color:#00d2ff;">CRYPTO</a>
                     <a onclick="switchTab('sniper')" id="nav-sniper">SNIPER</a>
                     <a onclick="switchTab('shop')" id="nav-shop" style="color:#f39c12;">SHOP</a>
                     <a onclick="switchTab('cheats')" id="nav-cheats" style="color:#e74c3c;">CHEATS</a>
                     <a onclick="switchTab('admin')" id="nav-admin" class="hidden" style="color:var(--success); border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">COMMANDER</a>
-    
-                    <a onclick="switchTab('tools')" id="nav-tools">TOOLS</a>
                     <a onclick="logout()" style="color:var(--error)">LOG OUT</a>
                 </nav>
             </div>
@@ -1308,71 +1305,6 @@
             </div>
         </div>
 
-        <div id="tab-tools" class="tab-content">
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
-                <div class="card">
-                    <h3>BIN INTEL</h3><input type="text" id="bin-input" placeholder="PREFIX"><button class="btn"
-                        onclick="runBinCheck()">LOOKUP</button>
-                    <div id="bin-results" class="results">...</div>
-                </div>
-                <div class="card" style="opacity: 0.4; filter: grayscale(1); pointer-events: none; position: relative;">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); border: 2px solid var(--error); color: var(--error); padding: 5px 15px; font-weight: 900; letter-spacing: 2px; z-index: 10; background: #000;">SYSTEM OFFLINE</div>
-                    <h3 style="color: #555;">EMAIL FLOOD</h3>
-                    <input type="text" placeholder="TARGET" disabled>
-                    <button class="btn" disabled>FIRE</button>
-                    <div class="results">BREVO_RELAY_SUSPENDED</div>
-                </div>
-                <div class="card">
-                    <h3>SMS BOMBER</h3>
-                    <div class="sms-modes">
-                        <div class="sms-mode-btn active" id="sms-mode-otp" onclick="setSmsMode('otp')">OTP FLOOD</div>
-                        <div class="sms-mode-btn" id="sms-mode-email" onclick="setSmsMode('email')">EMAIL GW</div>
-                        <div class="sms-mode-btn" id="sms-mode-shotgun" onclick="setSmsMode('shotgun')">SHOTGUN</div>
-                    </div>
-                    <input type="text" id="sms-target" placeholder="TARGET (e.g. 2025551234)">
-                    <div id="sms-email-opts" class="sms-email-opts hidden">
-                        <select id="sms-carrier">
-                            <option value="att">AT&amp;T</option>
-                            <option value="tmobile">T-Mobile</option>
-                            <option value="verizon">Verizon</option>
-                            <option value="sprint">Sprint</option>
-                            <option value="uscellular">US Cellular</option>
-                            <option value="boost">Boost Mobile</option>
-                            <option value="cricket">Cricket</option>
-                            <option value="metro">Metro PCS</option>
-                            <option value="googlefi">Google Fi</option>
-                            <option value="consumer">Consumer Cellular</option>
-                            <option value="virgin">Virgin Mobile</option>
-                            <option value="republic">Republic Wireless</option>
-                            <option value="xfinity">Xfinity Mobile</option>
-                            <option value="mint">Mint Mobile</option>
-                            <option value="visible">Visible</option>
-                            <option value="straighttalk">Straight Talk</option>
-                            <option value="tracfone">TracFone</option>
-                            <option value="ting">Ting</option>
-                            <option value="cspire">C Spire</option>
-                            <option value="spectrum">Spectrum Mobile</option>
-                        </select>
-                        <div class="sms-count-row">
-                            <input type="number" id="sms-count" value="25" min="1" max="100" placeholder="MSG COUNT">
-                        </div>
-                    </div>
-                    <div id="sms-shotgun-info" class="hidden" style="font-family:'JetBrains Mono';font-size:0.55rem;color:#555;margin-bottom:1rem;border:1px solid var(--border);padding:0.6rem;background:#050505;">⚡ SHOTGUN: Fires to ALL 20 carrier gateways simultaneously. No carrier detection needed — at least one will land.
-                        <div class="sms-count-row" style="margin-top:0.5rem;">
-                            <input type="number" id="sms-shotgun-count" value="5" min="1" max="20" placeholder="PER CARRIER">
-                        </div>
-                    </div>
-                    <button class="btn" id="sms-btn" onclick="runSmsBomber()">EXECUTE</button>
-                    <div id="sms-results" class="results">...</div>
-                </div>
-                <div class="card">
-                    <h3>CARRIER RECON</h3>
-                    <input type="text" id="carrier-phone" placeholder="PHONE (+1XXXXXXXXXX)">
-                    <button class="btn" onclick="runCarrierLookup()">IDENTIFY CARRIER</button>
-                    <div id="carrier-results" class="results">...</div>
-                </div>
-            </div>
-        </div>
 
         <div id="tab-admin" class="tab-content">
             <div style="margin-top:2rem;">
@@ -1653,6 +1585,20 @@
                         <button class="btn" onclick="generateTracer()">GENERATE TRACKER</button>
                         <div id="tracer-results" class="results">...</div>
                     </div>
+                    <div class="card">
+                        <h3>BIN INTEL</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Financial intelligence via BIN prefix lookup.</p>
+                        <input type="text" id="bin-input" placeholder="PREFIX">
+                        <button class="btn" onclick="runBinCheck()">LOOKUP</button>
+                        <div id="bin-results" class="results">...</div>
+                    </div>
+                    <div class="card">
+                        <h3>CARRIER RECON</h3>
+                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Identify cellular provider for a given number.</p>
+                        <input type="text" id="carrier-phone" placeholder="PHONE (+1XXXXXXXXXX)">
+                        <button class="btn" onclick="runCarrierLookup()">IDENTIFY CARRIER</button>
+                        <div id="carrier-results" class="results">...</div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1753,7 +1699,50 @@
             </div>
         </div>
 
-        <div id="tab-flood" class="tab-content"><div style="margin-top:2rem;"><h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #f39c12;">TSUNAMI FLOOD ENGINE</h2><div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;"><div class="card"><h3>TARGET SPECIFICATION</h3><label>PHONE OR EMAIL</label><input type="text" id="flood-target" placeholder="+1XXXXXXXXXX or target@email.com"><label>FLOOD MODE</label><select id="flood-mode" style="width:100%; padding:0.8rem; background:#000; border:1px solid #333; color:#f39c12; font-family:'JetBrains Mono';"><option value="sms">SMS / OTP BLITZ</option><option value="email">OFFICIAL NOTIFICATION STORM</option></select><button class="btn" style="margin-top:1.5rem; background:#f39c12; color:#000; font-weight:900;" onclick="launchTsunamiFlood()">INITIATE TSUNAMI</button></div><div class="card"><h3>OPERATIONAL CONSOLE</h3><div id="flood-console" class="results" style="height:300px; overflow-y:auto; font-family:'JetBrains Mono'; font-size:0.65rem;">&gt; AWAITING TARGET ACQUISITION...</div></div></div></div></div>
+        <div id="tab-flood" class="tab-content">
+            <div style="margin-top:2rem;">
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #f39c12;">TSUNAMI FLOOD ENGINE</h2>
+                <div class="grid" style="grid-template-columns: 1fr 1.5fr; gap: 1.5rem;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div class="card">
+                            <h3>TSUNAMI (OFFICIAL)</h3>
+                            <label>PHONE OR EMAIL</label>
+                            <input type="text" id="flood-target" placeholder="+1XXXXXXXXXX or target@email.com">
+                            <label>FLOOD MODE</label>
+                            <select id="flood-mode" style="width:100%; padding:0.8rem; background:#000; border:1px solid #333; color:#f39c12; font-family:'JetBrains Mono';">
+                                <option value="sms">SMS / OTP BLITZ</option>
+                                <option value="email">OFFICIAL NOTIFICATION STORM</option>
+                            </select>
+                            <button class="btn" style="margin-top:1.5rem; background:#f39c12; color:#000; font-weight:900;" onclick="launchTsunamiFlood()">INITIATE TSUNAMI</button>
+                        </div>
+                        <div class="card">
+                            <h3>LEGACY SMS BOMBER</h3>
+                            <div class="sms-modes">
+                                <div class="sms-mode-btn active" id="sms-mode-otp" onclick="setSmsMode('otp')">OTP FLOOD</div>
+                                <div class="sms-mode-btn" id="sms-mode-email" onclick="setSmsMode('email')">EMAIL GW</div>
+                                <div class="sms-mode-btn" id="sms-mode-shotgun" onclick="setSmsMode('shotgun')">SHOTGUN</div>
+                            </div>
+                            <input type="text" id="sms-target" placeholder="TARGET (e.g. 2025551234)">
+                            <div id="sms-email-opts" class="sms-email-opts hidden">
+                                <select id="sms-carrier">
+                                    <option value="att">AT&T</option>
+                                    <option value="tmobile">T-Mobile</option>
+                                    <option value="verizon">Verizon</option>
+                                    <option value="sprint">Sprint</option>
+                                    <option value="uscellular">US Cellular</option>
+                                </select>
+                                <input type="number" id="sms-count" value="25" min="1" max="100" style="margin-top:0.5rem;">
+                            </div>
+                            <button class="btn" id="sms-btn" style="margin-top:1rem;" onclick="runSmsBomber()">EXECUTE LEGACY</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>OPERATIONAL CONSOLE</h3>
+                        <div id="flood-console" class="results" style="height:500px; overflow-y:auto; font-family:'JetBrains Mono'; font-size:0.65rem;">&gt; AWAITING TARGET ACQUISITION...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="tab-crypto" class="tab-content">
             <div style="margin-top:2rem;">
                 <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #00d2ff;">CRYPTO RECON</h2>
