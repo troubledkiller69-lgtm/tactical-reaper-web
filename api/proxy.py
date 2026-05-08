@@ -55,43 +55,53 @@ class handler(BaseHTTPRequestHandler):
         })
 
     def harvest_proxies(self, protocol):
-        # Protocols mapping for different APIs
+        # Protocols mapping
         ps_proto = protocol if protocol != 'all' else 'socks5'
         geo_proto = protocol if protocol != 'all' else 'socks5'
         
-        # Source 1: ProxyScrape
-        url1 = f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=all&ssl=all&anonymity=all"
-        
-        # Source 2: Geonode (Free List API)
-        url2 = f"https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}"
+        # Sources refined for US-primary freshness
+        sources = [
+            # Source 1: ProxyScrape (Targeting US)
+            f"https://api.proxyscrape.com/v2/?request=displayproxies&protocol={ps_proto}&timeout=10000&country=US&ssl=all&anonymity=all",
+            # Source 2: Geonode (Targeting US, sorted by lastChecked)
+            f"https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=lastChecked&sort_type=desc&protocols={geo_proto}&country=US",
+            # Source 3: Spys.me (Daily list)
+            "https://spys.me/socks.txt" if ps_proto == 'socks5' else "https://spys.me/proxy.txt",
+            # Source 4: Monosans (High quality GitHub repo)
+            f"https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/{"socks5" if ps_proto == 'socks5' else "http"}.txt",
+            # Source 5: Proxy-List.download
+            f"https://www.proxy-list.download/api/v1/get?type={ps_proto}&country=US"
+        ]
 
         proxies = set()
         
-        # Fetch from ProxyScrape
-        try:
-            r1 = requests.get(url1, timeout=5)
-            if r1.status_code == 200:
-                for p in r1.text.split('\n'):
-                    if p.strip(): proxies.add(p.strip())
-        except: pass
+        for url in sources:
+            try:
+                r = requests.get(url, timeout=5)
+                if r.status_code == 200:
+                    if 'geonode' in url:
+                        data = r.json().get('data', [])
+                        for item in data:
+                            proxies.add(f"{item['ip']}:{item['port']}")
+                    else:
+                        for p in r.text.split('\n'):
+                            p = p.strip()
+                            if p and ':' in p and not p.startswith('#'):
+                                # Basic format check
+                                parts = p.split(':')
+                                if len(parts) >= 2:
+                                    proxies.add(f"{parts[0]}:{parts[1]}")
+            except: pass
 
-        # Fetch from Geonode
-        try:
-            r2 = requests.get(url2, timeout=5)
-            if r2.status_code == 200:
-                data = r2.json().get('data', [])
-                for item in data:
-                    proxies.add(f"{item['ip']}:{item['port']}")
-        except: pass
-
-        results = list(proxies)[:250] # Limit to 250 for response size/speed
+        results = list(proxies)[:500] # Increased limit to 500 for better selection
         
         self._json(200, {
             "status": "success",
             "protocol": protocol,
+            "country": "US",
             "count": len(results),
             "proxies": results,
-            "note": "Combined results from multiple upstream providers. Unverified."
+            "note": "Optimized for fresh US nodes from Spys.me, Geonode, and Monosans."
         })
 
     def _json(self, code, data):
