@@ -2,7 +2,8 @@ import json
 import urllib.parse
 from http.server import BaseHTTPRequestHandler
 import requests
-import concurrent.futures
+import asyncio
+from api.proxy_check import AsyncProxyChecker
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -12,8 +13,46 @@ class handler(BaseHTTPRequestHandler):
         
         if action == 'harvest':
             self.harvest_proxies(protocol)
+        elif action == 'check':
+            # Support small lists in GET, though POST is preferred
+            proxies = query.get('proxies', [])
+            if not proxies and 'list' in query:
+                proxies = query['list'][0].split(',')
+            self.check_proxies(proxies)
         else:
             self._json(400, {"error": "Invalid action"})
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        try:
+            data = json.loads(post_data)
+            action = data.get('action', 'check')
+            if action == 'check':
+                proxies = data.get('proxies', [])
+                self.check_proxies(proxies)
+            else:
+                self._json(400, {"error": "Invalid action for POST"})
+        except Exception as e:
+            self._json(400, {"error": f"Invalid JSON: {str(e)}"})
+
+    def check_proxies(self, proxies):
+        if not proxies:
+            self._json(400, {"error": "No proxies provided"})
+            return
+
+        checker = AsyncProxyChecker(proxies)
+        # Bridge sync to async
+        results = asyncio.run(checker.run())
+        
+        live_count = len([r for r in results if r['status'] == 'Live'])
+        
+        self._json(200, {
+            "status": "success",
+            "total": len(results),
+            "live": live_count,
+            "results": results
+        })
 
     def harvest_proxies(self, protocol):
         # Protocols mapping for different APIs
@@ -61,6 +100,3 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write(json.dumps(data).encode())
-
-    def do_POST(self):
-        self.do_GET()

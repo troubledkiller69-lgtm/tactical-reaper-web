@@ -1036,6 +1036,19 @@
             .shop-wallet-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
             .merchant-base-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
         }
+
+        /* ═══ PROXY VALIDATION TABLE ═══ */
+        .proxy-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #aaa; margin-top: 1rem; }
+        .proxy-table th { text-align: left; padding: 0.8rem; border-bottom: 2px solid #222; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .proxy-table td { padding: 0.8rem; border-bottom: 1px solid #111; }
+        .status-live { color: var(--success); font-weight: 900; }
+        .status-dead { color: var(--error); opacity: 0.6; }
+        .anon-elite { color: var(--primary); }
+        .anon-anon { color: #f39c12; }
+        .anon-trans { color: #555; }
+        .latency-fast { color: var(--success); }
+        .latency-mid { color: #f39c12; }
+        .latency-slow { color: var(--error); }
     </style>
 </head>
 
@@ -1660,8 +1673,9 @@
                                 <option value="all">ALL</option>
                             </select>
                         </div>
-                        <div style="flex: 1; display: flex; align-items: flex-end;">
-                            <button class="btn" onclick="runNetworkHarvest()" style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success); color: var(--success);">HARVEST PROXIES</button>
+                        <div style="flex: 1; display: flex; align-items: flex-end; gap: 0.5rem;">
+                            <button class="btn" onclick="runNetworkHarvest()" style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--success); color: var(--success); flex: 2;">HARVEST PROXIES</button>
+                            <button class="btn" id="network-proxy-validate-btn" onclick="runProxyCheck()" style="background: rgba(0, 210, 255, 0.1); border: 1px solid var(--primary); color: var(--primary); flex: 1; display: none;">VALIDATE</button>
                         </div>
                     </div>
 
@@ -1670,7 +1684,26 @@
                             <div id="network-proxy-count" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #555;">0 PROXIES FOUND</div>
                             <button class="btn" style="width: auto; padding: 0.4rem 1rem; font-size: 0.6rem;" onclick="copyProxiesToClipboard()">COPY ALL</button>
                         </div>
-                        <textarea id="network-proxy-list" style="height: 300px; font-size: 0.7rem; color: var(--success); border: 1px solid #111; background: #050505;" readonly></textarea>
+                        <textarea id="network-proxy-list" style="height: 150px; font-size: 0.7rem; color: var(--success); border: 1px solid #111; background: #050505;" readonly></textarea>
+                        
+                        <div id="network-proxy-check-area" style="display: none; margin-top: 2rem;">
+                            <h4 style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: #444; letter-spacing: 2px; margin-bottom: 1rem;">VALIDATION REPORT</h4>
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <table class="proxy-table">
+                                    <thead>
+                                        <tr>
+                                            <th>PROXY NODE</th>
+                                            <th>STATUS</th>
+                                            <th>GEO LOCATION</th>
+                                            <th>LATENCY</th>
+                                            <th>ANONYMITY</th>
+                                            <th>PROTOCOL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="network-proxy-check-results"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3023,8 +3056,11 @@
             const results = document.getElementById('network-proxy-results');
             const list = document.getElementById('network-proxy-list');
             const countEl = document.getElementById('network-proxy-count');
+            const validateBtn = document.getElementById('network-proxy-validate-btn');
             
             results.style.display = 'block';
+            validateBtn.style.display = 'none';
+            document.getElementById('network-proxy-check-area').style.display = 'none';
             countEl.innerText = 'INITIALIZING GLOBAL SCRAPE...';
             list.value = '> CONNECTING TO PROXY NODES...\n> POLLING UPSTREAM PROVIDERS...';
 
@@ -3036,6 +3072,7 @@
                     countEl.innerText = `${data.count} PROXIES IDENTIFIED [${protocol.toUpperCase()}]`;
                     list.value = data.proxies.join('\n');
                     addLog(`PROXY HARVEST: ${data.count} nodes found [${protocol}]`);
+                    validateBtn.style.display = 'block';
                 } else {
                     list.value = `> ERROR: ${data.error || 'FETCH FAILED'}`;
                     countEl.innerText = 'SCRAPE FAILED';
@@ -3043,6 +3080,61 @@
             } catch (e) {
                 list.value = `> ERROR: CONNECTION TIMEOUT`;
                 countEl.innerText = 'OFFLINE';
+            }
+        }
+
+        async function runProxyCheck() {
+            const list = document.getElementById('network-proxy-list').value.split('\n').filter(p => p.trim() && !p.startsWith('>'));
+            const resArea = document.getElementById('network-proxy-check-area');
+            const resTable = document.getElementById('network-proxy-check-results');
+            const btn = document.getElementById('network-proxy-validate-btn');
+            const countEl = document.getElementById('network-proxy-count');
+
+            if (!list.length) return;
+
+            btn.disabled = true;
+            btn.innerText = 'VALIDATING...';
+            resArea.style.display = 'block';
+            resTable.innerHTML = '';
+            countEl.innerText = `VALIDATING ${list.length} NODES...`;
+
+            try {
+                const response = await fetch('/api/proxy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'check', proxies: list })
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    resTable.innerHTML = data.results.map(r => {
+                        const statusClass = r.status === 'Live' ? 'status-live' : 'status-dead';
+                        const anonClass = `anon-${r.anonymity.toLowerCase().substring(0, 5)}`;
+                        const latencyClass = r.latency < 500 ? 'latency-fast' : r.latency < 1500 ? 'latency-mid' : 'latency-slow';
+                        const latencyText = r.latency > 0 ? `${r.latency}ms` : '---';
+                        const geoText = r.status === 'Live' ? `${r.country}, ${r.region}, ${r.city}` : 'N/A';
+                        
+                        return `<tr>
+                            <td style="color:#fff">${r.proxy}</td>
+                            <td class="${statusClass}">${r.status.toUpperCase()}</td>
+                            <td style="color:#777; font-size:0.55rem;">${geoText}</td>
+                            <td class="${latencyClass}">${latencyText}</td>
+                            <td class="${anonClass}">${r.anonymity.toUpperCase()}</td>
+                            <td style="color:#555">${r.protocol.toUpperCase()}</td>
+                        </tr>`;
+                    }).join('');
+                    
+                    countEl.innerText = `VALIDATION COMPLETE: ${data.live}/${data.total} LIVE NODES`;
+                    addLog(`PROXY VALIDATION: ${data.live}/${data.total} live nodes identified`);
+                } else {
+                    alert('Validation failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection error during validation');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'VALIDATE';
             }
         }
 
