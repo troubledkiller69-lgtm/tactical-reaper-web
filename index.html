@@ -12,7 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/sip.js@0.20.0/dist/sip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sip.js/0.20.0/sip.min.js"></script>
     <style>
         :root {
             --primary: #00d2ff;
@@ -4407,46 +4407,44 @@
             btnCall.disabled = true;
 
             try {
-                // Signal middleman to generate/fetch TTS
-                const ttsReq = await fetch('/api/tts', {
+                if (typeof SIP === 'undefined') {
+                    // We don't strictly need SIP.js for Twilio Autodialer, but we'll keep the check
+                    console.warn('SIP.js not loaded, continuing with Twilio Autodialer...');
+                }
+
+                log.innerHTML += `<br>> SIGNALING TWILIO AUTODIALER...`;
+
+                const response = await fetch('/api/ops', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'generate', text: p1Prompt, voice_id: voiceId })
+                    body: JSON.stringify({ 
+                        module: 'sip', 
+                        action: 'initiate', 
+                        target: target,
+                        cid: cid,
+                        prompt: p1Prompt,
+                        voice: voiceId,
+                        ambience: ambience,
+                        volume: ambVol
+                    })
                 });
-                const ttsRes = await ttsReq.json();
                 
-                log.innerHTML += `<br>> TTS ENGINE: ${ttsRes.status === 'success' ? 'READY' : 'EMULATED'}`;
-                log.innerHTML += `<br>> INITIALIZING SECURE SIP STACK...`;
-                btnCall.innerText = 'DIALING...';
-                // Intermediate SIP Proxy (VPS) - v20.5 Strategy
-                const configuration = {
-                    uri: SIP.UserAgent.makeURI('sip:operator@proxy.reaper.tech'),
-                    transportOptions: { server: 'wss://proxy.reaper.tech:8089/ws' }
-                };
-
-                sipUA = new SIP.UserAgent(configuration);
-                await sipUA.start();
-
-                const targetURI = SIP.UserAgent.makeURI(`sip:${target}@proxy.reaper.tech`);
+                const data = await response.json();
                 
-                // Inject custom spoofed CID header for Asterisk manipulation
-                const invitationOptions = {
-                    extraHeaders: [
-                        `X-Spoofed-CID: ${cid}`,
-                        `X-P1-Bot: ${p1Enabled ? '1' : '0'}`,
-                        `X-P1-Prompt: ${btoa(p1Prompt)}`,
-                        `X-TTS-Voice: ${voiceId}`,
-                        `X-Ambience-Type: ${ambience}`,
-                        `X-Ambience-Volume: ${ambVol}`
-                    ]
-                };
-
-                sipSession = new SIP.Inviter(sipUA, targetURI, invitationOptions);
-                await sipSession.invite();
-
-                log.innerHTML += `<br>> SIGNALING HANDSHAKE COMPLETE.`;
-                log.innerHTML += `<br>> OUTBOUND CID SET TO: [${cid}]`;
-                
-                btnHangup.disabled = false;
+                if (data.status === 'dialing') {
+                    log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED. SID: ${data.sid}</span>`;
+                    btnHangup.disabled = false;
+                    
+                    if (p1Enabled) {
+                        log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT ACTIVE. AWAITING INTERCEPT...</span>`;
+                        document.getElementById('p1-status').innerText = 'DIALING';
+                    }
+                } else {
+                    throw new Error(data.error || 'Dialing failed');
+                }
+            } catch (e) {
+                log.innerHTML += `<br><span style="color:var(--error)">> DIALER ERROR: ${e.message}</span>`;
+                finalizeSipCall();
+            }
 
                 sipSession.stateChange.addListener((newState) => {
                     log.innerHTML += `<br>> STATE: ${newState}`;
