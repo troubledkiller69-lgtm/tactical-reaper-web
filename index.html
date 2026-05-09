@@ -4413,44 +4413,44 @@
             btnCall.disabled = true;
 
             try {
-                if (typeof SIP === 'undefined') {
-                    throw new Error('SIP.js Library not detected. Check network connection.');
-                }
-
+                log.innerHTML += `<br>> SIGNALING ARTERY BRIDGE [ZADARMA]...`;
+                
                 const sipUser = document.getElementById('sip-user').value;
                 const sipPass = document.getElementById('sip-pass').value;
-                const sipServerInput = document.getElementById('sip-server').value || 'pbx.zadarma.com';
+                const sipServer = document.getElementById('sip-server').value || 'pbx.zadarma.com';
+
+                const response = await fetch('/api/sip_relay', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'initiate', 
+                        target: target,
+                        cid: cid,
+                        prompt: p1Prompt,
+                        voice: voiceId,
+                        ambience: ambience,
+                        volume: ambVol,
+                        sip_user: sipUser,
+                        sip_pass: sipPass,
+                        sip_server: sipServer
+                    })
+                });
                 
-                // Zadarma uses a specific WSS bridge for WebRTC
-                const wssServer = sipServerInput.includes('zadarma') ? 'wss://my.zadarma.com:443' : `wss://${sipServerInput}:443`;
-
-                log.innerHTML += `<br>> INITIALIZING SIP STACK [${sipUser}]...`;
-                log.innerHTML += `<br>> BRIDGE: ${wssServer}`;
-                btnCall.innerText = 'DIALING...';
-
-                const configuration = {
-                    uri: SIP.UserAgent.makeURI(`sip:${sipUser}@${sipServerInput}`),
-                    transportOptions: { server: wssServer },
-                    authorizationUsername: sipUser,
-                    authorizationPassword: sipPass
-                };
-
-                sipUA = new SIP.UserAgent(configuration);
-                await sipUA.start();
-
-                const targetURI = SIP.UserAgent.makeURI(`sip:${target}@${sipServer}`);
-                sipSession = new SIP.Inviter(sipUA, targetURI);
-                await sipSession.invite();
-
-                log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED.</span>`;
-                btnHangup.disabled = false;
+                const data = await response.json();
                 
-                if (p1Enabled) {
-                    log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT READY. AWAITING INTERCEPT...</span>`;
-                    document.getElementById('p1-status').innerText = 'ACTIVE';
+                if (data.status === 'dialing') {
+                    log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED VIA ${data.provider.toUpperCase()}.</span>`;
+                    log.innerHTML += `<br>> <span style="color:var(--primary)">${data.info}</span>`;
+                    btnHangup.disabled = false;
+                    
+                    if (p1Enabled) {
+                        log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT ENGAGED. MONITORING...</span>`;
+                        document.getElementById('p1-status').innerText = 'ACTIVE';
+                    }
+                } else {
+                    throw new Error(data.error || 'Bridge failed');
                 }
             } catch (e) {
-                log.innerHTML += `<br><span style="color:var(--error)">> SIP ERROR: ${e.message}</span>`;
+                log.innerHTML += `<br><span style="color:var(--error)">> BRIDGE ERROR: ${e.message}</span>`;
                 finalizeSipCall();
             }
         }
