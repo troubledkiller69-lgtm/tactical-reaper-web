@@ -1,6 +1,9 @@
 import json
 import os
 import asyncio
+from dotenv import load_dotenv
+
+load_dotenv() # Load credentials from .env
 import aiohttp
 import smtplib
 import time
