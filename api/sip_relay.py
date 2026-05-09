@@ -17,18 +17,20 @@ class handler(BaseHTTPRequestHandler):
                 import hashlib
                 import requests
                 
-                z_key = data.get('sip_user').split('-')[0] # Usually the first part
-                z_secret = data.get('sip_pass')
+                z_key = data.get('sip_user') # For Zadarma, this is the API Key
+                z_secret = data.get('sip_pass') # And this is the API Secret
                 target = data.get('target')
                 cid = data.get('cid') or "BIFROST"
                 
                 method = "/v1/request/callback/"
                 params = {"from": cid, "to": target}
+                # Sort params alphabetically
                 sorted_params = "&".join([f"{k}={v}" for k, v in sorted(params.items())])
                 
                 md5_params = hashlib.md5(sorted_params.encode()).hexdigest()
                 data_to_sign = f"{method}{sorted_params}{md5_params}"
-                signature = hashlib.md5((data_to_sign + z_secret).encode()).hexdigest()
+                # Sign using the secret
+                signature = hmac.new(z_secret.encode(), data_to_sign.encode(), hashlib.sha1).hexdigest()
                 
                 auth_header = f"{z_key}:{signature}"
                 
