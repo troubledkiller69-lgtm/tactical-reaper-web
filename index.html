@@ -4417,7 +4417,7 @@
                     console.warn('SIP.js not loaded, continuing with Twilio Autodialer...');
                 }
 
-                log.innerHTML += `<br>> SIGNALING TWILIO AUTODIALER...`;
+                log.innerHTML += `<br>> SIGNALING ZADARMA GATEWAY...`;
 
                 const z_key = document.getElementById('zadarma-key').value;
                 const z_secret = document.getElementById('zadarma-secret').value;
@@ -4441,7 +4441,7 @@
                 const data = await response.json();
                 
                 if (data.status === 'dialing') {
-                    log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED. SID: ${data.sid}</span>`;
+                    log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED VIA ${data.provider.toUpperCase()}.</span>`;
                     btnHangup.disabled = false;
                     
                     if (p1Enabled) {
