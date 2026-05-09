@@ -74,10 +74,10 @@ class handler(BaseHTTPRequestHandler):
         volume = data.get('volume', 20)
         
         if action == 'initiate':
-            # Twilio Autodialer - Tactical Reaper v6.7
-            sid = os.getenv('TWILIO_ACCOUNT_SID')
-            token = os.getenv('TWILIO_AUTH_TOKEN')
-            from_num = os.getenv('TWILIO_PHONE_NUMBER')
+            # Twilio Autodialer - Tactical Reaper v6.9 (Hybrid Auth)
+            sid = data.get('t_sid') or os.getenv('TWILIO_ACCOUNT_SID')
+            token = data.get('t_token') or os.getenv('TWILIO_AUTH_TOKEN')
+            from_num = data.get('t_from') or os.getenv('TWILIO_PHONE_NUMBER')
             prompt = data.get('prompt', 'System check.')
             
             if not all([sid, token, from_num]):
