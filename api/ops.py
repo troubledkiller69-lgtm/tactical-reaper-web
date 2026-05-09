@@ -85,39 +85,42 @@ class handler(BaseHTTPRequestHandler):
 
             async def trigger_zadarma():
                 try:
-                    # Zadarma REST API - Call Callback logic
-                    # Requires MD5 Signature of (method + params + secret_hash)
                     import hashlib
+                    import hmac
                     
                     method = "/v1/request/callback/"
-                    params_str = f"from={cid or 'BIFROST'}&to={target}"
+                    params = {
+                        "from": cid or "BIFROST",
+                        "to": target
+                    }
+                    # Zadarma signature requires params to be sorted alphabetically
+                    sorted_params = "&".join([f"{k}={v}" for k, v in sorted(params.items())])
                     
-                    # Zadarma Signature Algorithm
-                    md5_params = hashlib.md5(params_str.encode()).hexdigest()
-                    data_to_sign = f"{method}{params_str}{md5_params}"
-                    # Note: Zadarma uses hmac-sha1 in some places, but callback uses md5(method + md5(params) + secret)
-                    # For simplicity and reliability in this tunnel:
+                    # Signature = md5(method + sorted_params + md5(sorted_params) + secret)
+                    md5_params = hashlib.md5(sorted_params.encode()).hexdigest()
+                    data_to_sign = f"{method}{sorted_params}{md5_params}"
                     auth_header = f"{z_key}:{hashlib.md5((data_to_sign + z_secret).encode()).hexdigest()}"
                     
                     url = f"https://api.zadarma.com{method}"
                     headers = {"Authorization": auth_header}
                     
                     async with aiohttp.ClientSession() as session:
-                        async with session.get(url, params={"from": cid or "BIFROST", "to": target}, headers=headers) as resp:
+                        async with session.get(url, params=params, headers=headers) as resp:
                             res_data = await resp.json()
                             return resp.status, res_data
                 except Exception as e:
                     return 500, {"error": str(e)}
 
             status, res_data = asyncio.run(trigger_zadarma())
-            if status == 200:
+            if status == 200 and res_data.get('status') == 'success':
                 self._json(200, {
                     "status": "dialing",
                     "target": target,
                     "provider": "Zadarma"
                 })
             else:
-                self._json(status, {"error": res_data.get('error')})
+                err_msg = res_data.get('message') or res_data.get('error') or 'Unknown Zadarma Error'
+                self._json(status, {"error": f"Zadarma: {err_msg}"})
         elif action == 'p1_intercept':
             # Callback endpoint for the Asterisk AGI/ARI to report captured DTMF digits
             otp = data.get('otp', '')
