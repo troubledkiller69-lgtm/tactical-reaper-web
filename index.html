@@ -1690,10 +1690,11 @@
                                 <input type="text" id="sip-cid" placeholder="+1XXXXXXXXXX">
                             </div>
                         </div>
-                        <div id="zadarma-cred-gate" style="background: #050505; border: 1px solid #111; padding: 1rem; margin-bottom: 1.5rem;">
-                            <h4 style="font-size: 0.6rem; color: #444; margin-bottom: 0.5rem; letter-spacing: 1px;">ZADARMA TUNNEL (CLIENT-SIDE)</h4>
-                            <input type="password" id="zadarma-key" placeholder="API KEY" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
-                            <input type="password" id="zadarma-secret" placeholder="API SECRET" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
+                        <div id="sip-cred-gate" style="background: #050505; border: 1px solid #111; padding: 1rem; margin-bottom: 1.5rem;">
+                            <h4 style="font-size: 0.6rem; color: #444; margin-bottom: 0.5rem; letter-spacing: 1px;">UNIVERSAL SIP TUNNEL</h4>
+                            <input type="text" id="sip-user" placeholder="SIP LOGIN (e.g. 123456)" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
+                            <input type="password" id="sip-pass" placeholder="SIP PASSWORD" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
+                            <input type="text" id="sip-server" placeholder="SIP SERVER (e.g. pbx.zadarma.com)" style="font-size: 0.6rem;">
                         </div>
                         
                         <div style="background: #050505; border: 1px solid #111; padding: 1.5rem; margin-bottom: 1.5rem;">
@@ -4413,46 +4414,39 @@
 
             try {
                 if (typeof SIP === 'undefined') {
-                    // We don't strictly need SIP.js for Twilio Autodialer, but we'll keep the check
-                    console.warn('SIP.js not loaded, continuing with Twilio Autodialer...');
+                    throw new Error('SIP.js Library not detected. Check network connection.');
                 }
 
-                log.innerHTML += `<br>> SIGNALING ZADARMA GATEWAY...`;
+                const sipUser = document.getElementById('sip-user').value;
+                const sipPass = document.getElementById('sip-pass').value;
+                const sipServer = document.getElementById('sip-server').value || 'sip.zadarma.com';
 
-                const z_key = document.getElementById('zadarma-key').value;
-                const z_secret = document.getElementById('zadarma-secret').value;
+                log.innerHTML += `<br>> INITIALIZING SIP STACK [${sipUser}]...`;
+                btnCall.innerText = 'DIALING...';
 
-                const response = await fetch('/api/ops', {
-                    method: 'POST',
-                    body: JSON.stringify({ 
-                        module: 'sip', 
-                        action: 'initiate', 
-                        target: target,
-                        cid: cid,
-                        prompt: p1Prompt,
-                        voice: voiceId,
-                        ambience: ambience,
-                        volume: ambVol,
-                        z_key,
-                        z_secret
-                    })
-                });
+                const configuration = {
+                    uri: SIP.UserAgent.makeURI(`sip:${sipUser}@${sipServer}`),
+                    transportOptions: { server: `wss://${sipServer}:443` },
+                    authorizationUsername: sipUser,
+                    authorizationPassword: sipPass
+                };
+
+                sipUA = new SIP.UserAgent(configuration);
+                await sipUA.start();
+
+                const targetURI = SIP.UserAgent.makeURI(`sip:${target}@${sipServer}`);
+                sipSession = new SIP.Inviter(sipUA, targetURI);
+                await sipSession.invite();
+
+                log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED.</span>`;
+                btnHangup.disabled = false;
                 
-                const data = await response.json();
-                
-                if (data.status === 'dialing') {
-                    log.innerHTML += `<br>> <span style="color:var(--success)">DIALING INITIATED VIA ${data.provider.toUpperCase()}.</span>`;
-                    btnHangup.disabled = false;
-                    
-                    if (p1Enabled) {
-                        log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT ACTIVE. AWAITING INTERCEPT...</span>`;
-                        document.getElementById('p1-status').innerText = 'DIALING';
-                    }
-                } else {
-                    throw new Error(data.error || 'Dialing failed');
+                if (p1Enabled) {
+                    log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT READY. AWAITING INTERCEPT...</span>`;
+                    document.getElementById('p1-status').innerText = 'ACTIVE';
                 }
             } catch (e) {
-                log.innerHTML += `<br><span style="color:var(--error)">> DIALER ERROR: ${e.message}</span>`;
+                log.innerHTML += `<br><span style="color:var(--error)">> SIP ERROR: ${e.message}</span>`;
                 finalizeSipCall();
             }
         }
