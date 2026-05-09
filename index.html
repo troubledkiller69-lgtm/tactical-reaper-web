@@ -4445,32 +4445,6 @@
                 log.innerHTML += `<br><span style="color:var(--error)">> DIALER ERROR: ${e.message}</span>`;
                 finalizeSipCall();
             }
-
-                sipSession.stateChange.addListener((newState) => {
-                    log.innerHTML += `<br>> STATE: ${newState}`;
-                    if (newState === SIP.SessionState.Terminated) {
-                        finalizeSipCall();
-                    }
-                });
-
-                if (p1Enabled) {
-                    log.innerHTML += `<br>> <span style="color:var(--primary)">P1 BOT ENGAGED. MONITORING DTMF...</span>`;
-                    document.getElementById('p1-status').innerText = 'MONITORING';
-                    
-                    // Real-time OTP interception stream
-                    setTimeout(() => {
-                        if (sipSession) {
-                            const otp = Math.floor(100000 + Math.random() * 900000);
-                            document.getElementById('captured-otp').innerText = otp;
-                            log.innerHTML += `<br>> <span style="color:var(--success)">OTP INTERCEPTED: ${otp}</span>`;
-                        }
-                    }, 5000);
-                }
-
-            } catch (e) {
-                log.innerHTML += `<br><span style="color:var(--error)">> SIP ERROR: ${e.message}</span>`;
-                finalizeSipCall();
-            }
         }
 
         function hangupSipCall() {
