@@ -87,21 +87,21 @@ class handler(BaseHTTPRequestHandler):
                 try:
                     import hashlib
                     import hmac
-                    import base64
                     
                     method = "/v1/request/callback/"
                     params = {
                         "from": cid or "BIFROST",
                         "to": target
                     }
-                    # Zadarma signature: params sorted by key, then URL encoded
-                    sorted_params = "&".join([f"{k}={v}" for k, v in sorted(params.items())])
+                    # Precise Zadarma sorting and hashing
+                    sorted_keys = sorted(params.keys())
+                    params_str = "&".join([f"{k}={params[k]}" for k in sorted_keys])
                     
-                    # New Signature Algorithm: hmac-sha1(method + params + md5(params), secret)
-                    md5_params = hashlib.md5(sorted_params.encode()).hexdigest()
-                    data_to_sign = f"{method}{sorted_params}{md5_params}"
+                    # Zadarma Signature: hmac_sha1(method + md5(params_str) + secret_key)
+                    # Some versions use this specific concatenation
+                    md5_params = hashlib.md5(params_str.encode()).hexdigest()
+                    data_to_sign = f"{method}{params_str}{md5_params}"
                     
-                    # Sign using HMAC-SHA1
                     signature = hmac.new(z_secret.encode(), data_to_sign.encode(), hashlib.sha1).hexdigest()
                     auth_header = f"{z_key}:{signature}"
                     
