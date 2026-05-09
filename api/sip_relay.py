@@ -2,6 +2,9 @@ import asyncio
 import aiohttp
 import json
 import os
+import hashlib
+import hmac
+import requests
 from http.server import BaseHTTPRequestHandler
 
 class handler(BaseHTTPRequestHandler):
@@ -13,9 +16,7 @@ class handler(BaseHTTPRequestHandler):
             action = data.get('action', '')
             
             if action == 'initiate':
-                # Artery Bridge v1.1 - Live Zadarma Signaling
-                import hashlib
-                import requests
+                # Artery Bridge v1.2 - Live Zadarma Signaling (Fix Imports)
                 
                 z_key = data.get('sip_user') # For Zadarma, this is the API Key
                 z_secret = data.get('sip_pass') # And this is the API Secret
