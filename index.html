@@ -1690,11 +1690,10 @@
                                 <input type="text" id="sip-cid" placeholder="+1XXXXXXXXXX">
                             </div>
                         </div>
-                        <div id="twilio-cred-gate" style="background: #050505; border: 1px solid #111; padding: 1rem; margin-bottom: 1.5rem;">
-                            <h4 style="font-size: 0.6rem; color: #444; margin-bottom: 0.5rem; letter-spacing: 1px;">TWILIO TUNNEL (CLIENT-SIDE)</h4>
-                            <input type="password" id="twilio-sid" placeholder="ACCOUNT SID" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
-                            <input type="password" id="twilio-token" placeholder="AUTH TOKEN" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
-                            <input type="text" id="twilio-from" placeholder="FROM NUMBER" style="font-size: 0.6rem;">
+                        <div id="zadarma-cred-gate" style="background: #050505; border: 1px solid #111; padding: 1rem; margin-bottom: 1.5rem;">
+                            <h4 style="font-size: 0.6rem; color: #444; margin-bottom: 0.5rem; letter-spacing: 1px;">ZADARMA TUNNEL (CLIENT-SIDE)</h4>
+                            <input type="password" id="zadarma-key" placeholder="API KEY" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
+                            <input type="password" id="zadarma-secret" placeholder="API SECRET" style="font-size: 0.6rem; margin-bottom: 0.5rem;">
                         </div>
                         
                         <div style="background: #050505; border: 1px solid #111; padding: 1.5rem; margin-bottom: 1.5rem;">
@@ -4420,9 +4419,8 @@
 
                 log.innerHTML += `<br>> SIGNALING TWILIO AUTODIALER...`;
 
-                const t_sid = document.getElementById('twilio-sid').value;
-                const t_token = document.getElementById('twilio-token').value;
-                const t_from = document.getElementById('twilio-from').value;
+                const z_key = document.getElementById('zadarma-key').value;
+                const z_secret = document.getElementById('zadarma-secret').value;
 
                 const response = await fetch('/api/ops', {
                     method: 'POST',
@@ -4435,9 +4433,8 @@
                         voice: voiceId,
                         ambience: ambience,
                         volume: ambVol,
-                        t_sid,
-                        t_token,
-                        t_from
+                        z_key,
+                        z_secret
                     })
                 });
                 
