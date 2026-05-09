@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 import asyncio
 from dotenv import load_dotenv
 
@@ -85,16 +86,26 @@ class handler(BaseHTTPRequestHandler):
             async def trigger_zadarma():
                 try:
                     # Zadarma REST API - Call Callback logic
-                    # Using Zadarma's API to bridge a call to the target
-                    url = "https://api.zadarma.com/v1/request/callback/"
-                    params = {
-                        "from": cid or "BIFROST", # Spoofed CID (if supported by trunk)
-                        "to": target
-                    }
+                    # Requires MD5 Signature of (method + params + secret_hash)
+                    import hashlib
                     
-                    # Zadarma requires a specific signature header (simplified here)
-                    # For now, we'll signal the successful dispatch
-                    return 200, {"status": "success", "info": "Zadarma callback dispatched"}
+                    method = "/v1/request/callback/"
+                    params_str = f"from={cid or 'BIFROST'}&to={target}"
+                    
+                    # Zadarma Signature Algorithm
+                    md5_params = hashlib.md5(params_str.encode()).hexdigest()
+                    data_to_sign = f"{method}{params_str}{md5_params}"
+                    # Note: Zadarma uses hmac-sha1 in some places, but callback uses md5(method + md5(params) + secret)
+                    # For simplicity and reliability in this tunnel:
+                    auth_header = f"{z_key}:{hashlib.md5((data_to_sign + z_secret).encode()).hexdigest()}"
+                    
+                    url = f"https://api.zadarma.com{method}"
+                    headers = {"Authorization": auth_header}
+                    
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url, params={"from": cid or "BIFROST", "to": target}, headers=headers) as resp:
+                            res_data = await resp.json()
+                            return resp.status, res_data
                 except Exception as e:
                     return 500, {"error": str(e)}
 
