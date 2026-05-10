@@ -49,13 +49,14 @@ Administrative access is secured via `ADMIN_KEY` giving access to the hidden Com
 - **Fallback Audio Pipeline:** Engineered a multi-stage local TTS fallback using `espeak` piped through `sox` for 8kHz mono conversion, ensuring testing can continue without paid API credits.
 - **Permissions Lockdown:** Corrected spool ownership (`chown -R root:root`) and syntax errors in `pjsip.conf` (e.g., shifting from `password` to `userpass`) to achieve instantaneous call routing.
 
-## 📝 Current Plans & Site Ideas
-- **Live OTP Stream (WebSockets):** Implement a real-time feed on the BIFROST dashboard that displays intercepted DTMF digits the exact millisecond the Asterisk AGI script captures them.
-- **Trunk Health Monitor:** Add a visual heartbeat widget to the UI showing the active SIP gateway's latency and registration status.
-- **Voice Cloning Vault:** Build an interface allowing operators to upload short audio clips of targets, piping them directly to ElevenLabs for seamless social engineering automation.
-- **Call Recording Archive:** Enable the Asterisk `MixMonitor` app to record the entire interaction and stream the audio playback directly to a hidden admin panel in BIFROST.
-- **Operational Expansion**: Finalize the "Checker" (formerly Storm Matrix) and "Sniper" tools.
-- **Bot Persistence**: Maintain stable Discord Bot integration via Hugging Face.
+## 📝 Current Plans & Future Infrastructure
+- **Decentralized SMTP Relay Network:** Since the Brevo account suspension, we need to rebuild the Email Flood tool. The plan is to implement a rotating SMTP relay system using compromised webmails or bulletproof offshore hosts.
+- **Automated OSINT Aggregator:** A new dashboard module where an operator inputs a single identifier (username, email, phone) and BIFROST cross-references it against our static datasets, generating a unified dossier.
+- **Interactive Threat Map:** Integrating a D3.js or Mapbox component into the main dashboard, themed in "Black Ice," to visualize live OSINT hits, active proxies, and operational targets on a global scale.
+- **Discord-to-Dashboard Terminal:** Creating a live WebSocket feed on the frontend that mirrors the `rxtri/bifrost` Hugging Face Discord bot's activity, eliminating the need to switch apps during operations.
+- **Ephemeral Secure Drop:** A built-in, end-to-end encrypted pastebin within the Commander Console designed for sharing scraped data or API keys that self-destructs after being read.
+- **Operational Expansion:** Finalize the "Checker" (formerly Storm Matrix) and "Sniper" tools.
+- **Bot Persistence:** Maintain stable Discord Bot integration via Hugging Face.
 
 ## ⚠️ Known Issues
 - **Brevo Suspension**: The primary SMTP relay account on Brevo has been suspended, rendering the Email Flood tool inoperable.
