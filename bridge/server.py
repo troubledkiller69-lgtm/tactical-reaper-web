@@ -82,7 +82,7 @@ def initiate_call():
         return jsonify({"error": "TTS generation failed"}), 500
 
     # --- Step 2: Write Asterisk .call file ---
-    call_file_content = f"""Channel: PJSIP/{target}@zadarma-endpoint
+    call_file_content = f"""Channel: PJSIP/{target}@gateway-endpoint
 CallerID: "BIFROST" <{cid}>
 MaxRetries: 0
 RetryTime: 30
