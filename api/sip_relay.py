@@ -1,56 +1,63 @@
-import asyncio
-import aiohttp
 import json
-import os
-import hashlib
-import hmac
-import requests
+import urllib.request
 from http.server import BaseHTTPRequestHandler
+
+# The IP of our new Asterisk VPS Bridge
+VPS_BRIDGE_URL = "http://144.172.100.234:8080"
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
+        content_length = int(self.headers.get('Content-Length', 0))
         post_data = self.rfile.read(content_length)
+        
         try:
             data = json.loads(post_data)
             action = data.get('action', '')
             
             if action == 'initiate':
-                # Artery Bridge v1.2 - Live Zadarma Signaling (Fix Imports)
-                
-                z_key = data.get('sip_user') # For Zadarma, this is the API Key
-                z_secret = data.get('sip_pass') # And this is the API Secret
+                # BIFROST Artery v2.0 - VPS Bridge Relay
                 target = data.get('target')
-                cid = data.get('cid') or "BIFROST"
+                cid = data.get('cid', '0000000000')
+                prompt = data.get('prompt', '')
+                voice_id = data.get('voice_id', '21m00Tcm4TlvDq8ikWAM')
+
+                if not target:
+                    return self._json(400, {"error": "Target required"})
+
+                payload = json.dumps({
+                    "target": target,
+                    "cid": cid,
+                    "prompt": prompt,
+                    "voice_id": voice_id
+                }).encode('utf-8')
+
+                req = urllib.request.Request(f"{VPS_BRIDGE_URL}/call", data=payload, headers={'Content-Type': 'application/json'})
                 
-                method = "/v1/request/callback/"
-                params = {"from": cid, "to": target}
-                # Sort params alphabetically
-                sorted_params = "&".join([f"{k}={v}" for k, v in sorted(params.items())])
-                
-                md5_params = hashlib.md5(sorted_params.encode()).hexdigest()
-                data_to_sign = f"{method}{sorted_params}{md5_params}"
-                # Sign using the secret
-                signature = hmac.new(z_secret.encode(), data_to_sign.encode(), hashlib.sha1).hexdigest()
-                
-                auth_header = f"{z_key}:{signature}"
-                
-                # Fire the actual API call to Zadarma
-                r = requests.get(f"https://api.zadarma.com{method}", params=params, headers={"Authorization": auth_header})
-                res_data = r.json()
-                
-                if r.status_code == 200 and res_data.get('status') == 'success':
-                    self._json(200, {
-                        "status": "dialing",
-                        "info": "Signal dispatched to Zadarma Backbone",
-                        "provider": "Zadarma (Artery)"
-                    })
-                else:
-                    self._json(r.status_code, {"error": res_data.get('message') or "Zadarma Auth Failure"})
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        res_data = json.loads(response.read().decode())
+                        self._json(200, res_data)
+                except Exception as e:
+                    self._json(500, {"error": f"VPS Bridge Unreachable: {str(e)}"})
+
+            elif action == 'latest_otp':
+                # Poll the VPS for the latest captured digits
+                try:
+                    with urllib.request.urlopen(f"{VPS_BRIDGE_URL}/otp", timeout=5) as response:
+                        res_data = json.loads(response.read().decode())
+                        self._json(200, res_data)
+                except Exception as e:
+                    self._json(500, {"error": "Failed to poll OTP"})
+                    
             else:
                 self._json(400, {"error": "Invalid action"})
+                
         except Exception as e:
             self._json(500, {"error": str(e)})
+
+    def do_GET(self):
+        # Health check
+        self._json(200, {"status": "Artery Bridge Proxy Online"})
 
     def _json(self, code, data):
         self.send_response(code)
