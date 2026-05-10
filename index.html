@@ -1535,15 +1535,15 @@
         <div id="tab-osint" class="tab-content">
             <div style="margin-top:4rem;">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0; color: #fff;">AUTO-DOXXER <span style="color: #f39c12;">ENGINE</span></h2>
+                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0; color: #fff;">AUTO-DOXXER <span style="color: var(--primary);">ENGINE</span></h2>
                 </div>
                 <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">AGGREGATED INTELLIGENCE & DOSSIER GENERATION</p>
                 
                 <!-- Input Section -->
-                <div class="card" style="border: 1px solid #f39c12; background: rgba(243, 156, 18, 0.02); margin-bottom: 2rem;">
+                <div class="card" style="border: 1px solid var(--primary); background: rgba(0, 210, 255, 0.02); margin-bottom: 2rem;">
                     <div style="display: flex; gap: 1rem;">
                         <input type="text" id="doxxer-target" placeholder="TARGET (Email, Phone +1XXX, Username, IP, BIN...)" style="flex: 1; padding: 1rem; font-size: 0.8rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono'; letter-spacing: 1px;" onkeydown="if(event.key === 'Enter') runAutoDoxxer()">
-                        <button class="btn" onclick="runAutoDoxxer()" id="btn-run-doxxer" style="width: 200px; background: #f39c12; color: #000; font-weight: 900; letter-spacing: 2px;">COMPILE DOSSIER</button>
+                        <button class="btn" onclick="runAutoDoxxer()" id="btn-run-doxxer" style="width: 200px; background: var(--primary); color: #000; font-weight: 900; letter-spacing: 2px;">COMPILE DOSSIER</button>
                     </div>
                 </div>
 
@@ -1551,7 +1551,7 @@
                 <div id="dossier-output" style="display: none;">
                     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
                         <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #aaa;">DOSSIER REF: <span id="dossier-ref" style="color: #fff; font-weight: bold;">...</span></div>
-                        <div id="dossier-status" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #f39c12;">GATHERING INTEL...</div>
+                        <div id="dossier-status" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--primary);">GATHERING INTEL...</div>
                     </div>
 
                     <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
@@ -1575,7 +1575,7 @@
 
                         <!-- ASSETS & FINANCIAL -->
                         <div class="card" style="border: 1px solid #333; background: #050505;">
-                            <h3 style="color: #f39c12; border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">ASSETS & FINANCIAL</h3>
+                            <h3 style="color: var(--primary); border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">ASSETS & FINANCIAL</h3>
                             <div id="dox-assets" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; min-height: 100px; white-space: pre-wrap;">Awaiting data stream...</div>
                         </div>
                     </div>
@@ -1750,7 +1750,7 @@
 
         <div id="tab-flood" class="tab-content">
             <div style="margin-top:2rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: #f39c12;">TSUNAMI FLOOD ENGINE</h2>
+                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:1.5rem; color: var(--primary);">TSUNAMI FLOOD ENGINE</h2>
                 <div class="grid" style="grid-template-columns: 1fr 1.5fr; gap: 1.5rem;">
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <div class="card">
@@ -1758,11 +1758,11 @@
                             <label>PHONE OR EMAIL</label>
                             <input type="text" id="flood-target" placeholder="+1XXXXXXXXXX or target@email.com">
                             <label>FLOOD MODE</label>
-                            <select id="flood-mode" style="width:100%; padding:0.8rem; background:#000; border:1px solid #333; color:#f39c12; font-family:'JetBrains Mono';">
+                            <select id="flood-mode" style="width:100%; padding:0.8rem; background:#000; border:1px solid #333; color:var(--primary); font-family:'JetBrains Mono';">
                                 <option value="sms">SMS / OTP BLITZ</option>
                                 <option value="email">OFFICIAL NOTIFICATION STORM</option>
                             </select>
-                            <button class="btn" style="margin-top:1.5rem; background:#f39c12; color:#000; font-weight:900;" onclick="launchTsunamiFlood()">INITIATE TSUNAMI</button>
+                            <button class="btn" style="margin-top:1.5rem; background:var(--primary); color:#000; font-weight:900;" onclick="launchTsunamiFlood()">INITIATE TSUNAMI</button>
                         </div>
                         <div class="card">
                             <h3>LEGACY SMS BOMBER</h3>
@@ -2728,7 +2728,7 @@
             document.getElementById('dossier-output').style.display = 'block';
             document.getElementById('dossier-ref').innerText = target.toUpperCase();
             document.getElementById('dossier-status').innerText = 'GATHERING INTEL...';
-            document.getElementById('dossier-status').style.color = '#f39c12';
+            document.getElementById('dossier-status').style.color = 'var(--primary)';
             document.getElementById('dox-core').innerText = 'INITIALIZING TLO DEEP SEARCH...';
             document.getElementById('dox-telecom').innerText = 'INITIALIZING TELECOM TRACE...';
             document.getElementById('dox-digital').innerText = 'INITIALIZING DIGITAL FOOTPRINT...';
