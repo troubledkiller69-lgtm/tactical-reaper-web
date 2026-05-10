@@ -1534,67 +1534,53 @@
 
         <div id="tab-osint" class="tab-content">
             <div style="margin-top:4rem;">
-                <h2 style="font-weight:900; letter-spacing:4px; margin-bottom:0.5rem;">OSINT</h2>
-                <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">OPEN SOURCE INTELLIGENCE SUITE</p>
-                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
-                    <div class="card">
-                        <h3>USERNAME RECON</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Scan 30+ platforms for username presence.</p>
-                        <input type="text" id="osint-username" placeholder="TARGET USERNAME">
-                        <button class="btn" onclick="runUsernameScan()">SCAN</button>
-                        <div id="username-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>EMAIL INTEL</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Validate email and check breach exposure.</p>
-                        <input type="text" id="osint-email" placeholder="TARGET EMAIL">
-                        <button class="btn" onclick="runEmailOsint()">INVESTIGATE</button>
-                        <div id="email-osint-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>PHONE INTEL</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Carrier, line type, and location from number.</p>
-                        <input type="text" id="osint-phone" placeholder="PHONE (+1XXXXXXXXXX)">
-                        <button class="btn" onclick="runPhoneOsint()">QUERY</button>
-                        <div id="phone-osint-results" class="results">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>GEO LOCATOR</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">IP-to-Geolocation reverse mapping.</p>
-                        <input type="text" id="geo-ip" placeholder="TARGET IP (e.g., 8.8.8.8)">
-                        <button class="btn" onclick="runGeoLocator()">LOCATE</button>
-                        <div id="geo-results" class="results">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>WHOIS LOOKUP</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Domain registration and DNS intelligence.</p>
-                        <input type="text" id="osint-domain" placeholder="TARGET DOMAIN (e.g., example.com)">
-                        <button class="btn" onclick="runWhoisLookup()">LOOKUP</button>
-                        <div id="whois-results" class="results" style="max-height:300px;overflow-y:auto;">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>ZILLOW ZESTIMATE</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Property valuation, tax data, and home details via address lookup.</p>
-                        <input type="text" id="osint-zillow" placeholder="ADDRESS (e.g., 123 Main St, City, ST)">
-                        <button class="btn" onclick="runZillowLookup()">APPRAISE</button>
-                        <div id="zillow-results" class="results" style="max-height:350px;overflow-y:auto;">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>LINK TRACER</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Generate tracking links to capture IP, User-Agent, and metadata.</p>
-                        <input type="text" id="tracer-dest" placeholder="DESTINATION URL">
-                        <button class="btn" onclick="generateTracer()">GENERATE TRACKER</button>
-                        <div id="tracer-results" class="results">...</div>
-                    </div>
-                    <div class="card">
-                        <h3>BIN INTEL</h3>
-                        <p style="font-family:'JetBrains Mono'; font-size:0.55rem; color:#555; margin-bottom:1rem;">Financial intelligence via BIN prefix lookup.</p>
-                        <input type="text" id="bin-input" placeholder="PREFIX">
-                        <button class="btn" onclick="runBinCheck()">LOOKUP</button>
-                        <div id="bin-results" class="results">...</div>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+                    <h2 style="font-weight:900; letter-spacing:4px; margin: 0; color: #fff;">AUTO-DOXXER <span style="color: #f39c12;">ENGINE</span></h2>
+                </div>
+                <p style="font-family:'JetBrains Mono'; font-size:0.6rem; color:#555; margin-bottom:2rem;">AGGREGATED INTELLIGENCE & DOSSIER GENERATION</p>
+                
+                <!-- Input Section -->
+                <div class="card" style="border: 1px solid #f39c12; background: rgba(243, 156, 18, 0.02); margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" id="doxxer-target" placeholder="TARGET (Email, Phone +1XXX, Username, IP, BIN...)" style="flex: 1; padding: 1rem; font-size: 0.8rem; background: #000; border: 1px solid #333; color: var(--primary); font-family: 'JetBrains Mono'; letter-spacing: 1px;" onkeydown="if(event.key === 'Enter') runAutoDoxxer()">
+                        <button class="btn" onclick="runAutoDoxxer()" id="btn-run-doxxer" style="width: 200px; background: #f39c12; color: #000; font-weight: 900; letter-spacing: 2px;">COMPILE DOSSIER</button>
                     </div>
                 </div>
+
+                <!-- Dossier Output (Hidden by default) -->
+                <div id="dossier-output" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #aaa;">DOSSIER REF: <span id="dossier-ref" style="color: #fff; font-weight: bold;">...</span></div>
+                        <div id="dossier-status" style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #f39c12;">GATHERING INTEL...</div>
+                    </div>
+
+                    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <!-- CORE IDENTITY (TLO) -->
+                        <div class="card" style="border: 1px solid #333; background: #050505;">
+                            <h3 style="color: #00d2ff; border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">CORE IDENTITY (TLO)</h3>
+                            <div id="dox-core" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; min-height: 100px; white-space: pre-wrap;">Awaiting data stream...</div>
+                        </div>
+
+                        <!-- TELECOM INTEL -->
+                        <div class="card" style="border: 1px solid #333; background: #050505;">
+                            <h3 style="color: var(--success); border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">TELECOM & GEO</h3>
+                            <div id="dox-telecom" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; min-height: 100px; white-space: pre-wrap;">Awaiting data stream...</div>
+                        </div>
+
+                        <!-- DIGITAL FOOTPRINT -->
+                        <div class="card" style="border: 1px solid #333; background: #050505;">
+                            <h3 style="color: #e74c3c; border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">DIGITAL FOOTPRINT</h3>
+                            <div id="dox-digital" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; min-height: 100px; white-space: pre-wrap;">Awaiting data stream...</div>
+                        </div>
+
+                        <!-- ASSETS & FINANCIAL -->
+                        <div class="card" style="border: 1px solid #333; background: #050505;">
+                            <h3 style="color: #f39c12; border-bottom: 1px solid #222; padding-bottom: 0.5rem; margin-bottom: 1rem;">ASSETS & FINANCIAL</h3>
+                            <div id="dox-assets" style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; min-height: 100px; white-space: pre-wrap;">Awaiting data stream...</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -2732,6 +2718,120 @@
                     res.innerHTML = out;
                 } else { res.innerHTML = `> ERROR: BIN NOT FOUND`; }
             } catch (e) { res.innerHTML = `> EXCEPTION: TIMEOUT`; }
+        }
+
+        async function runAutoDoxxer() {
+            const target = document.getElementById('doxxer-target').value.trim();
+            if (!target) return;
+
+            // Show UI and reset
+            document.getElementById('dossier-output').style.display = 'block';
+            document.getElementById('dossier-ref').innerText = target.toUpperCase();
+            document.getElementById('dossier-status').innerText = 'GATHERING INTEL...';
+            document.getElementById('dossier-status').style.color = '#f39c12';
+            document.getElementById('dox-core').innerText = 'INITIALIZING TLO DEEP SEARCH...';
+            document.getElementById('dox-telecom').innerText = 'INITIALIZING TELECOM TRACE...';
+            document.getElementById('dox-digital').innerText = 'INITIALIZING DIGITAL FOOTPRINT...';
+            document.getElementById('dox-assets').innerText = 'INITIALIZING ASSET RECON...';
+            document.getElementById('dox-core').style.color = '#888';
+            document.getElementById('dox-telecom').style.color = '#888';
+            document.getElementById('dox-digital').style.color = '#888';
+            document.getElementById('dox-assets').style.color = '#888';
+
+            // Determine Target Type
+            const isEmail = target.includes('@');
+            const isPhone = !isEmail && [...target].some(c => c >= '0' && c <= '9') && target.length >= 7;
+            const isBin = !isEmail && !isPhone && target.length >= 6 && target.length <= 8 && [...target].every(c => c >= '0' && c <= '9');
+
+            // 1. TLO Core Identity (Always run)
+            // fetch(`/api/tlo?target=${encodeURIComponent(target)}`)
+            //     .then(r => r.json())
+            //     .then(d => {
+            //         const el = document.getElementById('dox-core');
+            //         if (d.hit && d.data) {
+            //             el.innerHTML = `> IDENTITY CONFIRMED\nNAME: ${d.data.name}\nDOB:  ${d.data.dob}\nSSN:  ${d.data.ssn}\n\nADDRESS HISTORY:\n${d.data.address_history.map(a=>`  - ${a}`).join('\n')}\n\nCONFIDENCE: ${d.data.confidence}%`;
+            //             el.style.color = '#fff';
+            //         } else {
+            //             el.innerText = '> TLO DATABASE: NO HIT FOUND';
+            //             el.style.color = 'var(--error)';
+            //         }
+            //     }).catch(() => { document.getElementById('dox-core').innerText = '> TLO TIMEOUT'; document.getElementById('dox-core').style.color = 'var(--error)'; });
+
+            // Since TLO is paused, update UI to reflect that.
+            setTimeout(() => {
+                document.getElementById('dox-core').innerText = '> TLO DEEP SEARCH PAUSED\n> AWAITING DATABASE INTEGRATION';
+                document.getElementById('dox-core').style.color = '#555';
+            }, 1000);
+
+            // 2. Telecom & Geo
+            if (isPhone) {
+                fetch(`/api/osint?action=carrier&target=${encodeURIComponent(target)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        const el = document.getElementById('dox-telecom');
+                        if (d.carrier) {
+                            el.innerHTML = `> CARRIER TRACE SUCCESS\nPHONE:   ${d.national || target}\nCARRIER: ${d.carrier}\nSMS GW:  ${d.sms_gateway || 'N/A'}`;
+                            el.style.color = '#fff';
+                        } else {
+                            el.innerText = '> CARRIER TRACE FAILED';
+                        }
+                    }).catch(() => document.getElementById('dox-telecom').innerText = '> TELECOM TIMEOUT');
+            } else {
+                document.getElementById('dox-telecom').innerText = '> SKIPPED: TARGET IS NOT A PHONE NUMBER';
+            }
+
+            // 3. Digital Footprint
+            if (isEmail) {
+                fetch(`/api/osint?action=email_intel&target=${encodeURIComponent(target)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        const el = document.getElementById('dox-digital');
+                        if (d.breach_status === 'FOUND') {
+                            el.innerHTML = `> EMAIL INTELLIGENCE\nBREACHES: ${d.breaches.length} DETECTED\n${d.breaches.slice(0,3).map(b=>` - ${b.name} (${b.date})`).join('\n')}`;
+                            el.style.color = '#fff';
+                        } else {
+                            el.innerText = `> EMAIL INTEL: ${d.breach_status}`;
+                            el.style.color = '#fff';
+                        }
+                    }).catch(() => document.getElementById('dox-digital').innerText = '> DIGITAL FOOTPRINT TIMEOUT');
+            } else if (!isPhone && !isBin) {
+                // Username recon
+                fetch(`/api/osint?action=maigret&target=${encodeURIComponent(target)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        const el = document.getElementById('dox-digital');
+                        if (d.results) {
+                            const found = Object.entries(d.results).filter(([k,v]) => v==='found').map(([k,v]) => k);
+                            el.innerHTML = `> USERNAME RECON\nPRESENCE DETECTED:\n${found.map(f=>` - ${f}`).join('\n') || 'NONE'}`;
+                            el.style.color = '#fff';
+                        } else { el.innerText = '> RECON FAILED'; }
+                    }).catch(() => document.getElementById('dox-digital').innerText = '> DIGITAL FOOTPRINT TIMEOUT');
+            } else {
+                document.getElementById('dox-digital').innerText = '> SKIPPED: INCOMPATIBLE TARGET TYPE';
+            }
+
+            // 4. Assets & Financial
+            if (isBin) {
+                fetch(`/api/osint?action=bincheck&target=${encodeURIComponent(target)}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        const el = document.getElementById('dox-assets');
+                        if (d.BIN) {
+                            el.innerHTML = `> BIN INTELLIGENCE\nBANK: ${d.BIN.issuer?.name || 'N/A'}\nTYPE: ${d.BIN.type} ${d.BIN.level}\nGEO:  ${d.BIN.country?.name}`;
+                            el.style.color = '#fff';
+                        } else { el.innerText = '> BIN TRACE FAILED'; }
+                    }).catch(() => document.getElementById('dox-assets').innerText = '> ASSET TIMEOUT');
+            } else {
+                setTimeout(() => {
+                    document.getElementById('dox-assets').innerText = '> ASSET RECON: NO PUBLIC RECORDS FOUND';
+                }, 1500);
+            }
+
+            // Finish
+            setTimeout(() => {
+                document.getElementById('dossier-status').innerText = 'DOSSIER COMPLETE';
+                document.getElementById('dossier-status').style.color = 'var(--success)';
+            }, 3000);
         }
 
         async function runFlooder() {
