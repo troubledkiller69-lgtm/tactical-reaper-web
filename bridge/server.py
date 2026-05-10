@@ -189,13 +189,18 @@ def generate_tts(text, voice_id, output_path):
     if not ELEVENLABS_KEY:
         # Fallback: use espeak
         try:
-            subprocess.run([
+            print("Using espeak fallback...")
+            res = subprocess.run([
                 "espeak", "-w", output_path, text
-            ], timeout=30)
+            ], timeout=30, capture_output=True, text=True)
+            if res.returncode != 0:
+                print(f"espeak failed: {res.stderr}")
+                return False
             # Convert to 8kHz mono for Asterisk
             convert_audio(output_path)
             return True
-        except:
+        except Exception as e:
+            print(f"espeak exception: {e}")
             return False
 
     try:
@@ -243,12 +248,14 @@ def convert_audio(path):
     """Convert any audio to Asterisk-compatible WAV"""
     tmp = path + ".tmp.wav"
     try:
-        subprocess.run([
+        res = subprocess.run([
             "sox", path, "-r", "8000", "-c", "1", "-b", "16", tmp
-        ], timeout=30)
+        ], timeout=30, capture_output=True, text=True)
+        if res.returncode != 0:
+            print(f"sox failed: {res.stderr}")
         os.replace(tmp, path)
-    except:
-        pass
+    except Exception as e:
+        print(f"sox exception: {e}")
 
 
 if __name__ == "__main__":
