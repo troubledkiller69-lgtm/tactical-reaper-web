@@ -207,7 +207,7 @@ def generate_tts(text, voice_id, output_path):
         }
         payload = {
             "text": text,
-            "model_id": "eleven_monolingual_v1",
+            "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.6,
                 "similarity_boost": 0.75
