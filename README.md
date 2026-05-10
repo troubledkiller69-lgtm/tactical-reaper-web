@@ -50,6 +50,7 @@ Administrative access is secured via `ADMIN_KEY` giving access to the hidden Com
 - **Permissions Lockdown:** Corrected spool ownership (`chown -R root:root`) and syntax errors in `pjsip.conf` (e.g., shifting from `password` to `userpass`) to achieve instantaneous call routing.
 
 ## 📝 Current Plans & Future Infrastructure
+- **TLO/Deep Search Engine:** The holy grail of the platform. A dedicated module (or Discord bot extension) capable of full identity resolution—pulling SSNs, DOBs, and comprehensive address histories. This will require integrating specialized underground APIs or aggregating massive breach/credit-header datasets.
 - **Decentralized SMTP Relay Network:** Since the Brevo account suspension, we need to rebuild the Email Flood tool. The plan is to implement a rotating SMTP relay system using compromised webmails or bulletproof offshore hosts.
 - **Automated OSINT Aggregator:** A new dashboard module where an operator inputs a single identifier (username, email, phone) and BIFROST cross-references it against our static datasets, generating a unified dossier.
 - **Interactive Threat Map:** Integrating a D3.js or Mapbox component into the main dashboard, themed in "Black Ice," to visualize live OSINT hits, active proxies, and operational targets on a global scale.
